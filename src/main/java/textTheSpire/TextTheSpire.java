@@ -40,6 +40,7 @@ import java.util.ArrayList;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
+    //Used to only update display every number of update cycles
     int iter;
 
     private Window hand;
@@ -51,6 +52,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Window relic;
     private Window map;
 
+    //Used for input
     private JFrame prompt;
     private JTextField promptFrame;
 
@@ -71,11 +73,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         discard = new Window("Discard",300,300);
         deck = new Window("Deck",300,300);
         player = new Window("Player",300,300);
-        monster = new Window("Monster", 500, 300);
+        monster = new Window("Monster", 400, 600);
         event = new Window("Event", 300, 300);
         relic = new Window("Relic",300,300);
         map = new Window("Map", 550, 425);
 
+        //Setup prompt
         prompt = new JFrame("Prompt");
         prompt.setResizable(true);
         prompt.setSize(300, 100);
@@ -101,11 +104,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         new TextTheSpire();
     }
 
+    //Queues input for correct timing
     public void queueInput(String input){
         queuedCommand = input;
         hasQueuedCommand = true;
     }
 
+    //Correct timing to execute commands
     @Override
     public void receivePreUpdate() {
         if (hasQueuedCommand) {
@@ -114,12 +119,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
     }
 
+    //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input){
 
+        //Quit command
         if(input.equals("quit")){
             Gdx.app.exit();
         }
 
+        //Continue command. Only usable when not in dungeon and save file exists
         if(!CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")){
 
             CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.NONE;
@@ -141,6 +149,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         AbstractDungeon d = CardCrawlGame.dungeon;
         String[] tokens = input.split("\\s+");
 
+        //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
                 CommandExecutor.executeCommand(input);
@@ -157,9 +166,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
+        //Commands below are only usable in a dungeon
         if(!CommandExecutor.isInDungeon())
             return;
 
+        //Potion Command. If out of combat can only discard
         if (tokens[0].equals("potion")) {
             try {
                 CommandExecutor.executeCommand(input);
@@ -169,6 +180,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
+        //Press a confirm or cancel button. Only usable if such a button exists
         if (ChoiceScreenUtils.isConfirmButtonAvailable() && input.equals(ChoiceScreenUtils.getConfirmButtonText())) {
             ChoiceScreenUtils.pressConfirmButton();
             return;
@@ -178,6 +190,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        //Commands only usable during combat. Includes play and end.
         if (d != null && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
             input = input.toLowerCase();
 
@@ -195,6 +208,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 }
             }
         } else {
+            //Everything else is a choice screen command. Only a number is needed.
             int in;
             try {
                 in = Integer.parseInt(input) - 1;
@@ -206,6 +220,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
+    //Update displays every 30 update cycles
     @Override
     public void receivePostUpdate() {
 
@@ -231,12 +246,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updateMap(){
 
+        //Is only displayed when on map screen
         if(CommandExecutor.isInDungeon() && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP) {
 
             String s = "";
             ArrayList<ArrayList<MapRoomNode>> m = AbstractDungeon.map;
+            //Current position
             s += "Current= Floor:" + (AbstractDungeon.currMapNode.y+1) + " X:" + AbstractDungeon.currMapNode.x + "\r\n";
 
+            //Either display all nodes.
             if(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
                 for (int i = m.size() - 1; i >= (AbstractDungeon.currMapNode.y + 1); i--) {
 
@@ -266,6 +284,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 }
             }else{
 
+                //Or only display ones reachable from current node
                 String limitedMap = "";
                 String limitedFloor;
                 String limitedNode;
@@ -321,6 +340,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             checkedSave = false;
 
+            //If in combat check if choices exists, otherwise remove window
             if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
                 int count = 1;
@@ -340,6 +360,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             }else{
 
+                //If not in combat, check and display choices
                 AbstractDungeon d = CardCrawlGame.dungeon;
 
                 int count = 1;
@@ -351,6 +372,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     s += ChoiceScreenUtils.getCancelButtonText() + "\r\n";
                 }
 
+                //Event choices
                 if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.EVENT) {
 
                     s += d.getCurrRoom().event.getClass().getSimpleName() + "\r\n";
@@ -367,8 +389,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                         }
                     }
 
+
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
 
+                    //Shop screen. Makes sure prices are shown
                     for (String c : priceShopScreenChoices()) {
                         s += count + ":" + c + " ";
                         count++;
@@ -376,11 +400,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
                 }else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
 
+                    //Also shows current position
                     if(AbstractDungeon.firstRoomChosen)
                         s += "Floor:" + (AbstractDungeon.currMapNode.y + 1) + " X:" + AbstractDungeon.currMapNode.x + "\r\n";
                     else
                         s+= "Floor:0\r\n";
 
+                    //Displays node type and xPos for each choice
                     for(MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()){
                         s += count + ":";
                         s += nodeType(n) + n.x + "\r\n";
@@ -389,6 +415,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
 
                 }else{
+                    //Catch all for all remaining choices. They are usually displayed in a list with numbers a simple name
                     for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
                         s += count + ":" + c + " ";
                         count++;
@@ -402,6 +429,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         }else{
 
+            //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(!checkedSave) {
                 if (CardCrawlGame.characterManager.anySaveFileExists()) {
                     s += "restart [class] [ascension] [seed]\r\n";
@@ -428,6 +456,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
+    /*
+    Params:
+        n - any MapRoomNode
+    Returns:
+        A String representing the type of node n is
+     */
     public String nodeType(MapRoomNode n){
         if(n.getRoom() instanceof MonsterRoomElite){
             if(n.hasEmeraldKey)
@@ -447,6 +481,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
     }
 
+    //Returns a list of all shop items with prices
     public static ArrayList<String> priceShopScreenChoices(){
         ArrayList<String> choices = new ArrayList<>();
         ArrayList<Object> shopItems = getAvailableShopItems();
@@ -464,6 +499,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         return choices;
     }
 
+    /*
+    Gets a list of all shop items.
+    Copied from CommunicationMod
+     */
     private static ArrayList<Object> getAvailableShopItems() {
         ArrayList<Object> choices = new ArrayList<>();
         ShopScreen screen = AbstractDungeon.shopScreen;
@@ -488,6 +527,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         return choices;
     }
 
+    /*
+    Params:
+        input - an Event choice
+    Returns:
+        A String with color mods removed from input
+     */
     public String stripColor(String input) {
         input = input.replace("#r", "");
         input = input.replace("#g", "");
@@ -498,11 +543,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updateHand(){
 
+        //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             hand.invisible();
             return;
         }
 
+        //If in combat
         if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
             CardGroup h = CardCrawlGame.dungeon.player.hand;
@@ -534,10 +581,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             hand.visible();
 
         }else{
+            //If not in combat
             hand.invisible();
         }
     }
 
+    /*
+    Params:
+        c - Any card in your hand
+    Returns:
+        Current cost of c
+     */
     public int handCost(AbstractCard c){
         if (c.freeToPlay()) {
             return 0;
@@ -548,11 +602,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updateMonsters(){
 
+        //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             monster.invisible();
             return;
         }
 
+        //If in combat
         if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
             String s = "";
@@ -587,10 +643,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             monster.visible();
 
         }else{
+            //If not in combat
             monster.invisible();
         }
     }
 
+    /*
+    Params:
+        m - any Monster on the field
+    Returns:
+        String containing m's intent
+     */
     public String monsterIntent(AbstractMonster m){
 
         AbstractMonster.Intent i = m.intent;
@@ -649,6 +712,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
     }
 
+    /*
+    Params:
+        m - Monster on field
+    Returns:
+        The number of hits in m's intent
+     */
     public int getMulti(AbstractMonster m){
 
         return (int) basemod.ReflectionHacks.getPrivate(m, AbstractMonster.class, "intentMultiAmt");
@@ -657,11 +726,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updateDiscard(){
 
+        //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             discard.invisible();
             return;
         }
 
+        //In combat
         if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
             CardGroup h = CardCrawlGame.dungeon.player.discardPile;
@@ -680,17 +751,20 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             discard.visible();
 
         }else{
+            //Not in combat
             discard.invisible();
         }
     }
 
     public void updateDeck(){
 
+        //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             deck.invisible();
             return;
         }
 
+        //Show remaining deck in combat
         if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
             CardGroup h = CardCrawlGame.dungeon.player.drawPile;
@@ -709,6 +783,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             deck.visible();
 
         }else{
+            //Show master deck out of combat
             CardGroup h = CardCrawlGame.dungeon.player.masterDeck;
             String s = "";
 
@@ -728,6 +803,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updatePlayer(){
 
+        //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             player.invisible();
             return;
@@ -736,12 +812,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         AbstractPlayer p = CardCrawlGame.dungeon.player;
         String s = "";
 
+        //In combat show all player stats
         if(CardCrawlGame.dungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
             s += "Block: " + p.currentBlock + " ";
             s += "Health: " + p.currentHealth + "/" + p.maxHealth + "\r\n";
             s += "Energy: " + EnergyPanel.totalCount + "\r\n";
 
+            //Display orbs if Defect
             if (p.chosenClass == AbstractPlayer.PlayerClass.DEFECT) {
                 ArrayList<AbstractOrb> ol = p.orbs;
                 for (AbstractOrb o : ol) {
@@ -760,16 +838,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 s += "\r\n";
             }
 
+            //If not neutral stance display it
             if (!(p.stance instanceof NeutralStance)) {
                 s += "Stance: " + p.stance.name + "\r\n";
             }
 
         }else{
 
+            //Out of combat show persistent stats
             s += "Health: " + p.currentHealth + "/" + p.maxHealth + "\r\n";
 
             s+= "Gold:" + p.gold + "\r\n";
 
+            //Hand window is gone so show potions in player out of combat
             ArrayList<AbstractPotion> pl = p.potions;
 
             if (pl.size() > 0) {
@@ -788,11 +869,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void updateRelic(){
 
+        //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             relic.invisible();
             return;
         }
 
+        //Display all relics when in dungeon
         ArrayList<AbstractRelic> relics = CardCrawlGame.dungeon.player.relics;
         String s = "";
 
@@ -814,6 +897,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
+    //Match and Keep can go die in a hole
     public void specialUpdates(){
 
         if(AbstractDungeon.shrineList.contains("Match and Keep!"))

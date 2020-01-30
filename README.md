@@ -43,4 +43,6 @@ play [hand pos] [monster pos] - Plays the card at hand pos targeting monster pos
 
 potion [use/discard] [potion slot] [monster pos] - Uses or discards the potion are potion slot targeting monster pos. The pos can be found in the Hand and Monster windows.
 
+end - Ends your turn during combat.
+
 All other commands can be found in the Event screen. Choices with a number are chosen by inputting the number while commands like "continue" you enter "continue".
