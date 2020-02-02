@@ -1,38 +1,49 @@
 package textTheSpire;
 
-import javax.swing.*;
-
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.*;
 
 public class Window {
 
-    public JFrame f;
-    public JTextArea t;
+    Display display;
+    Shell shell;
+    Text label;
 
     public Window(String header, int w, int h){
-        f = new JFrame(header);
-        f.setResizable(true);
-        f.setSize(w, h);
-        f.setLocation(200,400);
-        t = new JTextArea("");
-        t.setEditable(false);
-        t.setLineWrap(true);
-        t.setSize(w, h);
-        f.add(t);
-        f.setVisible(false);
+        display = new Display();
+        shell = new Shell(display);
+        shell.setSize(w,h);
+        shell.setLocation(200,400);
+        setText(header);
+        label = new Text(shell, SWT.NONE);
+
     }
 
     public void setText(String s){
-        t.setText(s);
-        t.repaint();
+        if(!s.equals(label.getText())) {
+
+            label.getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if(!label.isDisposed()){
+                        label.setText(s);
+                    }
+                }
+            });
+        }
     }
 
     public void visible(){
-        if(!f.isVisible())
-            f.setVisible(true);
+        if(!shell.isVisible())
+            shell.open();
     }
     public void invisible(){
-        if(f.isVisible())
-            f.setVisible(false);
+        if(shell.isVisible())
+            shell.close();
+    }
+
+    public void dispose(){
+        display.dispose();
     }
 
 }

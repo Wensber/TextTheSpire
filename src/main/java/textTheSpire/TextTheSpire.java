@@ -122,8 +122,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input){
 
-        //Quit command
+        //Dispose of windows and then exit
         if(input.equals("quit")){
+
+            hand.dispose();
+            discard.dispose();
+            deck.dispose();
+            player.dispose();
+            monster.dispose();
+            event.dispose();
+            relic.dispose();
+            map.dispose();
+
             Gdx.app.exit();
         }
 

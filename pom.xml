@@ -22,6 +22,13 @@
         <Steam.path>C:/Program Files (x86)/Steam/steamapps</Steam.path>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>swt-repo</id>
+            <url>https://raw.githubusercontent.com/maven-eclipse/swt-repo/master/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.megacrit.cardcrawl</groupId>
@@ -51,6 +58,13 @@
             <scope>system</scope>
             <systemPath>${Steam.path}/common/SlayTheSpire/mods/CommunicationMod.jar</systemPath>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+            <version>4.4</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -62,18 +76,10 @@
                 <version>2.4.2</version>
                 <executions>
                     <execution>
-                        <id>TextTheSpire</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <filters>
-                                <filter>
-                                    <artifact>TextTheSpire</artifact>
-                                </filter>
-                            </filters>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -87,7 +93,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy file="target/TextTheSpire.jar" tofile="C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
+                                <copy file="target/TextTheSpire.jar" tofile="${basedir}/../../_ModTheSpire${project.artifactId}.jar"/>
                             </target>
                         </configuration>
                         <goals>
