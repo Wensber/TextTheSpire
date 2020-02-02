@@ -43,6 +43,7 @@ public class Window {
     }
 
     public void dispose(){
+        label.dispose();
         display.dispose();
     }
 

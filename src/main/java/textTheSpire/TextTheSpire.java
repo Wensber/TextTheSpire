@@ -119,20 +119,24 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
     }
 
+    public void dispose(){
+        hand.dispose();
+        discard.dispose();
+        deck.dispose();
+        player.dispose();
+        monster.dispose();
+        event.dispose();
+        relic.dispose();
+        map.dispose();
+    }
+
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input){
 
         //Dispose of windows and then exit
         if(input.equals("quit")){
 
-            hand.dispose();
-            discard.dispose();
-            deck.dispose();
-            player.dispose();
-            monster.dispose();
-            event.dispose();
-            relic.dispose();
-            map.dispose();
+            dispose();
 
             Gdx.app.exit();
         }
