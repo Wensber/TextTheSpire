@@ -1,50 +1,58 @@
 package textTheSpire;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+import org.lwjgl.Sys;
 
 public class Window {
 
-    Display display;
     Shell shell;
-    Text label;
+    Label label;
 
-    public Window(String header, int w, int h){
-        display = new Display();
-        shell = new Shell(display);
+    public Window(Display d, String header, int w, int h){
+        shell = new Shell(d);
         shell.setSize(w,h);
         shell.setLocation(200,400);
-        setText(header);
-        label = new Text(shell, SWT.NONE);
+        shell.setText(header);
+        label = new Label(shell, SWT.NONE);
+        shell.setVisible(true);
+        shell.open();
 
     }
 
     public void setText(String s){
-        if(!s.equals(label.getText())) {
-
-            label.getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    if(!label.isDisposed()){
-                        label.setText(s);
-                    }
+        label.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if(!label.isDisposed() && !s.equals(label.getText())) {
+                    label.setText(s);
+                    System.out.println("Set Text: " + s);
                 }
-            });
-        }
+            }
+        });
+
     }
 
-    public void visible(){
-        if(!shell.isVisible())
-            shell.open();
+    /*public void visible(){
+        shell.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if(!shell.isDisposed()){
+                    shell.setVisible(true);
+                }
+            }
+        });
     }
     public void invisible(){
-        if(shell.isVisible())
-            shell.close();
-    }
-
-    public void dispose(){
-        label.dispose();
-        display.dispose();
-    }
+        shell.getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                if(!shell.isDisposed()){
+                    shell.setVisible(false);
+                }
+            }
+        });
+    }*/
 
 }
