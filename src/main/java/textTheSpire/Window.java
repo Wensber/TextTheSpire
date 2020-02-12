@@ -15,8 +15,9 @@ public class Window {
         shell.setSize(w,h);
         shell.setLocation(200,400);
         shell.setText(header);
-        label = new Text(shell, SWT.NONE);
-        label.setText("Unchanged");
+        label = new Text(shell, SWT.WRAP | SWT.MULTI);
+        label.setSize(w,h);
+        label.setEditable(false);
         shell.setVisible(true);
         shell.open();
 
@@ -34,25 +35,16 @@ public class Window {
 
     }
 
-    /*public void visible(){
+    public void setVisible(boolean b){
         shell.getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
                 if(!shell.isDisposed()){
-                    shell.setVisible(true);
+                    shell.setVisible(b);
                 }
             }
         });
     }
-    public void invisible(){
-        shell.getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                if(!shell.isDisposed()){
-                    shell.setVisible(false);
-                }
-            }
-        });
-    }*/
+
 
 }

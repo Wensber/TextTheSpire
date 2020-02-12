@@ -28,6 +28,7 @@ public class Relic {
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             relic.setText(s.toString());
+            relic.setVisible(false);
             return;
         }
 
@@ -45,6 +46,7 @@ public class Relic {
         s = new StringBuilder(s.substring(0, s.length() - 2));
 
         relic.setText(s.toString());
+        relic.setVisible(true);
 
     }
 

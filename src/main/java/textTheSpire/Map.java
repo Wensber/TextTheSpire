@@ -105,9 +105,11 @@ public class Map {
             }
 
             map.setText(s.toString());
+            map.setVisible(true);
 
         }else{
             map.setText(s.toString());
+            map.setVisible(false);
         }
     }
 

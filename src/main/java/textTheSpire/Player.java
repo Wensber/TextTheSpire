@@ -33,6 +33,7 @@ public class Player {
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             player.setText(s.toString());
+            player.setVisible(false);
             return;
         }
 
@@ -89,6 +90,7 @@ public class Player {
         }
 
         player.setText(s.toString());
+        player.setVisible(true);
 
     }
 

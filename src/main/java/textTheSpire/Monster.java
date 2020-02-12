@@ -33,6 +33,7 @@ public class Monster {
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             monster.setText(s.toString());
+            monster.setVisible(false);
             return;
         }
 
@@ -68,10 +69,12 @@ public class Monster {
             }
 
             monster.setText(s.toString());
+            monster.setVisible(true);
 
         }else{
             //If not in combat
             monster.setText(s.toString());
+            monster.setVisible(false);
         }
     }
 

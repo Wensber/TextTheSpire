@@ -32,6 +32,7 @@ public class Hand {
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             hand.setText(s.toString());
+            hand.setVisible(false);
             return;
         }
 
@@ -64,10 +65,12 @@ public class Hand {
             }
 
             hand.setText(s.toString());
+            hand.setVisible(true);
 
         }else{
             //If not in combat
             hand.setText(s.toString());
+            hand.setVisible(false);
         }
     }
 

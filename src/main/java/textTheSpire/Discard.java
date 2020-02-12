@@ -28,6 +28,7 @@ public class Discard {
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             discard.setText(s.toString());
+            discard.setVisible(false);
             return;
         }
 
@@ -47,10 +48,12 @@ public class Discard {
             }
 
             discard.setText(s.toString());
+            discard.setVisible(true);
 
         }else{
             //Not in combat
             discard.setText(s.toString());
+            discard.setVisible(false);
         }
     }
 

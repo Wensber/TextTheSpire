@@ -28,6 +28,7 @@ public class Deck {
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
             deck.setText(s.toString());
+            deck.setVisible(false);
             return;
         }
 
@@ -46,6 +47,7 @@ public class Deck {
             }
 
             deck.setText(s.toString());
+            deck.setVisible(true);
 
         }else{
             //Show master deck out of combat
@@ -61,6 +63,7 @@ public class Deck {
             }
 
             deck.setText(s.toString());
+            deck.setVisible(true);
         }
     }
 
