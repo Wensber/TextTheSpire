@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
@@ -16,6 +17,11 @@ public class Relic {
     }
 
     public void update(){
+
+        if(relic.shell.isDisposed()){
+            Display.getDefault().dispose();
+            Gdx.app.exit();
+        }
 
         StringBuilder s = new StringBuilder();
 

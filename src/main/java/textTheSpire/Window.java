@@ -8,14 +8,15 @@ import org.lwjgl.Sys;
 public class Window {
 
     Shell shell;
-    Label label;
+    Text label;
 
     public Window(Display d, String header, int w, int h){
         shell = new Shell(d);
         shell.setSize(w,h);
         shell.setLocation(200,400);
         shell.setText(header);
-        label = new Label(shell, SWT.NONE);
+        label = new Text(shell, SWT.NONE);
+        label.setText("Unchanged");
         shell.setVisible(true);
         shell.open();
 
@@ -25,9 +26,8 @@ public class Window {
         label.getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
-                if(!label.isDisposed() && !s.equals(label.getText())) {
+                if(!label.isDisposed() && !shell.isDisposed() && !s.equals(label.getText())) {
                     label.setText(s);
-                    System.out.println("Set Text: " + s);
                 }
             }
         });

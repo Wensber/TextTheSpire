@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
@@ -16,6 +17,11 @@ public class Deck {
     }
 
     public void update(){
+
+        if(deck.shell.isDisposed()){
+            Display.getDefault().dispose();
+            Gdx.app.exit();
+        }
 
         StringBuilder s = new StringBuilder();
 

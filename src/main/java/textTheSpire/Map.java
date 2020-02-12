@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rooms.*;
@@ -18,6 +19,11 @@ public class Map {
     }
 
     public void update(){
+
+        if(map.shell.isDisposed()){
+            Display.getDefault().dispose();
+            Gdx.app.exit();
+        }
 
         StringBuilder s = new StringBuilder();
 

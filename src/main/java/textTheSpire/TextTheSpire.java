@@ -56,28 +56,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             player = new Player(display);
 
             while(!display.isDisposed()){
-                while(display.readAndDispatch()){
-                    System.out.println("Read and Dispatched");
+                if(!display.readAndDispatch()){
+                    display.sleep();
                 }
-
-                if(iter < 50){
-                    iter++;
-                    return;
-                }
-                iter = 0;
-
-                System.out.println("Update");
-
-                deck.update();
-                discard.update();
-                hand.update();
-                monster.update();
-                player.update();
-                relic.update();
-                map.update();
-                event.update();
-
-                specialUpdates();
             }
         });
 
@@ -232,27 +213,29 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     @Override
     public void receivePostUpdate() {
 
-        /*
+
         if(iter < 30){
             iter++;
             return;
         }
         iter = 0;
 
+        if(player == null)
+            return;
 
-        updateDeck();
-        updateDiscard();
-        updateHand();
-        updateMonsters();
-        updatePlayer();
-        updateRelic();
-        updateMap();
 
-        updateEvent();
+        deck.update();
+        discard.update();
+        hand.update();
+        monster.update();
+        player.update();
+        relic.update();
+        map.update();
+        event.update();
 
         specialUpdates();
 
-         */
+
 
     }
 

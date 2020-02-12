@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -21,6 +22,11 @@ public class Monster {
     }
 
     public void update(){
+
+        if(monster.shell.isDisposed()){
+            Display.getDefault().dispose();
+            Gdx.app.exit();
+        }
 
         StringBuilder s = new StringBuilder();
 
