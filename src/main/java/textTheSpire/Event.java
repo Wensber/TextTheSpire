@@ -46,6 +46,13 @@ public class Event {
             //If in combat check if choices exists, otherwise remove window
             if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
+                if (ChoiceScreenUtils.isConfirmButtonAvailable()) {
+                    s.append(ChoiceScreenUtils.getConfirmButtonText()).append("\r\n");
+                }
+                if (ChoiceScreenUtils.isCancelButtonAvailable()) {
+                    s.append(ChoiceScreenUtils.getCancelButtonText()).append("\r\n");
+                }
+
                 int count = 1;
                 for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
 
