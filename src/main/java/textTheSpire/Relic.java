@@ -35,15 +35,14 @@ public class Relic {
         //Display all relics when in dungeon
         ArrayList<AbstractRelic> relics = AbstractDungeon.player.relics;
 
-        for(AbstractRelic r : relics){
-
+        for(int i=relics.size()-1; i>=0; i--){
+            AbstractRelic r = relics.get(i);
             if(r.counter != -1){
-                s.append(r.name).append(":").append(r.counter).append(", ");
+                s.append(r.name).append(":").append(r.counter).append("\r\n");
             }else{
-                s.append(r.name).append(", ");
+                s.append(r.name).append("\r\n");
             }
         }
-        s = new StringBuilder(s.substring(0, s.length() - 2));
 
         relic.setText(s.toString());
         relic.setVisible(true);

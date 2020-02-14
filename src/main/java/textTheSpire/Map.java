@@ -38,23 +38,22 @@ public class Map {
             if(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
                 for (int i = m.size() - 1; i >= (AbstractDungeon.currMapNode.y + 1); i--) {
 
-                    s.append("Floor:").append(i + 1).append(" ");
+                    s.append("Floor:").append(i + 1).append("\r\n");
                     for (MapRoomNode n : m.get(i)) {
 
                         if (n.hasEdges()) {
                             if (i > 0) {
 
-                                s.append(nodeType(n)).append(n.x).append("{");
+                                s.append(nodeType(n)).append(n.x).append(" Connected ");
                                 for (MapRoomNode child : m.get(i - 1)) {
                                     if (child.hasEdges() && child.isConnectedTo(n)) {
-                                        s.append(child.x).append(",");
+                                        s.append(child.x).append(" ");
                                     }
                                 }
-                                s = new StringBuilder(s.substring(0, s.length() - 1));
-                                s.append("} ");
+                                s. append("\r\n");
 
                             } else {
-                                s.append(nodeType(n)).append(n.x).append(" ");
+                                s.append(nodeType(n)).append(n.x).append("\r\n");
                             }
                         }
 
@@ -75,18 +74,18 @@ public class Map {
                 prev.add(AbstractDungeon.currMapNode);
 
                 for(int i=(AbstractDungeon.currMapNode.y + 1);i<m.size();i++ ){
-                    limitedFloor = new StringBuilder("Floor:" + (i + 1) + " ");
+                    limitedFloor = new StringBuilder("Floor:" + (i + 1) + "\r\n");
 
                     for(MapRoomNode n : m.get(i)){
                         limitedNode = new StringBuilder();
 
                         for (MapRoomNode child : prev) {
                             if (child.isConnectedTo(n)) {
-                                limitedNode.append(child.x).append(",");
+                                limitedNode.append(child.x).append(" ");
                             }
                         }
                         if(limitedNode.length() > 0) {
-                            limitedNode = new StringBuilder(nodeType(n) + n.x + "{" + limitedNode.substring(0, limitedNode.length() - 1) + "} ");
+                            limitedNode = new StringBuilder(nodeType(n) + n.x + " Connected " + limitedNode.substring(0, limitedNode.length() - 1) + "\r\n");
                             limitedFloor.append(limitedNode);
                             current.add(n);
                         }
@@ -96,7 +95,7 @@ public class Map {
                     prev.clear();
                     prev.addAll(current);
                     current.clear();
-                    limitedMap.insert(0, limitedFloor + "\r\n");
+                    limitedMap.insert(0, limitedFloor);
 
                 }
 
@@ -122,19 +121,19 @@ public class Map {
      public static String nodeType(MapRoomNode n){
         if(n.getRoom() instanceof MonsterRoomElite){
             if(n.hasEmeraldKey)
-                return "EK-";
+                return "Emerald Key ";
             else
-                return "E-";
+                return "Elite ";
         }else if(n.getRoom() instanceof MonsterRoom){
-            return "M-";
+            return "Monster ";
         }else if(n.getRoom() instanceof RestRoom){
-            return "R-";
+            return "Rest ";
         }else if(n.getRoom() instanceof ShopRoom){
-            return "S-";
+            return "Shop ";
         }else if(n.getRoom() instanceof TreasureRoom){
-            return "T-";
+            return "Treasure ";
         }else{
-            return "U-";
+            return "Unknown ";
         }
     }
 

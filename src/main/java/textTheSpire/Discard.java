@@ -42,9 +42,8 @@ public class Discard {
 
             if(h.size() > 0) {
                 for (AbstractCard c : h.group) {
-                    s.append(c.name).append(", ");
+                    s.append(c.name).append("\r\n");
                 }
-                s = new StringBuilder(s.substring(0, s.length() - 2));
             }
 
             discard.setText(s.toString());

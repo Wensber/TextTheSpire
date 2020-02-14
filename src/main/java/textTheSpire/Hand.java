@@ -43,25 +43,18 @@ public class Hand {
 
             int count = 1;
             for(AbstractCard c : h.group){
-                s.append(count).append(":").append(c.name).append("-").append(handCost(c)).append(", ");
+                s.append(count).append(":").append(c.name).append("-").append(handCost(c)).append("\r\n");
                 count++;
             }
-            if(count > 1)
-                s = new StringBuilder(s.substring(0, s.length() - 2));
-
-            s.append("\r\n");
 
             ArrayList<AbstractPotion> pl = AbstractDungeon.player.potions;
             count = 0;
             if (pl.size() > 0) {
                 s.append("Potions: ");
                 for (AbstractPotion po : pl) {
-                    s.append(count).append(":").append(po.name).append(", ");
+                    s.append(count).append(":").append(po.name).append("\r\n");
                     count++;
                 }
-                if(count > 0)
-                    s = new StringBuilder(s.substring(0, s.length() - 2));
-                s.append("\r\n");
             }
 
             hand.setText(s.toString());

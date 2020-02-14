@@ -16,6 +16,7 @@ public class Monster {
 
     public Window monster;
     public boolean haveRunic = false;
+    public int totalDmg = 0;
 
     public Monster(Display display){
         monster = new Window(display,"Monster", 400, 600);
@@ -40,14 +41,18 @@ public class Monster {
         //If in combat
         if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
-
             int count = 0;
+            int totalAlive = 0;
+            totalDmg = 0;
 
             for(AbstractMonster m : AbstractDungeon.getCurrRoom().monsters.monsters){
 
                 if(m.currentHealth > 0) {
+
+                    totalAlive++;
+
                     s.append(count).append(": ").append(m.name).append("\r\n");
-                    s.append("Block: ").append(m.currentBlock).append(" ");
+                    s.append("Block: ").append(m.currentBlock).append("\r\n");
                     s.append("HP: ").append(m.currentHealth).append("/").append(m.maxHealth).append("\r\n");
 
                     if (!haveRunic && !runicDome())
@@ -55,18 +60,17 @@ public class Monster {
 
                     ArrayList<AbstractPower> p = m.powers;
                     if(p.size() > 0) {
-                        s.append("Powers: ");
+                        s.append("Powers:\r\n");
                         for (AbstractPower ap : p) {
-                            s.append(ap.name).append("-").append(ap.amount).append(", ");
+                            s.append(ap.name).append(" ").append(ap.amount).append("\r\n");
                         }
-                        s = new StringBuilder(s.substring(0, s.length() - 2));
                     }
-
-                    s.append("\r\n\r\n");
                 }
                 count++;
 
             }
+
+            s.insert(0, "Count: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
 
             monster.setText(s.toString());
             monster.setVisible(true);
@@ -103,28 +107,40 @@ public class Monster {
 
         if (i == AbstractMonster.Intent.ATTACK) {
             multi = getMulti(m);
-            if(multi > 1)
-                return "Intent: Attack " + m.getIntentDmg() + "x" + multi + "\r\n";
-            else
+            if(multi > 1) {
+                totalDmg += m.getIntentDmg() * multi;
+                return "Intent: Attack " + m.getIntentDmg() + " x " + multi + "\r\n";
+            } else {
+                totalDmg += m.getIntentDmg();
                 return "Intent: Attack " + m.getIntentDmg() + "\r\n";
+            }
         } else if (i == AbstractMonster.Intent.ATTACK_BUFF) {
             multi = getMulti(m);
-            if(multi > 1)
-                return "Intent: Attack/Buff " + m.getIntentDmg() + "x" + multi + "\r\n";
-            else
+            if(multi > 1) {
+                totalDmg += m.getIntentDmg() * multi;
+                return "Intent: Attack/Buff " + m.getIntentDmg() + " x " + multi + "\r\n";
+            } else {
+                totalDmg += m.getIntentDmg();
                 return "Intent: Attack/Buff " + m.getIntentDmg() + "\r\n";
+            }
         } else if (i == AbstractMonster.Intent.ATTACK_DEFEND) {
             multi = getMulti(m);
-            if(multi > 1)
-                return "Intent: Attack/Defend " + m.getIntentDmg() + "x" + multi + "\r\n";
-            else
+            if(multi > 1) {
+                totalDmg += m.getIntentDmg() * multi;
+                return "Intent: Attack/Defend " + m.getIntentDmg() + " x " + multi + "\r\n";
+            } else {
+                totalDmg += m.getIntentDmg();
                 return "Intent: Attack/Defend " + m.getIntentDmg() + "\r\n";
+            }
         } else if (i == AbstractMonster.Intent.ATTACK_DEBUFF) {
             multi = getMulti(m);
-            if(multi > 1)
-                return "Intent: Attack/Debuff " + m.getIntentDmg() + "x" + multi + "\r\n";
-            else
+            if(multi > 1) {
+                totalDmg += m.getIntentDmg() * multi;
+                return "Intent: Attack/Debuff " + m.getIntentDmg() + " x " + multi + "\r\n";
+            } else {
+                totalDmg += m.getIntentDmg();
                 return "Intent: Attack/Debuff " + m.getIntentDmg() + "\r\n";
+            }
         } else if (i == AbstractMonster.Intent.BUFF) {
             return "Intent: Buff" + "\r\n";
         } else if (i == AbstractMonster.Intent.DEBUFF) {

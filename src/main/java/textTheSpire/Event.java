@@ -45,15 +45,17 @@ public class Event {
                 int count = 1;
                 for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
 
-                    s.append(count).append(":").append(c).append(" ");
+                    s.append(count).append(":").append(c).append("\r\n");
                     count++;
 
                 }
 
                 if (s.length() > 0) {
                     event.setText(s.toString());
+                    event.setVisible(true);
                 } else {
                     event.setText(s.toString());
+                    event.setVisible(false);
                 }
 
             }else{
@@ -91,7 +93,7 @@ public class Event {
 
                     //Shop screen. Makes sure prices are shown
                     for (String c : priceShopScreenChoices()) {
-                        s.append(count).append(":").append(c).append(" ");
+                        s.append(count).append(":").append(c).append("\r\n");
                         count++;
                     }
 
@@ -99,7 +101,7 @@ public class Event {
 
                     //Also shows current position
                     if(AbstractDungeon.firstRoomChosen)
-                        s.append("Floor:").append(AbstractDungeon.currMapNode.y + 1).append(" X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
+                        s.append("Floor:").append(AbstractDungeon.currMapNode.y + 1).append(", X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
                     else
                         s.append("Floor:0\r\n");
 
@@ -114,12 +116,13 @@ public class Event {
                 }else{
                     //Catch all for all remaining choices. They are usually displayed in a list with numbers a simple name
                     for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
-                        s.append(count).append(":").append(c).append(" ");
+                        s.append(count).append(":").append(c).append("\r\n");
                         count++;
                     }
                 }
 
                 event.setText(s.toString());
+                event.setVisible(true);
 
             }
 
@@ -146,6 +149,7 @@ public class Event {
             }
 
             event.setText(s.toString());
+            event.setVisible(true);
 
         }
 

@@ -42,7 +42,7 @@ public class Player {
         //In combat show all player stats
         if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
-            s.append("Block: ").append(p.currentBlock).append(" ");
+            s.append("Block: ").append(p.currentBlock).append("\r\n");
             s.append("Health: ").append(p.currentHealth).append("/").append(p.maxHealth).append("\r\n");
             s.append("Energy: ").append(EnergyPanel.totalCount).append("\r\n");
 
@@ -51,15 +51,15 @@ public class Player {
                 ArrayList<AbstractOrb> ol = p.orbs;
                 for (AbstractOrb o : ol) {
                     if (o instanceof Dark) {
-                        s.append("D").append(o.evokeAmount).append(" ");
+                        s.append("Dark ").append(o.evokeAmount).append(" ");
                     } else if (o instanceof Lightning) {
-                        s.append("L ");
+                        s.append("Lightning ");
                     } else if (o instanceof Frost) {
-                        s.append("F ");
+                        s.append("Frost ");
                     } else if (o instanceof Plasma) {
-                        s.append("P ");
+                        s.append("Plasma ");
                     } else {
-                        s.append("E ");
+                        s.append("Empty ");
                     }
                 }
                 s.append("\r\n");
@@ -81,11 +81,10 @@ public class Player {
             ArrayList<AbstractPotion> pl = p.potions;
 
             if (pl.size() > 0) {
-                s.append("Potions: ");
+                s.append("Potions:\r\n");
                 for (AbstractPotion po : pl) {
-                    s.append(po.name).append(", ");
+                    s.append(po.name).append("\r\n");
                 }
-                s = new StringBuilder(s.substring(0, s.length() - 2));
             }
         }
 

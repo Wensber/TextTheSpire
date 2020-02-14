@@ -15,7 +15,7 @@ public class Window {
         shell.setSize(w,h);
         shell.setLocation(200,400);
         shell.setText(header);
-        label = new Text(shell, SWT.WRAP | SWT.MULTI);
+        label = new Text(shell, SWT.MULTI);
         label.setSize(w,h);
         label.setEditable(false);
         shell.setVisible(true);
