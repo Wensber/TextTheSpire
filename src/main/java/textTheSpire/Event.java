@@ -7,6 +7,7 @@ import com.megacrit.cardcrawl.characters.TheSilent;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.map.MapRoomNode;
+import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
@@ -115,7 +116,15 @@ public class Event {
                         count++;
                     }
 
-                }else{
+                } else if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD) {
+                    for(RewardItem reward : AbstractDungeon.combatRewardScreen.rewards) {
+                        if(reward.type == RewardItem.RewardType.POTION)
+                            s.append(count).append(":").append(reward.potion.getClass().getSimpleName()).append("\r\n");
+                        else
+                            s.append(count).append(":").append(reward.type.name().toLowerCase()).append("\r\n");
+                        count++;
+                    }
+                } else {
                     //Catch all for all remaining choices. They are usually displayed in a list with numbers a simple name
                     for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
                         s.append(count).append(":").append(c).append("\r\n");

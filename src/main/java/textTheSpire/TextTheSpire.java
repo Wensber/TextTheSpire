@@ -200,6 +200,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 } catch (Exception e) {
                     return;
                 }
+            }else{
+                int in;
+                try {
+                    in = Integer.parseInt(input) - 1;
+                    ChoiceScreenUtils.executeChoice(in);
+                } catch (Exception e) {
+                    return;
+                }
             }
         } else {
             //Everything else is a choice screen command. Only a number is needed.

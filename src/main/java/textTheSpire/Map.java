@@ -28,7 +28,7 @@ public class Map {
         StringBuilder s = new StringBuilder();
 
         //Is only displayed when on map screen
-        if(CommandExecutor.isInDungeon() && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP) {
+        if(CommandExecutor.isInDungeon() && !(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT)) {
 
             ArrayList<ArrayList<MapRoomNode>> m = AbstractDungeon.map;
             //Current position
