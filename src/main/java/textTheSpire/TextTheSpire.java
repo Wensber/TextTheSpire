@@ -6,6 +6,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import basemod.BaseMod;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
@@ -14,6 +15,7 @@ import com.megacrit.cardcrawl.helpers.ModHelper;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
+import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
@@ -142,14 +144,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                CommandExecutor.executeCommand(input);
+                if(isUnlocked(tokens))
+                    CommandExecutor.executeCommand(input);
                 return;
             } catch (Exception e) {
                 return;
             }
         }else if(tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()){
             try {
-                CommandExecutor.executeCommand(input.substring(2));
+                if(isUnlocked(tokens))
+                    CommandExecutor.executeCommand(input.substring(2));
                 return;
             } catch (Exception e) {
                 return;
@@ -208,6 +212,67 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
+    }
+
+    public boolean isUnlocked(String[] tokens){
+        String c = tokens[1].toLowerCase();
+        switch(c){
+            case "ironclad" :
+                if(tokens.length > 2){
+                    try {
+                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
+                            return false;
+                        }
+                    }catch(Exception e){
+                        return false;
+                    }
+                }
+                return true;
+            case "the_silent" :
+            case "silent" :
+                if(UnlockTracker.isCharacterLocked("The Silent")){
+                    return false;
+                }
+                if(tokens.length > 2){
+                    try {
+                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
+                            return false;
+                        }
+                    }catch(Exception e){
+                        return false;
+                    }
+                }
+                return true;
+            case "defect" :
+                if(UnlockTracker.isCharacterLocked("Defect")){
+                    return false;
+                }
+                if(tokens.length > 2){
+                    try {
+                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
+                            return false;
+                        }
+                    }catch(Exception e){
+                        return false;
+                    }
+                }
+                return true;
+            case "watcher" :
+                if(UnlockTracker.isCharacterLocked("Watcher")){
+                    return false;
+                }
+                if(tokens.length > 2){
+                    try {
+                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
+                            return false;
+                        }
+                    }catch(Exception e){
+                        return false;
+                    }
+                }
+                return true;
+        }
+        return false;
     }
 
     //Update displays every 30 update cycles

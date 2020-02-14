@@ -2,6 +2,8 @@ package textTheSpire;
 
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.characters.TheSilent;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.map.MapRoomNode;
@@ -10,6 +12,7 @@ import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
+import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
@@ -112,7 +115,6 @@ public class Event {
                         count++;
                     }
 
-
                 }else{
                     //Catch all for all remaining choices. They are usually displayed in a list with numbers a simple name
                     for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
@@ -145,6 +147,15 @@ public class Event {
                     s.append("continue\r\n");
                 } else {
                     s.append("start [class] [ascension] [seed]\r\n");
+                }
+            }
+
+            s.append("Unlocks:\r\n");
+
+            for(AbstractPlayer p : CardCrawlGame.characterManager.getAllCharacters()){
+                if(!UnlockTracker.isCharacterLocked(p.getClass().getSimpleName())){
+                    s.append(p.getClass().getSimpleName() + " ");
+                    s.append("Ascension " + p.getPrefs().getInteger("ASCENSION_LEVEL", 0) + "\r\n");
                 }
             }
 
