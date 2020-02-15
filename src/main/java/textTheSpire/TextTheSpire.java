@@ -6,6 +6,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import basemod.BaseMod;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
@@ -38,6 +39,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Event event;
     private Relic relic;
 
+    private Window inspect;
+
     private JTextField promptFrame;
 
     private String queuedCommand = "";
@@ -57,6 +60,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             discard = new Discard(display);
             relic = new Relic(display);
             player = new Player(display);
+
+            inspect = new Window(display,"Inspect" , 550, 425);
 
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
@@ -200,7 +205,39 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 } catch (Exception e) {
                     return;
                 }
-            }else{
+            } else if(tokens[0].equals("inspect")){
+                int in;
+                try {
+                    in = Integer.parseInt(tokens[1]) - 1;
+
+                    String s = "";
+
+                    if(in < 0 || in >= AbstractDungeon.player.hand.group.size())
+                        return;
+
+                    AbstractCard c = AbstractDungeon.player.hand.group.get(in);
+
+                    s += c.name + "\r\n";
+                    s += "Cost : " + Hand.handCost(c) + "\r\n";
+                    if(c.damage > 0)
+                        s += "Damage : " + c.damage + "\r\n";
+                    if(c.block > 0)
+                        s += "Block : " + c.block + "\r\n";
+                    if(c.magicNumber > 0)
+                        s += "Magic Number : " + c.magicNumber + "\r\n";
+                    if(c.heal > 0)
+                        s += "Heal : " + c.heal + "\r\n";
+                    if(c.draw > 0)
+                        s += "Draw : " + c.draw + "\r\n";
+                    if(c.discard > 0)
+                        s += ("Discard : " + c.discard + "\r\n");
+
+                    inspect.setText(s);
+
+                } catch (Exception e) {
+                    return;
+                }
+            } else {
                 int in;
                 try {
                     in = Integer.parseInt(input) - 1;

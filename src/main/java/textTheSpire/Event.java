@@ -131,7 +131,9 @@ public class Event {
                 } else if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD) {
                     for(RewardItem reward : AbstractDungeon.combatRewardScreen.rewards) {
                         if(reward.type == RewardItem.RewardType.POTION)
-                            s.append(count).append(":").append(reward.potion.getClass().getSimpleName()).append("\r\n");
+                            s.append(count).append(":").append(reward.potion.name).append("\r\n");
+                        else if(reward.type == RewardItem.RewardType.RELIC)
+                            s.append(count).append(":").append(reward.relic.name).append("\r\n");
                         else
                             s.append(count).append(":").append(reward.type.name().toLowerCase()).append("\r\n");
                         count++;

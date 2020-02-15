@@ -43,7 +43,7 @@ public class Hand {
 
             int count = 1;
             for(AbstractCard c : h.group){
-                s.append(count).append(":").append(c.name).append("-").append(handCost(c)).append("\r\n");
+                s.append(count).append(":").append(c.name).append(" ").append(handCost(c)).append("\r\n");
                 count++;
             }
 
@@ -73,7 +73,7 @@ public class Hand {
     Returns:
         Current cost of c
      */
-    public int handCost(AbstractCard c){
+    public static int handCost(AbstractCard c){
         if (c.freeToPlay()) {
             return 0;
         } else{
