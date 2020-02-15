@@ -43,6 +43,18 @@ public class Event {
 
             checkedSave = false;
 
+            ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();
+
+            if(currChoice == ChoiceScreenUtils.ChoiceType.HAND_SELECT){
+                s.append("Hand Selection\r\n");
+                s.append(AbstractDungeon.handCardSelectScreen.selectionReason + "\r\n");
+                s.append("Select " + AbstractDungeon.handCardSelectScreen.numCardsToSelect + "\r\n");
+                s.append("Number Selected: " + AbstractDungeon.handCardSelectScreen.numSelected + "\r\n");
+            }else if(currChoice == ChoiceScreenUtils.ChoiceType.GRID){
+                s.append("Grid Selection\r\n");
+                s.append("Number Selected: " + AbstractDungeon.gridSelectScreen.selectedCards.size() + "\r\n");
+            }
+
             //If in combat check if choices exists, otherwise remove window
             if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
 
@@ -54,7 +66,15 @@ public class Event {
                 }
 
                 int count = 1;
-                for (String c : ChoiceScreenUtils.getCurrentChoiceList()) {
+                ArrayList<String> cards = ChoiceScreenUtils.getCurrentChoiceList();
+
+                if (cards.size() == 0) {
+                    event.setText(s.toString());
+                    event.setVisible(false);
+                    return;
+                }
+
+                for (String c : cards) {
 
                     s.append(count).append(":").append(c).append("\r\n");
                     count++;

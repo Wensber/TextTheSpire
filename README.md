@@ -18,7 +18,7 @@ I can't call this done until I confirm TextTheSpire works for other people too.
 
 Requirements:
 
-Communication Mod : https://github.com/ForgottenArbiter/CommunicationMod
+Communication Mod : https://github.com/ForgottenArbiter/CommunicationMod/releases
 
 Mod The Spire
 
@@ -56,6 +56,15 @@ Step 7: Make sure you are in the save slot you want to use.
 TextTheSpire currently does not support changing save slots.
 After this setup is complete and you are free to close all windows.
 
+Starting the game:
+
+First you need to log into Steam. Close the steam windows afterwards.
+It is recommended you also close any other windows to reduce the numbers of windows you need to alt tab through.
+
+Double click mts-launcher.jar. The previous settings are still selected so once the window appears all you need to do is hit enter.
+
+Once you hear the main screen music you are able to start or continue runs.
+
 Display:
 
 There are numerous windows that are going to display information. Most represent a single zone.
@@ -68,8 +77,11 @@ Event:
 This window is used to display all choices that can be made.
 Choices that can be made are usually but not always displayed with a number followed by a description of the choice.
 More details in the Controls section.
+During a run you will be returning to this window very often and usually right after a non combat command unless you've memorized the choices to be made.
 While in the shop screen choices will be followed by the price of the choice.
 When choosing a map node to go to the choices include the node type and X coordinate.
+When selecting a card from a grid or your hand it will show the number of already selected cards and which type of selection it is, hand or grid.
+Hand selection will also show the number of selections you need to make and a brief reason for selection.
 While on the main menu it will display choice on continuing, starting, or restarting a run.
 It will also display information on the unlock status of characters and their ascensions.
 

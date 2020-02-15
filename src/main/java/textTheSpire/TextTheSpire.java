@@ -127,7 +127,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         //Continue command. Only usable when not in dungeon and save file exists
-        if (!CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")) {
+        if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")) {
 
             CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.NONE;
             CardCrawlGame.mainMenuScreen.hideMenuButtons();
@@ -151,7 +151,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (isUnlocked(tokens))
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
                     CommandExecutor.executeCommand(input);
                 return;
             } catch (Exception e) {
@@ -159,7 +159,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (isUnlocked(tokens))
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
                     CommandExecutor.executeCommand(input.substring(2));
                 return;
             } catch (Exception e) {
