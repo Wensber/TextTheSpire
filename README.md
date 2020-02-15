@@ -1,10 +1,12 @@
 TextTheSpire
 
+Author: Wensber - texttherspire@gmail.com
+
 Description:
 
 This is a mod for the game Slay the Spire and provides screen reader accessibility.
 It does so by providing lots of windows displaying the game information and a prompt window for inputting commands.
-Descriptions of the windows and commands is provided in the sections Display and Controls.
+Descriptions of the windows and commands are provided in the sections Display and Controls.
 
 Status of Completion:
 
@@ -15,12 +17,14 @@ You are not supposed to be able to see enemy intents while owning Runic Dome but
 I have not been able to check every single relic, card, and potential interactions between them that could cause bugs that are game breaking or simply messes up the display.
 The second reason is that I have only tested this mod on my personal computer and with only the screen reader NVDA.
 I can't call this done until I confirm TextTheSpire works for other people too.
+If you decide to use this mod and run into issues, let me know at texttherspire@gmail.com.
 
 Limitations:
 
 TextTheSpire is currently not capable of accessing menus or screens not reached automatically by playing the game.
 This includes save slots, statistics, achievements, compendium, run history, settings, patch notes, custom game, daily climb, etc.
 After TextTheSpire is tested to satisfaction I will work on accessing the daily climb.
+I also removed the event Goblin Match Game.
 
 Requirements:
 
@@ -38,8 +42,8 @@ Setup:
 If you are visually impaired you will likely need help with setting this up.
 
 Step 1: Make sure you have all of the requirements. Base Mod and Mod the Spire simply need to be subscribed to in the Steam Workshop.
-CommunicationMod.jar and TextTheSpire.jar need to be placed in the Slay the Spire's mod directory.
-It is located at Steam\steamapps\common\SlayTheSpire\mods. If the folder does not exist create it.
+CommunicationMod.jar and TextTheSpire.jar need to be placed in the Slay the Spire's mod directory located at Steam\steamapps\common\SlayTheSpire\mods.
+If the folder does not exist create it.
 
 Step 2: You should see a file called mts-launcher.jar in the Slay the Spire main directory.
 Create a shortcut of this. This is the easy way to open Slay the Spire with mods.
@@ -65,7 +69,7 @@ After this setup is complete and you are free to close all windows.
 
 Starting the game:
 
-First you need to log into Steam. Close the steam windows afterwards.
+First you need to log into Steam. Close the Steam windows afterwards.
 It is recommended you also close any other windows to reduce the numbers of windows you need to alt tab through.
 
 Double click mts-launcher.jar. The previous settings are still selected so once the window appears all you need to do is hit enter.
@@ -108,8 +112,8 @@ While out of combat it will also display current gold and your potion slots.
 
 Monster:
 This window is used to display enemy information while in combat.
-It first displays the total number of enemies and total incoming damage.
-Then it displays each enemy with its information.
+The first 2 lines displays the total number of enemies and total incoming damage.
+After that it displays each enemy with its information.
 The first line for each monster includes the monster's index and name.
 
 Hand:
@@ -167,8 +171,8 @@ A monster's index does not change in the middle of combat.
 Playing cards:
 
 Play commands follow the format "play [card index] [target index]".
-The target index is option if the card has no target.
-The card index if the card's position in your hand.
+The target index is optional if the card has no target.
+The card index is the card's position in your hand.
 A card's index will change as cards leave your hand.
 
 Inspecting cards:
@@ -179,11 +183,11 @@ Can only be used on cards in your hand.
 Inspecting map nodes:
 
 Inspecting a map node has the format "map [floor] [X coordinate]".
-Can be used when out of combat.
+Can only be used when out of combat.
 
 Quiting:
 
 The command "quit" will close the game. The windows don't close on their own.
 You can close them by either closing each one or closing the Mod the Spire window.
 
-If you run into issues using the above commands, whether using them at designated times or not, please let me know.
+If you run into issues using the above commands, whether using them at designated times or not, please let me know at texttherspire@gmail.com.
