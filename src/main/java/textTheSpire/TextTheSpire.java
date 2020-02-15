@@ -13,6 +13,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.ModHelper;
+import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
@@ -22,6 +23,7 @@ import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 
 @SpireInitializer
@@ -114,10 +116,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     }
 
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
-    public void parsePrompt(String input){
+    public void parsePrompt(String input) {
 
         //Dispose of windows and then exit
-        if(input.equals("quit")){
+        if (input.equals("quit")) {
 
             dispose();
 
@@ -125,7 +127,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         //Continue command. Only usable when not in dungeon and save file exists
-        if(!CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")){
+        if (!CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")) {
 
             CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.NONE;
             CardCrawlGame.mainMenuScreen.hideMenuButtons();
@@ -149,15 +151,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if(isUnlocked(tokens))
+                if (isUnlocked(tokens))
                     CommandExecutor.executeCommand(input);
                 return;
             } catch (Exception e) {
                 return;
             }
-        }else if(tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()){
+        } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if(isUnlocked(tokens))
+                if (isUnlocked(tokens))
                     CommandExecutor.executeCommand(input.substring(2));
                 return;
             } catch (Exception e) {
@@ -166,7 +168,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         //Commands below are only usable in a dungeon
-        if(!CommandExecutor.isInDungeon())
+        if (!CommandExecutor.isInDungeon())
             return;
 
         //Potion Command. If out of combat can only discard
@@ -205,31 +207,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 } catch (Exception e) {
                     return;
                 }
-            } else if(tokens[0].equals("inspect")){
+            } else if (tokens[0].equals("inspect")) {
                 int in;
                 try {
                     in = Integer.parseInt(tokens[1]) - 1;
 
                     String s = "";
 
-                    if(in < 0 || in >= AbstractDungeon.player.hand.group.size())
+                    if (in < 0 || in >= AbstractDungeon.player.hand.group.size())
                         return;
 
                     AbstractCard c = AbstractDungeon.player.hand.group.get(in);
 
                     s += c.name + "\r\n";
                     s += "Cost : " + Hand.handCost(c) + "\r\n";
-                    if(c.damage > 0)
+                    if (c.damage > 0)
                         s += "Damage : " + c.damage + "\r\n";
-                    if(c.block > 0)
+                    if (c.block > 0)
                         s += "Block : " + c.block + "\r\n";
-                    if(c.magicNumber > 0)
+                    if (c.magicNumber > 0)
                         s += "Magic Number : " + c.magicNumber + "\r\n";
-                    if(c.heal > 0)
+                    if (c.heal > 0)
                         s += "Heal : " + c.heal + "\r\n";
-                    if(c.draw > 0)
+                    if (c.draw > 0)
                         s += "Draw : " + c.draw + "\r\n";
-                    if(c.discard > 0)
+                    if (c.discard > 0)
                         s += ("Discard : " + c.discard + "\r\n");
 
                     inspect.setText(s);
@@ -246,6 +248,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return;
                 }
             }
+        } else if (tokens[0].equals("map")){
+
+            if(tokens.length >= 3){
+                inspect.setText(inspectMap(tokens));
+            }
+
         } else {
             //Everything else is a choice screen command. Only a number is needed.
             int in;
@@ -256,6 +264,100 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 return;
             }
         }
+    }
+
+    public String inspectMap(String[] tokens){
+        int floor;
+        int x;
+
+        try{
+            floor = Integer.parseInt(tokens[1]);
+            x = Integer.parseInt(tokens[2]);
+        } catch (Exception e){
+            return "";
+        }
+
+        if(floor < 1 || floor > 15 || x < 0 || x > 6)
+            return "";
+
+        StringBuilder s = new StringBuilder();
+
+        ArrayList<ArrayList<MapRoomNode>> map = AbstractDungeon.map;
+        int current_y = AbstractDungeon.currMapNode.y;
+        ArrayList<ArrayList<MapRoomNode>> m;
+
+        if(!(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0))) {
+
+            m = new ArrayList<ArrayList<MapRoomNode>>();
+
+            ArrayList<MapRoomNode> current = new ArrayList<MapRoomNode>();
+            current.add(AbstractDungeon.currMapNode);
+            m.add(current);
+
+            for (int i = (current_y + 1); i < map.size(); i++) {
+
+                ArrayList<MapRoomNode> next_floor = new ArrayList<MapRoomNode>();
+
+                for (MapRoomNode n : map.get(i)) {
+
+                    for (MapRoomNode child : m.get(i - current_y - 1)) {
+                        if (child.isConnectedTo(n)) {
+                            next_floor.add(n);
+
+                            break;
+                        }
+                    }
+
+                }
+
+                m.add(next_floor);
+
+            }
+        }else{
+            m = map;
+        }
+
+        ArrayList<MapRoomNode> curr = new ArrayList<MapRoomNode>();
+        ArrayList<MapRoomNode> prev = new ArrayList<MapRoomNode>();
+
+        if(current_y == -1)
+            current_y = 0;
+
+        for(MapRoomNode child : m.get(floor - current_y - 1)){
+            if(child.x == x){
+                prev.add(child);
+                s.append("Floor " + floor + "\r\n");
+                s.append(Map.nodeType(child) + x + "\r\n");
+                break;
+            }
+        }
+
+        if(prev.size() == 0)
+            return "";
+
+        for(int i = (floor - current_y - 2);i>=0;i--){
+
+            s.append("Floor " + (i + current_y + 1) + "\r\n");
+
+            for(MapRoomNode node : m.get(i)){
+
+                for(MapRoomNode parent : prev){
+                    if(node.isConnectedTo(parent)){
+                        s.append(Map.nodeType(node) + node.x + "\r\n");
+                        curr.add(node);
+                        break;
+                    }
+                }
+
+            }
+
+            prev.clear();
+            prev.addAll(curr);
+            curr.clear();
+
+        }
+
+        return s.toString();
 
     }
 
