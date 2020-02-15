@@ -50,7 +50,7 @@ public class Hand {
             ArrayList<AbstractPotion> pl = AbstractDungeon.player.potions;
             count = 0;
             if (pl.size() > 0) {
-                s.append("Potions: ");
+                s.append("Potions:\r\n");
                 for (AbstractPotion po : pl) {
                     s.append(count).append(":").append(po.name).append("\r\n");
                     count++;
