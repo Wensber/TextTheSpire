@@ -8,13 +8,19 @@ Descriptions of the windows and commands is provided in the sections Display and
 
 Status of Completion:
 
-This mod is almost done. I hesitate to call it done for 2 reasons.
+TextTheSpire is almost done. I hesitate to call it done for 2 reasons.
 The first is that there are still potentially unknown bugs that need to be fixed.
 For example, I previously discovered that TextTheSpire did not behave correctly with the relic Runic Dome.
 You are not supposed to be able to see enemy intents while owning Runic Dome but TextTheSpire displayed the intents anyway.
 I have not been able to check every single relic, card, and potential interactions between them that could cause bugs that are game breaking or simply messes up the display.
 The second reason is that I have only tested this mod on my personal computer and with only the screen reader NVDA.
 I can't call this done until I confirm TextTheSpire works for other people too.
+
+Limitations:
+
+TextTheSpire is currently not capable of accessing menus or screens not reached automatically by playing the game.
+This includes save slots, statistics, achievements, compendium, run history, settings, patch notes, custom game, daily climb, etc.
+After TextTheSpire is tested to satisfaction I will work on accessing the daily climb.
 
 Requirements:
 
