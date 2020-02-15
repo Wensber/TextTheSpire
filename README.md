@@ -18,13 +18,14 @@ I can't call this done until I confirm TextTheSpire works for other people too.
 
 Requirements:
 
-Communication Mod : https://github.com/ForgottenArbiter/CommunicationMod/releases
+Communication Mod : https://github.com/ForgottenArbiter/CommunicationMod
 
 Mod The Spire
 
 Base Mod
 
-The last 2 should be obtained from the Steam Workshop.
+A screen reader. Chances are if you are here you already have one, but if you do not NVDA is a free screen reader.
+https://www.nvaccess.org/download/
 
 Setup:
 
