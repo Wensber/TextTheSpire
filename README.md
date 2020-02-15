@@ -1,6 +1,6 @@
 TextTheSpire
 
-Author: Wensber - texttherspire@gmail.com
+Author: Wensber - textthespire@gmail.com
 
 Description:
 
@@ -17,7 +17,7 @@ You are not supposed to be able to see enemy intents while owning Runic Dome but
 I have not been able to check every single relic, card, and potential interactions between them that could cause bugs that are game breaking or simply messes up the display.
 The second reason is that I have only tested this mod on my personal computer and with only the screen reader NVDA.
 I can't call this done until I confirm TextTheSpire works for other people too.
-If you decide to use this mod and run into issues, let me know at texttherspire@gmail.com.
+If you decide to use this mod and run into issues, let me know at textthespire@gmail.com.
 
 Limitations:
 
@@ -190,4 +190,4 @@ Quiting:
 The command "quit" will close the game. The windows don't close on their own.
 You can close them by either closing each one or closing the Mod the Spire window.
 
-If you run into issues using the above commands, whether using them at designated times or not, please let me know at texttherspire@gmail.com.
+If you run into issues using the above commands, whether using them at designated times or not, please let me know at textthespire@gmail.com.
