@@ -6,6 +6,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.stances.NeutralStance;
 import com.megacrit.cardcrawl.ui.panels.EnergyPanel;
@@ -68,6 +69,14 @@ public class Player {
             //If not neutral stance display it
             if (!(p.stance instanceof NeutralStance)) {
                 s.append("Stance: ").append(p.stance.name).append("\r\n");
+            }
+
+            ArrayList<AbstractPower> po = p.powers;
+            if(po.size() > 0) {
+                s.append("Powers:\r\n");
+                for (AbstractPower ap : po) {
+                    s.append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                }
             }
 
         }else{
