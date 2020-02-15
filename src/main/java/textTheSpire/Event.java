@@ -117,10 +117,15 @@ public class Event {
                         s.append("Floor:0\r\n");
 
                     //Displays node type and xPos for each choice
-                    for(MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()){
+                    if(ChoiceScreenUtils.bossNodeAvailable()){
                         s.append(count).append(":");
-                        s.append(Map.nodeType(n)).append(n.x).append("\r\n");
-                        count++;
+                        s.append("boss").append("\r\n");
+                    } else {
+                        for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
+                            s.append(count).append(":");
+                            s.append(Map.nodeType(n)).append(n.x).append("\r\n");
+                            count++;
+                        }
                     }
 
                 } else if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD) {
