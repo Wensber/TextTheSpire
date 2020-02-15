@@ -43,7 +43,14 @@ public class Hand {
 
             int count = 1;
             for(AbstractCard c : h.group){
-                s.append(count).append(":").append(c.name).append(" ").append(handCost(c)).append("\r\n");
+                int cost = handCost(c);
+                if(cost == -2) {
+                    s.append(count).append(":").append(c.name).append("\r\n");
+                } else if(cost == -1) {
+                    s.append(count).append(":").append(c.name).append(" X").append("\r\n");
+                } else {
+                    s.append(count).append(":").append(c.name).append(" ").append(cost).append("\r\n");
+                }
                 count++;
             }
 

@@ -93,7 +93,7 @@
                         <phase>package</phase>
                         <configuration>
                             <target>
-                                <copy file="target/TextTheSpire-0.1-shaded.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
+                                <copy file="target/TextTheSpire-${project.version}-shaded.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
                             </target>
                         </configuration>
                         <goals>

@@ -7,6 +7,7 @@ import basemod.BaseMod;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.red.Whirlwind;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
@@ -218,9 +219,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                         return;
 
                     AbstractCard c = AbstractDungeon.player.hand.group.get(in);
+                    int cost = Hand.handCost(c);
 
                     s += c.name + "\r\n";
-                    s += "Cost : " + Hand.handCost(c) + "\r\n";
+                    if(cost == -1)
+                        s += "Cost : X"+ "\r\n";
+                    else if(cost != -2)
+                        s += "Cost : " + cost + "\r\n";
                     if (c.damage > 0)
                         s += "Damage : " + c.damage + "\r\n";
                     if (c.block > 0)

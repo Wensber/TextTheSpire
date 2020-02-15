@@ -37,7 +37,7 @@ public class Relic {
 
         for(int i=relics.size()-1; i>=0; i--){
             AbstractRelic r = relics.get(i);
-            if(r.counter != -1){
+            if(r.counter >= 0){
                 s.append(r.name).append(":").append(r.counter).append("\r\n");
             }else{
                 s.append(r.name).append("\r\n");
