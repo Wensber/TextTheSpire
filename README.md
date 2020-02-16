@@ -7,6 +7,8 @@ Description:
 This is a mod for the game Slay the Spire and provides screen reader accessibility.
 It does so by providing lots of windows displaying the game information and a prompt window for inputting commands.
 Descriptions of the windows and commands are provided in the sections Display and Controls.
+TextTheSpire is intended to be used alongside the wiki.
+If you have not memorized most of the cards and relics you will likely be using the wiki a lot.
 
 Status of Completion:
 
