@@ -70,7 +70,10 @@ public class Event {
 
                 if (cards.size() == 0) {
                     event.setText(s.toString());
-                    event.setVisible(false);
+                    if(s.length() > 0)
+                        event.setVisible(true);
+                    else
+                        event.setVisible(false);
                     return;
                 }
 
