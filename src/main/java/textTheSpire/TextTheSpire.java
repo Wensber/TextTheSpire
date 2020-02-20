@@ -42,7 +42,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Event event;
     private Relic relic;
 
-    private Window inspect;
+    private Inspect inspect;
 
     private JTextField promptFrame;
 
@@ -64,7 +64,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             relic = new Relic(display);
             player = new Player(display);
 
-            inspect = new Window(display,"Inspect" , 550, 425);
+            inspect = new Inspect(display);
 
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
@@ -256,7 +256,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         } else if (tokens[0].equals("map")){
 
             if(tokens.length >= 3){
-                inspect.setText(inspectMap(tokens));
+                inspect.setText(Inspect.inspectMap(tokens));
             }
 
         } else {
@@ -269,101 +269,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 return;
             }
         }
-    }
-
-    public String inspectMap(String[] tokens){
-        int floor;
-        int x;
-
-        try{
-            floor = Integer.parseInt(tokens[1]);
-            x = Integer.parseInt(tokens[2]);
-        } catch (Exception e){
-            return "";
-        }
-
-        if(floor < 1 || floor > 15 || x < 0 || x > 6)
-            return "";
-
-        StringBuilder s = new StringBuilder();
-
-        ArrayList<ArrayList<MapRoomNode>> map = AbstractDungeon.map;
-        int current_y = AbstractDungeon.currMapNode.y;
-        ArrayList<ArrayList<MapRoomNode>> m;
-
-        if(!(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0))) {
-
-            m = new ArrayList<ArrayList<MapRoomNode>>();
-
-            ArrayList<MapRoomNode> current = new ArrayList<MapRoomNode>();
-            current.add(AbstractDungeon.currMapNode);
-            m.add(current);
-
-            for (int i = (current_y + 1); i < map.size(); i++) {
-
-                ArrayList<MapRoomNode> next_floor = new ArrayList<MapRoomNode>();
-
-                for (MapRoomNode n : map.get(i)) {
-
-                    for (MapRoomNode child : m.get(i - current_y - 1)) {
-                        if (child.isConnectedTo(n)) {
-                            next_floor.add(n);
-
-                            break;
-                        }
-                    }
-
-                }
-
-                m.add(next_floor);
-
-            }
-        }else{
-            m = map;
-        }
-
-        ArrayList<MapRoomNode> curr = new ArrayList<MapRoomNode>();
-        ArrayList<MapRoomNode> prev = new ArrayList<MapRoomNode>();
-
-        if(current_y == -1)
-            current_y = 0;
-
-        for(MapRoomNode child : m.get(floor - current_y - 1)){
-            if(child.x == x){
-                prev.add(child);
-                s.append("Floor " + floor + "\r\n");
-                s.append(Map.nodeType(child) + x + "\r\n");
-                break;
-            }
-        }
-
-        if(prev.size() == 0)
-            return "";
-
-        for(int i = (floor - current_y - 2);i>=0;i--){
-
-            s.append("Floor " + (i + current_y + 1) + "\r\n");
-
-            for(MapRoomNode node : m.get(i)){
-
-                for(MapRoomNode parent : prev){
-                    if(node.isConnectedTo(parent)){
-                        s.append(Map.nodeType(node) + node.x + "\r\n");
-                        curr.add(node);
-                        break;
-                    }
-                }
-
-            }
-
-            prev.clear();
-            prev.addAll(curr);
-            curr.clear();
-
-        }
-
-        return s.toString();
-
     }
 
     public boolean isUnlocked(String[] tokens){

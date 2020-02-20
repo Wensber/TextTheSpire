@@ -134,21 +134,40 @@ public class Event {
                 }else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
 
                     //Also shows current position
-                    if(AbstractDungeon.firstRoomChosen)
+                    if (AbstractDungeon.firstRoomChosen)
                         s.append("Floor:").append(AbstractDungeon.currMapNode.y + 1).append(", X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
                     else
                         s.append("Floor:0\r\n");
 
-                    //Displays node type and xPos for each choice
-                    if(ChoiceScreenUtils.bossNodeAvailable()){
+                    if (ChoiceScreenUtils.bossNodeAvailable()) {
+
                         s.append(count).append(":");
                         s.append("boss").append("\r\n");
-                    } else {
+
+                    } else if(!Inspect.has_inspected) {
+
+                        //Displays node type and xPos for each choice
                         for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
                             s.append(count).append(":");
                             s.append(Map.nodeType(n)).append(n.x).append("\r\n");
                             count++;
                         }
+
+                    }else{
+
+                        s.append("Inspected " + Map.nodeType(Inspect.destination) + (Inspect.destination.y+1) + " " + Inspect.destination.x + "\r\n");
+
+                        for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
+                            s.append(count).append(":");
+                            s.append(Map.nodeType(n));
+                            if(Inspect.inspected_map.contains(n)) {
+                                s.append("On Track ").append(n.x).append("\r\n");
+                            }else{
+                                s.append("Diverge ").append(n.x).append("\r\n");
+                            }
+                            count++;
+                        }
+
                     }
 
                 } else if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD) {
