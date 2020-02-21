@@ -15,15 +15,22 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.ModHelper;
 import com.megacrit.cardcrawl.map.MapRoomNode;
+import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
+import com.megacrit.cardcrawl.shop.ShopScreen;
+import com.megacrit.cardcrawl.shop.StorePotion;
+import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import javax.swing.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -175,7 +182,198 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Potion Command. If out of combat can only discard
         if (tokens[0].equals("potion")) {
             try {
-                CommandExecutor.executeCommand(input);
+                if(tokens.length >= 3 && tokens[1].equals("inspect")){
+
+                    int in = Integer.parseInt(tokens[2]);
+                    String s = " ";
+                    if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
+                        AbstractPotion p = AbstractDungeon.player.potions.get(in);
+
+                        s += p.name + "\r\n";
+                        s += Event.stripColor(p.description) + "\r\n";
+
+                        inspect.setText(s);
+
+                    }
+                    return;
+                }else {
+                    CommandExecutor.executeCommand(input);
+                }
+                return;
+            } catch (Exception e) {
+                return;
+            }
+        }
+
+        if (tokens[0].equals("choice")) {
+            try {
+                if(tokens.length >= 2) {
+                    int in = Integer.parseInt(tokens[1]);
+
+                    ChoiceScreenUtils.ChoiceType c = ChoiceScreenUtils.getCurrentChoiceType();
+
+                    if(c == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN){
+                        ArrayList<Object> shopItems = Event.getAvailableShopItems();
+
+                        in--;
+
+                        if (in >= 0 && in < shopItems.size()) {
+
+                            Object item = shopItems.get(in);
+
+                            if (item instanceof String) {
+
+                                if(((String)item).equals("purge-" + ShopScreen.actualPurgeCost)){
+                                    inspect.setText("Remove a card from your deck.\r\n");
+                                }
+
+                            } else if (item instanceof AbstractCard) {
+
+                                AbstractCard card = (AbstractCard)item;
+
+                                inspect.setText(inspectCard(card));
+
+                            } else if (item instanceof StoreRelic) {
+
+                                AbstractRelic r = ((StoreRelic)item).relic;
+                                String s = "";
+
+                                s += r.name + "\r\n";
+                                s += "Counter: " + r.counter + "\r\n";
+                                s += Event.stripColor(r.description) + "\r\n";
+
+                                inspect.setText(s);
+
+                            } else if (item instanceof StorePotion) {
+
+                                AbstractPotion p = ((StorePotion)item).potion;
+                                String s = "";
+
+                                s += p.name + "\r\n";
+                                s += Event.stripColor(p.description) + "\r\n";
+
+                                inspect.setText(s);
+
+                            }
+                        }
+                    } else if (c == ChoiceScreenUtils.ChoiceType.GRID){
+
+                        in--;
+
+                        ArrayList<AbstractCard> grid = ChoiceScreenUtils.getGridScreenCards();
+
+                        if(in >= 0 && in < grid.size()){
+
+                            AbstractCard card = grid.get(in);
+
+                            inspect.setText(inspectCard(card));
+
+                        }
+
+                    } else if (c == ChoiceScreenUtils.ChoiceType.CARD_REWARD){
+
+                        in--;
+
+                        if(in >= 0 && in < AbstractDungeon.cardRewardScreen.rewardGroup.size()){
+
+                            AbstractCard card = AbstractDungeon.cardRewardScreen.rewardGroup.get(in);
+
+                            inspect.setText(inspectCard(card));
+
+                        }
+
+                    } else if (c == ChoiceScreenUtils.ChoiceType.HAND_SELECT){
+
+                        in--;
+
+                        if(in >= 0 && in < AbstractDungeon.handCardSelectScreen.selectedCards.group.size()){
+
+                            AbstractCard card = AbstractDungeon.handCardSelectScreen.selectedCards.group.get(in);
+
+                            inspect.setText(inspectCard(card));
+
+                        }
+
+                    } else if (c == ChoiceScreenUtils.ChoiceType.BOSS_REWARD){
+
+                        if(in >= 0 && in < AbstractDungeon.bossRelicScreen.relics.size()){
+
+                            AbstractRelic r = AbstractDungeon.bossRelicScreen.relics.get(in);
+
+                            String s = "";
+
+                            s += r.name + "\r\n";
+                            s += "Counter: " + r.counter + "\r\n";
+                            s += Event.stripColor(r.description) + "\r\n";
+
+                            inspect.setText(s);
+
+                        }
+
+                    } else if (c == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD){
+
+                        in--;
+
+                        ArrayList<RewardItem> rewards = AbstractDungeon.combatRewardScreen.rewards;
+
+                        if(in >= 0 && in < rewards.size()){
+
+                            RewardItem reward = rewards.get(in);
+
+                            if(reward.type == RewardItem.RewardType.RELIC){
+
+                                AbstractRelic r = reward.relic;
+
+                                String s = "";
+
+                                s += r.name + "\r\n";
+                                s += "Counter: " + r.counter + "\r\n";
+                                s += Event.stripColor(r.description) + "\r\n";
+
+                                inspect.setText(s);
+
+                            }else if (reward.type == RewardItem.RewardType.POTION){
+
+                                AbstractPotion p = reward.potion;
+
+                                String s = "";
+
+                                s += p.name + "\r\n";
+                                s += Event.stripColor(p.description) + "\r\n";
+
+                                inspect.setText(s);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+                return;
+            } catch (Exception e) {
+                return;
+            }
+        }
+
+        if (tokens[0].equals("relic")) {
+            try {
+                if(tokens.length >= 2) {
+                    int in = Integer.parseInt(tokens[1]);
+                    if(in >= 0 && in < AbstractDungeon.player.relics.size()){
+
+                        AbstractRelic r = AbstractDungeon.player.relics.get(in);
+
+                        String s = "";
+
+                        s += r.name + "\r\n";
+                        s += "Counter: " + r.counter + "\r\n";
+                        s += Event.stripColor(r.description) + "\r\n";
+
+                        inspect.setText(s);
+
+                    }
+                }
                 return;
             } catch (Exception e) {
                 return;
@@ -208,38 +406,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 } catch (Exception e) {
                     return;
                 }
-            } else if (tokens[0].equals("inspect")) {
+            } else if (tokens[0].equals("hand")) {
                 int in;
                 try {
                     in = Integer.parseInt(tokens[1]) - 1;
-
-                    String s = "";
 
                     if (in < 0 || in >= AbstractDungeon.player.hand.group.size())
                         return;
 
                     AbstractCard c = AbstractDungeon.player.hand.group.get(in);
-                    int cost = Hand.handCost(c);
 
-                    s += c.name + "\r\n";
-                    if(cost == -1)
-                        s += "Cost : X"+ "\r\n";
-                    else if(cost != -2)
-                        s += "Cost : " + cost + "\r\n";
-                    if (c.damage > 0)
-                        s += "Damage : " + c.damage + "\r\n";
-                    if (c.block > 0)
-                        s += "Block : " + c.block + "\r\n";
-                    if (c.magicNumber > 0)
-                        s += "Magic Number : " + c.magicNumber + "\r\n";
-                    if (c.heal > 0)
-                        s += "Heal : " + c.heal + "\r\n";
-                    if (c.draw > 0)
-                        s += "Draw : " + c.draw + "\r\n";
-                    if (c.discard > 0)
-                        s += ("Discard : " + c.discard + "\r\n");
-
-                    inspect.setText(s);
+                    inspect.setText(inspectCard(c));
 
                 } catch (Exception e) {
                     return;
@@ -269,6 +446,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 return;
             }
         }
+    }
+
+    public String inspectCard(AbstractCard card){
+
+        String s = "";
+
+        int cost = Hand.handCost(card);
+
+        s += card.name + "\r\n";
+
+        s += Event.stripColor(card.rawDescription) + "\r\n";
+
+        if(cost == -1)
+            s += "Cost : X"+ "\r\n";
+        else if(cost != -2)
+            s += "Cost : " + cost + "\r\n";
+        if (card.damage > 0)
+            s += "Damage : " + card.damage + "\r\n";
+        if (card.block > 0)
+            s += "Block : " + card.block + "\r\n";
+        if (card.magicNumber > 0)
+            s += "Magic Number : " + card.magicNumber + "\r\n";
+        if (card.heal > 0)
+            s += "Heal : " + card.heal + "\r\n";
+        if (card.draw > 0)
+            s += "Draw : " + card.draw + "\r\n";
+        if (card.discard > 0)
+            s += "Discard : " + card.discard + "\r\n";
+
+        return s;
+
     }
 
     public boolean isUnlocked(String[] tokens){

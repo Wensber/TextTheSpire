@@ -253,7 +253,7 @@ public class Event {
     Gets a list of all shop items.
     Copied from CommunicationMod
      */
-    private static ArrayList<Object> getAvailableShopItems() {
+    public static ArrayList<Object> getAvailableShopItems() {
         ArrayList<Object> choices = new ArrayList<>();
         ShopScreen screen = AbstractDungeon.shopScreen;
         if(screen.purgeAvailable && AbstractDungeon.player.gold >= ShopScreen.actualPurgeCost) {
@@ -283,7 +283,7 @@ public class Event {
     Returns:
         A String with color mods removed from input
      */
-    public String stripColor(String input) {
+    public static String stripColor(String input) {
         input = input.replace("#r", "");
         input = input.replace("#g", "");
         input = input.replace("#b", "");

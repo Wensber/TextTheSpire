@@ -139,12 +139,10 @@ This window is used to display relics you have.
 Relics with a counter will display its count.
 
 Inspect:
-This window is used to display more details of certain things.
-Currently this is limited to cards in hand and map nodes.
-When you inspect a card in hand this window will display the cards damage, block, magic number, heal, draw, and discard values if the value is significant.
+This window is used to examine something in more detail.
+When you inspect a card, relic, or potion, this window will display the name, description, and variables of the inspected object.
 When you inspect a map node, this window will display a filtered version of the map with only nodes you can reach from your current position and can reach the inspected node.
 The inspected node is effectively a destination and all displayed nodes are nodes you can pass on your way from your current node to this destination.
-In this window nodes are not displayed with connections.
 More details about inspection in Controls.
 
 Controls:
@@ -166,7 +164,7 @@ They are not always named that way but function the same. You just need to type 
 
 Potions:
 
-Potion commands follow the format "potion [use/discard] [potion index] [target index]".
+Potion commands follow the format "potion [use/discard/inspect] [potion index] [target index]".
 The target index is the monster's index and is optional if the potion has no target.
 A monster's index does not change in the middle of combat.
 
@@ -179,8 +177,14 @@ A card's index will change as cards leave your hand.
 
 Inspecting cards:
 
-Inspecting a card in your hand has the format "inspect [card index]".
+Inspecting a card in your hand has the format "hand [card index]".
 Can only be used on cards in your hand.
+The card description and its variables will be displayed.
+
+Inspecting relics:
+
+Inspecting a card in your hand has the format "relic [card index]".
+The relic description and its counter will be displayed.
 
 Inspecting map nodes:
 
