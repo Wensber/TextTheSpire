@@ -48,6 +48,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Monster monster;
     private Event event;
     private Relic relic;
+    private Orbs orbs;
 
     private Inspect inspect;
 
@@ -70,6 +71,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             discard = new Discard(display);
             relic = new Relic(display);
             player = new Player(display);
+            orbs = new Orbs(display);
 
             inspect = new Inspect(display);
 
@@ -295,6 +297,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                         }
 
                     } else if (c == ChoiceScreenUtils.ChoiceType.BOSS_REWARD){
+
+                        in--;
 
                         if(in >= 0 && in < AbstractDungeon.bossRelicScreen.relics.size()){
 
@@ -563,6 +567,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         relic.update();
         map.update();
         event.update();
+        orbs.update();
 
         specialUpdates();
 

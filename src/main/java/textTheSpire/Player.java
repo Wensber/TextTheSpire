@@ -48,38 +48,6 @@ public class Player {
             s.append("Energy: ").append(EnergyPanel.totalCount).append("\r\n");
 
             //Display orbs if Defect or have channeled orbs
-            ArrayList<AbstractOrb> ol = p.orbs;
-            if (p.chosenClass == AbstractPlayer.PlayerClass.DEFECT) {
-                for (AbstractOrb o : ol) {
-                    if (o instanceof Dark) {
-                        s.append("Dark ").append(o.evokeAmount).append(" ");
-                    } else if (o instanceof Lightning) {
-                        s.append("Lightning ");
-                    } else if (o instanceof Frost) {
-                        s.append("Frost ");
-                    } else if (o instanceof Plasma) {
-                        s.append("Plasma ");
-                    } else {
-                        s.append("Empty ");
-                    }
-                }
-                s.append("\r\n");
-            }else if(ol.size() > 0 && !(ol.get(0) instanceof  EmptyOrbSlot)){
-                for (AbstractOrb o : ol) {
-                    if (o instanceof Dark) {
-                        s.append("Dark ").append(o.evokeAmount).append(" ");
-                    } else if (o instanceof Lightning) {
-                        s.append("Lightning ");
-                    } else if (o instanceof Frost) {
-                        s.append("Frost ");
-                    } else if (o instanceof Plasma) {
-                        s.append("Plasma ");
-                    } else {
-                        s.append("Empty ");
-                    }
-                }
-                s.append("\r\n");
-            }
 
             //If not neutral stance display it
             if (!(p.stance instanceof NeutralStance)) {
