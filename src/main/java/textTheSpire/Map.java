@@ -10,17 +10,16 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Map {
-
-    public Window map;
+public class Map extends AbstractWindow{
 
     public Map(Display display){
-        map = new Window(display,"Map", 550, 425);
+        isVisible = false;
+        window = new Window(display,"Map", 550, 425);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(map.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -35,8 +34,14 @@ public class Map {
             s.append("Current= Floor:").append(AbstractDungeon.currMapNode.y + 1).append(" X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
 
             //Either display all nodes.
-            if(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
-                for (int i = m.size() - 1; i >= (AbstractDungeon.currMapNode.y + 1); i--) {
+            if(AbstractDungeon.currMapNode.y == 15 || AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
+
+                int currFloor = AbstractDungeon.currMapNode.y;
+
+                if(currFloor == 15)
+                    currFloor = -1;
+
+                for (int i = m.size() - 1; i >= (currFloor + 1); i--) {
 
                     s.append("Floor:").append(i + 1).append("\r\n");
                     for (MapRoomNode n : m.get(i)) {
@@ -103,12 +108,10 @@ public class Map {
 
             }
 
-            map.setText(s.toString());
-            map.setVisible(true);
+            return s.toString();
 
         }else{
-            map.setText(s.toString());
-            map.setVisible(false);
+            return "";
         }
     }
 

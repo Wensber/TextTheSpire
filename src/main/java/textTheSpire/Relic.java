@@ -8,17 +8,17 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Relic {
+public class Relic extends AbstractWindow{
 
-    public Window relic;
 
     public Relic(Display display){
-        relic = new Window(display,"Relic",300,300);
+        isVisible = false;
+        window = new Window(display,"Relic",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(relic.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -27,9 +27,7 @@ public class Relic {
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            relic.setText(s.toString());
-            relic.setVisible(false);
-            return;
+            return "";
         }
 
         //Display all relics when in dungeon
@@ -44,8 +42,7 @@ public class Relic {
             }
         }
 
-        relic.setText(s.toString());
-        relic.setVisible(true);
+        return s.toString();
 
     }
 

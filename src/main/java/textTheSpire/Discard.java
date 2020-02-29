@@ -8,17 +8,16 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.eclipse.swt.widgets.Display;
 
-public class Discard {
-
-    public Window discard;
+public class Discard extends AbstractWindow{
 
     public Discard(Display display){
-        discard = new Window(display,"Discard",300,300);
+        isVisible = false;
+        window = new Window(display,"Discard",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(discard.shell.isDisposed()) {
+        if(window.shell.isDisposed()) {
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -27,9 +26,7 @@ public class Discard {
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            discard.setText(s.toString());
-            discard.setVisible(false);
-            return;
+            return "";
         }
 
         //In combat
@@ -46,13 +43,11 @@ public class Discard {
                 }
             }
 
-            discard.setText(s.toString());
-            discard.setVisible(true);
+            return s.toString();
 
         }else{
             //Not in combat
-            discard.setText(s.toString());
-            discard.setVisible(false);
+            return "";
         }
     }
 

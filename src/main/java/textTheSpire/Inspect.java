@@ -21,7 +21,7 @@ public class Inspect {
     public static MapRoomNode destination;
 
     public Inspect(Display display){
-        inspect = new Window(display,"Inspect",450,525);
+        inspect = new Window(display,"Output",450,525);
     }
 
     public void setText(String s){
@@ -32,23 +32,25 @@ public class Inspect {
         int floor;
         int x;
 
+        StringBuilder s = new StringBuilder();;
+
         try{
             floor = Integer.parseInt(tokens[1]);
             x = Integer.parseInt(tokens[2]);
         } catch (Exception e){
-            return "";
+            return s.toString();
         }
 
         if(floor < 1 || floor > 15 || x < 0 || x > 6)
             return "";
 
-        StringBuilder s = new StringBuilder();
-
         ArrayList<ArrayList<MapRoomNode>> map = AbstractDungeon.map;
         int current_y = AbstractDungeon.currMapNode.y;
+        if(current_y >= 15)
+            current_y = -1;
         ArrayList<ArrayList<MapRoomNode>> m;
 
-        if(!(AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0))) {
+        if(!(current_y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0))) {
 
             m = new ArrayList<ArrayList<MapRoomNode>>();
 
@@ -99,7 +101,7 @@ public class Inspect {
         }
 
         if(prev.size() == 0)
-            return "";
+            return s.toString();
 
         for(int i = (floor - current_y - 2);i>=0;i--){
 

@@ -128,12 +128,38 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input) {
 
-        //Dispose of windows and then exit
-        if (input.equals("quit")) {
-
-            dispose();
-
-            Gdx.app.exit();
+        switch(input){
+            case "quit":
+                dispose();
+                Gdx.app.exit();
+                break;
+            case "deck":
+                inspect.setText(deck.getText());
+                break;
+            case "discard":
+                inspect.setText(discard.getText());
+                break;
+            case "event":
+                inspect.setText(event.getText());
+                break;
+            case "hand":
+                inspect.setText(hand.getText());
+                break;
+            case "map":
+                inspect.setText(map.getText());
+                break;
+            case "monster":
+                inspect.setText(monster.getText());
+                break;
+            case "orbs":
+                inspect.setText(orbs.getText());
+                break;
+            case "player":
+                inspect.setText(player.getText());
+                break;
+            case "relic":
+                inspect.setText(relic.getText());
+                break;
         }
 
         //Continue command. Only usable when not in dungeon and save file exists
@@ -157,6 +183,75 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         AbstractDungeon d = CardCrawlGame.dungeon;
         String[] tokens = input.split("\\s+");
+
+        if(tokens[0].equals("show") && tokens.length >= 2){
+
+            switch(tokens[1]){
+                case "deck":
+                    deck.isVisible = true;
+                    break;
+                case "discard":
+                    discard.isVisible = true;
+                    break;
+                case "event":
+                    event.isVisible = true;
+                    break;
+                case "hand":
+                    hand.isVisible = true;
+                    break;
+                case "map":
+                    hand.isVisible = true;
+                    break;
+                case "monster":
+                    monster.isVisible = true;
+                    break;
+                case "orbs":
+                    orbs.isVisible = true;
+                    break;
+                case "player":
+                    player.isVisible = true;
+                    break;
+                case "relic":
+                    relic.isVisible = true;
+                    break;
+            }
+
+        }
+
+        if(tokens[0].equals("hide") && tokens.length >= 2){
+
+            switch(tokens[1]){
+                case "deck":
+                    deck.isVisible = false;
+                    break;
+                case "discard":
+                    discard.isVisible = false;
+                    break;
+                case "event":
+                    event.isVisible = false;
+                    break;
+                case "hand":
+                    hand.isVisible = false;
+                    break;
+                case "map":
+                    hand.isVisible = false;
+                    break;
+                case "monster":
+                    monster.isVisible = false;
+                    break;
+                case "orbs":
+                    orbs.isVisible = false;
+                    break;
+                case "player":
+                    player.isVisible = false;
+                    break;
+                case "relic":
+                    relic.isVisible = false;
+                    break;
+            }
+
+        }
+
 
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
@@ -460,24 +555,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         s += card.name + "\r\n";
 
-        s += Event.stripColor(card.rawDescription) + "\r\n";
-
         if(cost == -1)
             s += "Cost : X"+ "\r\n";
         else if(cost != -2)
             s += "Cost : " + cost + "\r\n";
-        if (card.damage > 0)
-            s += "Damage : " + card.damage + "\r\n";
-        if (card.block > 0)
-            s += "Block : " + card.block + "\r\n";
-        if (card.magicNumber > 0)
-            s += "Magic Number : " + card.magicNumber + "\r\n";
-        if (card.heal > 0)
-            s += "Heal : " + card.heal + "\r\n";
-        if (card.draw > 0)
-            s += "Draw : " + card.draw + "\r\n";
-        if (card.discard > 0)
-            s += "Discard : " + card.discard + "\r\n";
+
+        s += cardText(card) + "\r\n";
+
+        return s;
+
+    }
+
+    public String cardText(AbstractCard c){
+
+        String s = Event.stripColor(c.rawDescription);
+
+        s = s.replace("NL", " ");
+
+        if(c.magicNumber < 0)
+            s = s.replace("!M!", "" + c.baseMagicNumber);
+        else
+            s = s.replace("!M!", "" + c.magicNumber);
+
+        if(c.damage < 0)
+            s = s.replace("!D!", "" + c.baseDamage);
+        else
+            s = s.replace("!D!", "" + c.damage);
+
+        if(c.block < 0)
+            s = s.replace("!B!", "" + c.baseBlock);
+        else
+            s = s.replace("!B!", "" + c.block);
 
         return s;
 

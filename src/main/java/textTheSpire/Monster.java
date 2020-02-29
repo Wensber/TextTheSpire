@@ -12,19 +12,19 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Monster {
+public class Monster extends AbstractWindow{
 
-    public Window monster;
     public boolean haveRunic = false;
     public int totalDmg = 0;
 
     public Monster(Display display){
-        monster = new Window(display,"Monster", 400, 600);
+        isVisible = false;
+        window = new Window(display,"Monster", 400, 600);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(monster.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -33,9 +33,7 @@ public class Monster {
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            monster.setText(s.toString());
-            monster.setVisible(false);
-            return;
+            return "";
         }
 
         //If in combat
@@ -72,13 +70,11 @@ public class Monster {
 
             s.insert(0, "Count: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
 
-            monster.setText(s.toString());
-            monster.setVisible(true);
+            return s.toString();
 
         }else{
             //If not in combat
-            monster.setText(s.toString());
-            monster.setVisible(false);
+            return "";
         }
     }
 

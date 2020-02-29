@@ -13,18 +13,16 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Orbs {
-
-    public Window orb;
-
+public class Orbs extends AbstractWindow{
 
     public Orbs(Display display){
-        orb = new Window(display,"Orbs",300,300);
+        isVisible = false;
+        window = new Window(display,"Orbs",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(orb.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -33,9 +31,7 @@ public class Orbs {
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            orb.setText(s.toString());
-            orb.setVisible(false);
-            return;
+            return "";
         }
 
         //If in combat
@@ -76,18 +72,15 @@ public class Orbs {
                     }
                 }
             } else {
-                orb.setText(s.toString());
-                orb.setVisible(false);
+                return "";
             }
 
             s.append("Back\r\n");
-            orb.setText(s.toString());
-            orb.setVisible(true);
+            return s.toString();
 
         }else{
             //If not in combat
-            orb.setText(s.toString());
-            orb.setVisible(false);
+            return "";
         }
     }
 

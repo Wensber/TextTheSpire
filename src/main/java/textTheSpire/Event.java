@@ -20,19 +20,19 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Event {
+public class Event extends AbstractWindow{
 
-    public Window event;
     private boolean checkedSave = false;
     private boolean haveSave;
 
     public Event(Display display){
-        event = new Window(display,"Event", 300, 300);
+        isVisible = false;
+        window = new Window(display,"Event", 300, 300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(event.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -69,12 +69,7 @@ public class Event {
                 ArrayList<String> cards = ChoiceScreenUtils.getCurrentChoiceList();
 
                 if (cards.size() == 0) {
-                    event.setText(s.toString());
-                    if(s.length() > 0)
-                        event.setVisible(true);
-                    else
-                        event.setVisible(false);
-                    return;
+                    return s.toString();
                 }
 
                 for (String c : cards) {
@@ -84,13 +79,7 @@ public class Event {
 
                 }
 
-                if (s.length() > 0) {
-                    event.setText(s.toString());
-                    event.setVisible(true);
-                } else {
-                    event.setText(s.toString());
-                    event.setVisible(false);
-                }
+                return  s.toString();
 
             }else{
 
@@ -188,8 +177,7 @@ public class Event {
                     }
                 }
 
-                event.setText(s.toString());
-                event.setVisible(true);
+                return s.toString();
 
             }
 
@@ -224,8 +212,7 @@ public class Event {
                 }
             }
 
-            event.setText(s.toString());
-            event.setVisible(true);
+            return s.toString();
 
         }
 

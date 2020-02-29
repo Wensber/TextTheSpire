@@ -11,18 +11,17 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Hand {
-
-    public Window hand;
+public class Hand extends AbstractWindow{
 
 
     public Hand(Display display){
-        hand = new Window(display,"Hand",300,300);
+        isVisible = false;
+        window = new Window(display,"Hand",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(hand.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -31,9 +30,7 @@ public class Hand {
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            hand.setText(s.toString());
-            hand.setVisible(false);
-            return;
+            return "";
         }
 
         //If in combat
@@ -64,13 +61,11 @@ public class Hand {
                 }
             }
 
-            hand.setText(s.toString());
-            hand.setVisible(true);
+            return s.toString();
 
         }else{
             //If not in combat
-            hand.setText(s.toString());
-            hand.setVisible(false);
+            return "";
         }
     }
 

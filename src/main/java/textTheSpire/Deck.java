@@ -8,17 +8,16 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import org.eclipse.swt.widgets.Display;
 
-public class Deck {
-
-    public Window deck;
+public class Deck extends AbstractWindow{
 
     public Deck(Display display){
-        deck = new Window(display,"Deck",300,300);
+        isVisible = false;
+        window = new Window(display,"Deck",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(deck.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -27,9 +26,7 @@ public class Deck {
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            deck.setText(s.toString());
-            deck.setVisible(false);
-            return;
+            return "";
         }
 
         //Show remaining deck in combat
@@ -45,8 +42,7 @@ public class Deck {
                 }
             }
 
-            deck.setText(s.toString());
-            deck.setVisible(true);
+            return s.toString();
 
         }else{
             //Show master deck out of combat
@@ -60,8 +56,7 @@ public class Deck {
                 }
             }
 
-            deck.setText(s.toString());
-            deck.setVisible(true);
+            return s.toString();
         }
     }
 

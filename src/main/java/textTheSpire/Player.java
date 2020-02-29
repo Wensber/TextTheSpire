@@ -14,17 +14,16 @@ import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
 
-public class Player {
-
-    public Window player;
+public class Player extends AbstractWindow{
 
     public Player(Display display){
-        player = new Window(display,"Player",300,300);
+        isVisible = false;
+        window = new Window(display,"Player",300,300);
     }
 
-    public void update(){
+    public String getText(){
 
-        if(player.shell.isDisposed()){
+        if(window.shell.isDisposed()){
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
@@ -33,9 +32,7 @@ public class Player {
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
-            player.setText(s.toString());
-            player.setVisible(false);
-            return;
+            return "";
         }
 
         AbstractPlayer p = AbstractDungeon.player;
@@ -80,8 +77,7 @@ public class Player {
             }
         }
 
-        player.setText(s.toString());
-        player.setVisible(true);
+        return s.toString();
 
     }
 
