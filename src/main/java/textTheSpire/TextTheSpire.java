@@ -9,13 +9,17 @@ import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.red.Whirlwind;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.characters.CharacterManager;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.ModHelper;
+import com.megacrit.cardcrawl.helpers.SeedHelper;
+import com.megacrit.cardcrawl.helpers.TrialHelper;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.*;
@@ -27,6 +31,8 @@ import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
+import communicationmod.GameStateListener;
+import communicationmod.InvalidCommandException;
 import org.eclipse.swt.widgets.Display;
 
 import javax.swing.*;
@@ -200,7 +206,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     hand.isVisible = true;
                     break;
                 case "map":
-                    hand.isVisible = true;
+                    map.isVisible = true;
                     break;
                 case "monster":
                     monster.isVisible = true;
@@ -234,7 +240,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     hand.isVisible = false;
                     break;
                 case "map":
-                    hand.isVisible = false;
+                    map.isVisible = false;
                     break;
                 case "monster":
                     monster.isVisible = false;
@@ -257,7 +263,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
                 if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
-                    CommandExecutor.executeCommand(input);
+                    executeStartCommand(tokens);
                 return;
             } catch (Exception e) {
                 return;
@@ -265,7 +271,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
                 if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
-                    CommandExecutor.executeCommand(input.substring(2));
+                    tokens = (input.substring(2)).split("\\s+");
+                    executeStartCommand(tokens);
                 return;
             } catch (Exception e) {
                 return;
@@ -545,6 +552,51 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 return;
             }
         }
+    }
+
+    private static void executeStartCommand(String[] tokens){
+        if (tokens.length < 2) {
+            return;
+        }
+        int ascensionLevel = 0;
+        AbstractPlayer.PlayerClass selectedClass = null;
+        for(AbstractPlayer.PlayerClass playerClass : AbstractPlayer.PlayerClass.values()) {
+            if(playerClass.name().equalsIgnoreCase(tokens[1])) {
+                selectedClass = playerClass;
+            }
+        }
+        // Better to allow people to specify the character as "silent" rather than requiring "the_silent"
+        if(tokens[1].equalsIgnoreCase("silent")) {
+            selectedClass = AbstractPlayer.PlayerClass.THE_SILENT;
+        }
+        if(selectedClass == null) {
+            return;
+        }
+        if(tokens.length >= 3) {
+            try {
+                ascensionLevel = Integer.parseInt(tokens[2]);
+            } catch (NumberFormatException e) {
+                return;
+            }
+            if(ascensionLevel < 0 || ascensionLevel > 20) {
+                return;
+            }
+        }
+
+        Settings.seed = SeedHelper.generateUnoffensiveSeed(new Random(System.nanoTime()));;
+        Settings.seedSet = false;
+        Settings.isTrial = false;
+        Settings.isDailyRun = false;
+        AbstractDungeon.generateSeeds();
+        AbstractDungeon.ascensionLevel = ascensionLevel;
+        AbstractDungeon.isAscensionMode = ascensionLevel > 0;
+        CardCrawlGame.startOver = true;
+        CardCrawlGame.mainMenuScreen.isFadingOut = true;
+        CardCrawlGame.mainMenuScreen.fadeOutMusic();
+        CharacterManager manager = new CharacterManager();
+        manager.setChosenCharacter(selectedClass);
+        CardCrawlGame.chosenCharacter = selectedClass;
+        GameStateListener.resetStateVariables();
     }
 
     public String inspectCard(AbstractCard card){

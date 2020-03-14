@@ -79,7 +79,7 @@ public class Event extends AbstractWindow{
 
                 }
 
-                return  s.toString();
+                return s.toString();
 
             }else{
 
@@ -186,20 +186,20 @@ public class Event extends AbstractWindow{
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(!checkedSave) {
                 if (CardCrawlGame.characterManager.anySaveFileExists()) {
-                    s.append("restart [class] [ascension] [seed]\r\n");
+                    s.append("restart [class] [ascension]\r\n");
                     s.append("continue\r\n");
                     haveSave = true;
                 } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
+                    s.append("start [class] [ascension]\r\n");
                     haveSave = false;
                 }
                 checkedSave = true;
             }else{
                 if (haveSave) {
-                    s.append("restart [class] [ascension] [seed]\r\n");
+                    s.append("restart [class] [ascension]\r\n");
                     s.append("continue\r\n");
                 } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
+                    s.append("start [class] [ascension]\r\n");
                 }
             }
 
