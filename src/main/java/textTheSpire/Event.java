@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.helpers.Prefs;
 import com.megacrit.cardcrawl.helpers.SaveHelper;
+import com.megacrit.cardcrawl.helpers.TipTracker;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
@@ -196,6 +197,9 @@ public class Event extends AbstractWindow{
                     s.append("start [class] [ascension] [seed]\r\n");
                     haveSave = false;
                 }
+
+                TipTracker.disableAllFtues();
+
                 checkedSave = true;
             }else{
                 if (haveSave) {

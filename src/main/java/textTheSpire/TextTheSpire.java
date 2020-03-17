@@ -748,6 +748,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             Settings.FAST_HAND_CONF = Settings.gamePref.getBoolean("Hand Confirmation", false);
             CardCrawlGame.MUTE_IF_BG = Settings.soundPref.getBoolean("Mute in Bg", true);
 
+            TipTracker.disableAllFtues();
+
         }
 
     }
