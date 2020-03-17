@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class Orbs extends AbstractWindow{
 
     public Orbs(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Orbs",300,300);
     }
 
@@ -28,6 +28,7 @@ public class Orbs extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){

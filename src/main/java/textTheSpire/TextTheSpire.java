@@ -14,9 +14,7 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
-import com.megacrit.cardcrawl.helpers.ModHelper;
-import com.megacrit.cardcrawl.helpers.SeedHelper;
-import com.megacrit.cardcrawl.helpers.TrialHelper;
+import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.random.Random;
@@ -45,6 +43,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     //Used to only update display every number of update cycles
     int iter;
+
+    private boolean setSettings = false;
 
     private Hand hand;
     private Map map;
@@ -262,7 +262,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT)
                     executeStartCommand(tokens);
                 return;
             } catch (Exception e) {
@@ -270,7 +270,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT)
                     tokens = (input.substring(2)).split("\\s+");
                     executeStartCommand(tokens);
                 return;
@@ -643,7 +643,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public boolean isUnlocked(String[] tokens){
+    /*public boolean isUnlocked(String[] tokens){
         String c = tokens[1].toLowerCase();
         switch(c){
             case "ironclad" :
@@ -702,7 +702,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 return true;
         }
         return false;
-    }
+    }*/
 
     //Update displays every 30 update cycles
     @Override
@@ -731,7 +731,22 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         specialUpdates();
 
+        if(!setSettings){
 
+            Settings.soundPref.putBoolean("Mute in Bg", false);
+            Settings.soundPref.flush();
+
+            Settings.gamePref.putBoolean("Fast Mode", true);
+            Settings.gamePref.putBoolean("Hand Confirmation", true);
+            Settings.gamePref.flush();
+
+            setSettings = true;
+
+            Settings.FAST_MODE = Settings.gamePref.getBoolean("Fast Mode", false);
+            Settings.FAST_HAND_CONF = Settings.gamePref.getBoolean("Hand Confirmation", false);
+            CardCrawlGame.MUTE_IF_BG = Settings.soundPref.getBoolean("Mute in Bg", true);
+
+        }
 
     }
 

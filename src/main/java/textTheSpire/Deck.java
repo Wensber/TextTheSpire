@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Display;
 public class Deck extends AbstractWindow{
 
     public Deck(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Deck",300,300);
     }
 
@@ -23,6 +23,7 @@ public class Deck extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){

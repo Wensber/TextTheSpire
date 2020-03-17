@@ -6,6 +6,8 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.TheSilent;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.helpers.Prefs;
+import com.megacrit.cardcrawl.helpers.SaveHelper;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
@@ -26,7 +28,7 @@ public class Event extends AbstractWindow{
     private boolean haveSave;
 
     public Event(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Event", 300, 300);
     }
 
@@ -38,6 +40,7 @@ public class Event extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         if(CommandExecutor.isInDungeon()){
 
@@ -186,30 +189,29 @@ public class Event extends AbstractWindow{
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(!checkedSave) {
                 if (CardCrawlGame.characterManager.anySaveFileExists()) {
-                    s.append("restart [class] [ascension]\r\n");
+                    s.append("restart [class] [ascension] [seed]\r\n");
                     s.append("continue\r\n");
                     haveSave = true;
                 } else {
-                    s.append("start [class] [ascension]\r\n");
+                    s.append("start [class] [ascension] [seed]\r\n");
                     haveSave = false;
                 }
                 checkedSave = true;
             }else{
                 if (haveSave) {
-                    s.append("restart [class] [ascension]\r\n");
+                    s.append("restart [class] [ascension] [seed]\r\n");
                     s.append("continue\r\n");
                 } else {
-                    s.append("start [class] [ascension]\r\n");
+                    s.append("start [class] [ascension] [seed]\r\n");
                 }
             }
 
             s.append("Unlocks:\r\n");
 
             for(AbstractPlayer p : CardCrawlGame.characterManager.getAllCharacters()){
-                if(!UnlockTracker.isCharacterLocked(p.getClass().getSimpleName())){
-                    s.append(p.getClass().getSimpleName() + " ");
-                    s.append("Ascension " + p.getPrefs().getInteger("ASCENSION_LEVEL", 0) + "\r\n");
-                }
+
+                s.append(p.getClass().getSimpleName() + "\r\n");
+
             }
 
             return s.toString();

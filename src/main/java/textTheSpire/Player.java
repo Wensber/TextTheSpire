@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class Player extends AbstractWindow{
 
     public Player(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Player",300,300);
     }
 
@@ -29,6 +29,7 @@ public class Player extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class Map extends AbstractWindow{
 
     public Map(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Map", 550, 425);
     }
 
@@ -25,6 +25,7 @@ public class Map extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         //Is only displayed when on map screen
         if(CommandExecutor.isInDungeon() && !(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT)) {

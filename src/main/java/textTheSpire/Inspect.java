@@ -32,7 +32,8 @@ public class Inspect {
         int floor;
         int x;
 
-        StringBuilder s = new StringBuilder();;
+        StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         try{
             floor = Integer.parseInt(tokens[1]);

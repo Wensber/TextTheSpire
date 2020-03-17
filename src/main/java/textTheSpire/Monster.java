@@ -18,7 +18,7 @@ public class Monster extends AbstractWindow{
     public int totalDmg = 0;
 
     public Monster(Display display){
-        isVisible = false;
+        isVisible = true;
         window = new Window(display,"Monster", 400, 600);
     }
 
@@ -30,6 +30,7 @@ public class Monster extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
+        s.append("\r\n");
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
