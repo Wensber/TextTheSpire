@@ -10,6 +10,7 @@ import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.stances.NeutralStance;
 import com.megacrit.cardcrawl.ui.panels.EnergyPanel;
+import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class Player extends AbstractWindow{
         s.append("\r\n");
 
         //Not in dungeon
-        if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
+        if(CardCrawlGame.dungeon == null || !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
             return "";
         }
 

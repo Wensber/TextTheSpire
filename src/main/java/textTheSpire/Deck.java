@@ -6,6 +6,7 @@ import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 public class Deck extends AbstractWindow{
@@ -26,7 +27,7 @@ public class Deck extends AbstractWindow{
         s.append("\r\n");
 
         //Not in dungeon
-        if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
+        if(CardCrawlGame.dungeon == null || !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
             return "";
         }
 

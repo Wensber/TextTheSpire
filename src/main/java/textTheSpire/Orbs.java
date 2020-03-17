@@ -9,6 +9,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.orbs.*;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class Orbs extends AbstractWindow{
         s.append("\r\n");
 
         //If not in dungeon
-        if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
+        if(CardCrawlGame.dungeon == null || !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
             return "";
         }
 

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class Relic extends AbstractWindow{
         s.append("\r\n");
 
         //Not in dungeon
-        if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
+        if(CardCrawlGame.dungeon == null || !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
             return "";
         }
 

@@ -8,6 +8,7 @@ import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.RunicDome;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class Monster extends AbstractWindow{
         s.append("\r\n");
 
         //If not in dungeon
-        if(CardCrawlGame.dungeon == null || !CardCrawlGame.isInARun()){
+        if(CardCrawlGame.dungeon == null ||  !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
             return "";
         }
 
