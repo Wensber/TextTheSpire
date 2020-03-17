@@ -33,6 +33,7 @@ public class Map extends AbstractWindow{
             ArrayList<ArrayList<MapRoomNode>> m = AbstractDungeon.map;
             //Current position
             s.append("Current= Floor:").append(AbstractDungeon.currMapNode.y + 1).append(" X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
+            s.append("\r\n");
 
             //Either display all nodes.
             if(AbstractDungeon.currMapNode.y == 15 || AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
@@ -44,26 +45,15 @@ public class Map extends AbstractWindow{
 
                 for (int i = m.size() - 1; i >= (currFloor + 1); i--) {
 
-                    s.append("Floor:").append(i + 1).append("\r\n");
+
                     for (MapRoomNode n : m.get(i)) {
 
                         if (n.hasEdges()) {
-                            if (i > 0) {
-
-                                s.append(nodeType(n)).append(n.x).append(" Connected ");
-                                for (MapRoomNode child : m.get(i - 1)) {
-                                    if (child.hasEdges() && child.isConnectedTo(n)) {
-                                        s.append(child.x).append(" ");
-                                    }
-                                }
-                                s. append("\r\n");
-
-                            } else {
-                                s.append(nodeType(n)).append(n.x).append("\r\n");
-                            }
+                            s.append(nodeType(n)).append("Floor:").append(i + 1).append(" X:").append(n.x).append("\r\n");
                         }
 
                     }
+
                     s.append("\r\n");
 
                 }
@@ -80,23 +70,25 @@ public class Map extends AbstractWindow{
                 prev.add(AbstractDungeon.currMapNode);
 
                 for(int i=(AbstractDungeon.currMapNode.y + 1);i<m.size();i++ ){
-                    limitedFloor = new StringBuilder("Floor:" + (i + 1) + "\r\n");
+                    limitedFloor = new StringBuilder();
 
                     for(MapRoomNode n : m.get(i)){
                         limitedNode = new StringBuilder();
 
                         for (MapRoomNode child : prev) {
                             if (child.isConnectedTo(n)) {
-                                limitedNode.append(child.x).append(" ");
+                                limitedNode.append(nodeType(n)).append(" Floor:" + (i + 1) + " X: ").append(n.x).append("\r\n");
+                                break;
                             }
                         }
                         if(limitedNode.length() > 0) {
-                            limitedNode = new StringBuilder(nodeType(n) + n.x + " Connected " + limitedNode.substring(0, limitedNode.length() - 1) + "\r\n");
                             limitedFloor.append(limitedNode);
                             current.add(n);
                         }
 
                     }
+
+                    limitedFloor.append("\r\n");
 
                     prev.clear();
                     prev.addAll(current);

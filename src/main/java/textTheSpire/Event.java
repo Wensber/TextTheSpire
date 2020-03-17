@@ -206,8 +206,6 @@ public class Event extends AbstractWindow{
                 }
             }
 
-            s.append("Unlocks:\r\n");
-
             for(AbstractPlayer p : CardCrawlGame.characterManager.getAllCharacters()){
 
                 s.append(p.getClass().getSimpleName() + "\r\n");

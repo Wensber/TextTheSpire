@@ -289,7 +289,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 if(tokens.length >= 3 && tokens[1].equals("inspect")){
 
                     int in = Integer.parseInt(tokens[2]);
-                    String s = " ";
+                    String s = "\r\n";
                     if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
                         AbstractPotion p = AbstractDungeon.player.potions.get(in);
 
@@ -340,7 +340,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             } else if (item instanceof StoreRelic) {
 
                                 AbstractRelic r = ((StoreRelic)item).relic;
-                                String s = "";
+                                String s = "\r\n";
 
                                 s += r.name + "\r\n";
                                 s += "Counter: " + r.counter + "\r\n";
@@ -351,7 +351,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             } else if (item instanceof StorePotion) {
 
                                 AbstractPotion p = ((StorePotion)item).potion;
-                                String s = "";
+                                String s = "\r\n";
 
                                 s += p.name + "\r\n";
                                 s += Event.stripColor(p.description) + "\r\n";
@@ -470,7 +470,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
                         AbstractRelic r = AbstractDungeon.player.relics.get(in);
 
-                        String s = "";
+                        String s = "\r\n";
 
                         s += r.name + "\r\n";
                         s += "Counter: " + r.counter + "\r\n";
@@ -601,7 +601,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public String inspectCard(AbstractCard card){
 
-        String s = "";
+        String s = "\r\n";
 
         int cost = Hand.handCost(card);
 
@@ -611,6 +611,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             s += "Cost : X"+ "\r\n";
         else if(cost != -2)
             s += "Cost : " + cost + "\r\n";
+
+        s += "Type : " + card.type.toString() + "\r\n";
 
         s += cardText(card) + "\r\n";
 
