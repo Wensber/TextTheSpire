@@ -31,7 +31,6 @@ public class Monster extends AbstractWindow{
         }
 
         StringBuilder s = new StringBuilder();
-        s.append("\r\n");
 
         //If not in dungeon
         if(CardCrawlGame.dungeon == null ||  !CommandExecutor.isInDungeon() || !CardCrawlGame.isInARun()){
@@ -70,7 +69,7 @@ public class Monster extends AbstractWindow{
 
             }
 
-            s.insert(0, "Count: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
+            s.insert(0, "\r\nCount: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
 
             return s.toString();
 

@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 
@@ -23,9 +24,13 @@ import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
+import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
+import com.megacrit.cardcrawl.ui.buttons.CancelButton;
+import com.megacrit.cardcrawl.ui.buttons.ProceedButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
@@ -52,9 +57,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Deck deck;
     private Player player;
     private Monster monster;
-    private Event event;
+    private Choices choice;
     private Relic relic;
     private Orbs orbs;
+    private Event event;
 
     private Inspect inspect;
 
@@ -71,13 +77,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             hand = new Hand(display);
             map = new Map(display);
-            event = new Event(display);
+            choice = new Choices(display);
             monster = new Monster(display);
             deck = new Deck(display);
             discard = new Discard(display);
             relic = new Relic(display);
             player = new Player(display);
             orbs = new Orbs(display);
+            event = new Event(display);
 
             inspect = new Inspect(display);
 
@@ -131,6 +138,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         hasQueuedCommand = true;
     }
 
+    //TODO Create help commands
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input) {
 
@@ -145,8 +153,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             case "discard":
                 inspect.setText(discard.getText());
                 break;
-            case "event":
-                inspect.setText(event.getText());
+            case "choices":
+                inspect.setText(choice.getText());
                 break;
             case "hand":
                 inspect.setText(hand.getText());
@@ -165,6 +173,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 break;
             case "relic":
                 inspect.setText(relic.getText());
+                break;
+            case "event":
+                inspect.setText(event.getText());
                 break;
         }
 
@@ -199,8 +210,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "discard":
                     discard.isVisible = true;
                     break;
-                case "event":
-                    event.isVisible = true;
+                case "choices":
+                    choice.isVisible = true;
                     break;
                 case "hand":
                     hand.isVisible = true;
@@ -220,6 +231,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "relic":
                     relic.isVisible = true;
                     break;
+                case "event":
+                    event.isVisible = true;
+                    break;
             }
 
         }
@@ -233,8 +247,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "discard":
                     discard.isVisible = false;
                     break;
-                case "event":
-                    event.isVisible = false;
+                case "choices":
+                    choice.isVisible = false;
                     break;
                 case "hand":
                     hand.isVisible = false;
@@ -254,6 +268,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "relic":
                     relic.isVisible = false;
                     break;
+                case "event":
+                    event.isVisible = false;
+                    break;
             }
 
         }
@@ -263,16 +280,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
                 if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT)
-                    executeStartCommand(tokens);
+                    CommandExecutor.executeCommand(input);
                 return;
             } catch (Exception e) {
                 return;
             }
         } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT)
-                    tokens = (input.substring(2)).split("\\s+");
-                    executeStartCommand(tokens);
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                    //tokens = (input.substring(2)).split("\\s+");
+                    CommandExecutor.executeCommand(input.substring(2));
+                }
                 return;
             } catch (Exception e) {
                 return;
@@ -289,14 +307,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 if(tokens.length >= 3 && tokens[1].equals("inspect")){
 
                     int in = Integer.parseInt(tokens[2]);
-                    String s = "\r\n";
                     if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
                         AbstractPotion p = AbstractDungeon.player.potions.get(in);
 
-                        s += p.name + "\r\n";
-                        s += Event.stripColor(p.description) + "\r\n";
-
-                        inspect.setText(s);
+                        inspect.setText(inspectPotion(p));
 
                     }
                     return;
@@ -310,156 +324,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         if (tokens[0].equals("choice")) {
-            try {
-                if(tokens.length >= 2) {
-                    int in = Integer.parseInt(tokens[1]);
-
-                    ChoiceScreenUtils.ChoiceType c = ChoiceScreenUtils.getCurrentChoiceType();
-
-                    if(c == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN){
-                        ArrayList<Object> shopItems = Event.getAvailableShopItems();
-
-                        in--;
-
-                        if (in >= 0 && in < shopItems.size()) {
-
-                            Object item = shopItems.get(in);
-
-                            if (item instanceof String) {
-
-                                if(((String)item).equals("purge-" + ShopScreen.actualPurgeCost)){
-                                    inspect.setText("Remove a card from your deck.\r\n");
-                                }
-
-                            } else if (item instanceof AbstractCard) {
-
-                                AbstractCard card = (AbstractCard)item;
-
-                                inspect.setText(inspectCard(card));
-
-                            } else if (item instanceof StoreRelic) {
-
-                                AbstractRelic r = ((StoreRelic)item).relic;
-                                String s = "\r\n";
-
-                                s += r.name + "\r\n";
-                                s += "Counter: " + r.counter + "\r\n";
-                                s += Event.stripColor(r.description) + "\r\n";
-
-                                inspect.setText(s);
-
-                            } else if (item instanceof StorePotion) {
-
-                                AbstractPotion p = ((StorePotion)item).potion;
-                                String s = "\r\n";
-
-                                s += p.name + "\r\n";
-                                s += Event.stripColor(p.description) + "\r\n";
-
-                                inspect.setText(s);
-
-                            }
-                        }
-                    } else if (c == ChoiceScreenUtils.ChoiceType.GRID){
-
-                        in--;
-
-                        ArrayList<AbstractCard> grid = ChoiceScreenUtils.getGridScreenCards();
-
-                        if(in >= 0 && in < grid.size()){
-
-                            AbstractCard card = grid.get(in);
-
-                            inspect.setText(inspectCard(card));
-
-                        }
-
-                    } else if (c == ChoiceScreenUtils.ChoiceType.CARD_REWARD){
-
-                        in--;
-
-                        if(in >= 0 && in < AbstractDungeon.cardRewardScreen.rewardGroup.size()){
-
-                            AbstractCard card = AbstractDungeon.cardRewardScreen.rewardGroup.get(in);
-
-                            inspect.setText(inspectCard(card));
-
-                        }
-
-                    } else if (c == ChoiceScreenUtils.ChoiceType.HAND_SELECT){
-
-                        in--;
-
-                        if(in >= 0 && in < AbstractDungeon.handCardSelectScreen.selectedCards.group.size()){
-
-                            AbstractCard card = AbstractDungeon.handCardSelectScreen.selectedCards.group.get(in);
-
-                            inspect.setText(inspectCard(card));
-
-                        }
-
-                    } else if (c == ChoiceScreenUtils.ChoiceType.BOSS_REWARD){
-
-                        in--;
-
-                        if(in >= 0 && in < AbstractDungeon.bossRelicScreen.relics.size()){
-
-                            AbstractRelic r = AbstractDungeon.bossRelicScreen.relics.get(in);
-
-                            String s = "";
-
-                            s += r.name + "\r\n";
-                            s += "Counter: " + r.counter + "\r\n";
-                            s += Event.stripColor(r.description) + "\r\n";
-
-                            inspect.setText(s);
-
-                        }
-
-                    } else if (c == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD){
-
-                        in--;
-
-                        ArrayList<RewardItem> rewards = AbstractDungeon.combatRewardScreen.rewards;
-
-                        if(in >= 0 && in < rewards.size()){
-
-                            RewardItem reward = rewards.get(in);
-
-                            if(reward.type == RewardItem.RewardType.RELIC){
-
-                                AbstractRelic r = reward.relic;
-
-                                String s = "";
-
-                                s += r.name + "\r\n";
-                                s += "Counter: " + r.counter + "\r\n";
-                                s += Event.stripColor(r.description) + "\r\n";
-
-                                inspect.setText(s);
-
-                            }else if (reward.type == RewardItem.RewardType.POTION){
-
-                                AbstractPotion p = reward.potion;
-
-                                String s = "";
-
-                                s += p.name + "\r\n";
-                                s += Event.stripColor(p.description) + "\r\n";
-
-                                inspect.setText(s);
-
-                            }
-
-                        }
-
-                    }
-
-                }
-                return;
-            } catch (Exception e) {
-                return;
-            }
+            executeChoice(tokens);
         }
 
         if (tokens[0].equals("relic")) {
@@ -470,13 +335,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
                         AbstractRelic r = AbstractDungeon.player.relics.get(in);
 
-                        String s = "\r\n";
-
-                        s += r.name + "\r\n";
-                        s += "Counter: " + r.counter + "\r\n";
-                        s += Event.stripColor(r.description) + "\r\n";
-
-                        inspect.setText(s);
+                        inspect.setText(inspectRelic(r));
 
                     }
                 }
@@ -488,10 +347,27 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         //Press a confirm or cancel button. Only usable if such a button exists
         if (ChoiceScreenUtils.isConfirmButtonAvailable() && input.equals(ChoiceScreenUtils.getConfirmButtonText())) {
+
+            if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
+                AbstractDungeon.deathScreen.returnButton.hb.clicked = true;
+                return;
+            }
+            if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
+                AbstractDungeon.victoryScreen.returnButton.hb.clicked = true;
+                return;
+            }
+
             ChoiceScreenUtils.pressConfirmButton();
             return;
         }
         if (ChoiceScreenUtils.isCancelButtonAvailable() && input.equals(ChoiceScreenUtils.getCancelButtonText())) {
+
+            if(input.equals("skip") && ChoiceScreenUtils.getCurrentChoiceType()==ChoiceScreenUtils.ChoiceType.BOSS_REWARD){
+                MenuCancelButton button = (MenuCancelButton) ReflectionHacks.getPrivate(AbstractDungeon.bossRelicScreen, BossRelicSelectScreen.class, "cancelButton");
+                button.hb.clicked = true;
+                return;
+            }
+
             ChoiceScreenUtils.pressCancelButton();
             return;
         }
@@ -500,40 +376,40 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (d != null && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
             input = input.toLowerCase();
 
-            if (tokens[0].equals("play")) {
-                try {
-                    CommandExecutor.executeCommand(input);
-                } catch (Exception e) {
-                    return;
-                }
-            } else if (tokens[0].equals("end")) {
-                try {
-                    CommandExecutor.executeCommand(tokens[0]);
-                } catch (Exception e) {
-                    return;
-                }
-            } else if (tokens[0].equals("hand")) {
-                int in;
-                try {
-                    in = Integer.parseInt(tokens[1]) - 1;
-
-                    if (in < 0 || in >= AbstractDungeon.player.hand.group.size())
+            switch (tokens[0]) {
+                case "play":
+                    try {
+                        CommandExecutor.executeCommand(input);
+                    } catch (Exception e) {
                         return;
-
-                    AbstractCard c = AbstractDungeon.player.hand.group.get(in);
-
-                    inspect.setText(inspectCard(c));
-
-                } catch (Exception e) {
-                    return;
+                    }
+                    break;
+                case "end":
+                    try {
+                        CommandExecutor.executeCommand(tokens[0]);
+                    } catch (Exception e) {
+                        return;
+                    }
+                    break;
+                case "hand": {
+                    int in;
+                    try {
+                        in = Integer.parseInt(tokens[1]);
+                        choiceCard(in, AbstractDungeon.player.hand.group);
+                    } catch (Exception e) {
+                        return;
+                    }
+                    break;
                 }
-            } else {
-                int in;
-                try {
-                    in = Integer.parseInt(input) - 1;
-                    ChoiceScreenUtils.executeChoice(in);
-                } catch (Exception e) {
-                    return;
+                default: {
+                    int in;
+                    try {
+                        in = Integer.parseInt(input) - 1;
+                        ChoiceScreenUtils.executeChoice(in);
+                    } catch (Exception e) {
+                        return;
+                    }
+                    break;
                 }
             }
         } else if (tokens[0].equals("map")){
@@ -548,12 +424,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             try {
                 in = Integer.parseInt(input) - 1;
                 ChoiceScreenUtils.executeChoice(in);
-            } catch (Exception e) {
-                return;
+            } catch (Exception ignored) {
             }
         }
     }
 
+    /*
     private static void executeStartCommand(String[] tokens){
         if (tokens.length < 2) {
             return;
@@ -597,6 +473,145 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         manager.setChosenCharacter(selectedClass);
         CardCrawlGame.chosenCharacter = selectedClass;
         GameStateListener.resetStateVariables();
+    }*/
+
+    public void executeChoice(String[] tokens){
+
+        try {
+            if(tokens.length >= 2) {
+                int in = Integer.parseInt(tokens[1]);
+
+                ChoiceScreenUtils.ChoiceType c = ChoiceScreenUtils.getCurrentChoiceType();
+
+                if(c == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN){
+                    choiceShop(in);
+                } else if (c == ChoiceScreenUtils.ChoiceType.GRID){
+                    choiceCard(in, ChoiceScreenUtils.getGridScreenCards());
+                } else if (c == ChoiceScreenUtils.ChoiceType.CARD_REWARD){
+                    choiceCard(in, AbstractDungeon.cardRewardScreen.rewardGroup);
+                } else if (c == ChoiceScreenUtils.ChoiceType.HAND_SELECT){
+                    choiceCard(in, AbstractDungeon.handCardSelectScreen.selectedCards.group);
+                } else if (c == ChoiceScreenUtils.ChoiceType.BOSS_REWARD){
+
+                    in--;
+
+                    if(in >= 0 && in < AbstractDungeon.bossRelicScreen.relics.size()){
+
+                        AbstractRelic r = AbstractDungeon.bossRelicScreen.relics.get(in);
+
+                        inspect.setText(inspectRelic(r));
+
+                    }
+
+                } else if (c == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD){
+                    choiceCombatReward(in);
+                }
+
+            }
+
+        } catch (Exception ignored) {
+
+        }
+
+    }
+
+    public void choiceCombatReward(int in){
+        in--;
+
+        ArrayList<RewardItem> rewards = AbstractDungeon.combatRewardScreen.rewards;
+
+        if(in >= 0 && in < rewards.size()){
+
+            RewardItem reward = rewards.get(in);
+
+            if(reward.type == RewardItem.RewardType.RELIC){
+
+                AbstractRelic r = reward.relic;
+
+                inspect.setText(inspectRelic(r));
+
+            }else if (reward.type == RewardItem.RewardType.POTION){
+
+                AbstractPotion p = reward.potion;
+
+                inspect.setText(inspectPotion(p));
+
+            }
+
+        }
+    }
+
+    public void choiceCard(int in, ArrayList<AbstractCard> list){
+        in--;
+
+        if(in >= 0 && in < list.size()){
+
+            AbstractCard card = list.get(in);
+
+            inspect.setText(inspectCard(card));
+
+        }
+    }
+
+    public void choiceShop(int in){
+        ArrayList<Object> shopItems = Choices.getAvailableShopItems();
+
+        in--;
+
+        if (in >= 0 && in < shopItems.size()) {
+
+            Object item = shopItems.get(in);
+
+            if (item instanceof String) {
+
+                if(((String)item).equals("purge-" + ShopScreen.actualPurgeCost)){
+                    inspect.setText("Remove a card from your deck.\r\n");
+                }
+
+            } else if (item instanceof AbstractCard) {
+
+                AbstractCard card = (AbstractCard)item;
+
+                inspect.setText(inspectCard(card));
+
+            } else if (item instanceof StoreRelic) {
+
+                AbstractRelic r = ((StoreRelic)item).relic;
+
+                inspect.setText(inspectRelic(r));
+
+            } else if (item instanceof StorePotion) {
+
+                AbstractPotion p = ((StorePotion)item).potion;
+
+                inspect.setText(inspectPotion(p));
+
+            }
+        }
+    }
+
+    public String inspectPotion(AbstractPotion p){
+
+        String s = "\r\n";
+
+        s += "Potion\r\n";
+        s += p.name + "\r\n";
+        s += Choices.stripColor(p.description) + "\r\n";
+
+        return s;
+
+    }
+
+    public String inspectRelic(AbstractRelic r){
+
+        String s = "\r\n";
+
+        s += "Relic\r\n";
+        s += r.name + "\r\n";
+        s += Choices.stripColor(r.description) + "\r\n";
+
+        return s;
+
     }
 
     public String inspectCard(AbstractCard card){
@@ -622,7 +637,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public String cardText(AbstractCard c){
 
-        String s = Event.stripColor(c.rawDescription);
+        String s = Choices.stripColor(c.rawDescription);
 
         s = s.replace("NL", " ");
 
@@ -728,8 +743,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         player.update();
         relic.update();
         map.update();
-        event.update();
+        choice.update();
         orbs.update();
+        event.update();
 
         specialUpdates();
 
@@ -747,8 +763,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             Settings.FAST_MODE = Settings.gamePref.getBoolean("Fast Mode", false);
             Settings.FAST_HAND_CONF = Settings.gamePref.getBoolean("Hand Confirmation", false);
             CardCrawlGame.MUTE_IF_BG = Settings.soundPref.getBoolean("Mute in Bg", true);
-
-            TipTracker.disableAllFtues();
 
         }
 

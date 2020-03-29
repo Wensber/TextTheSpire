@@ -30,6 +30,8 @@ public class Map extends AbstractWindow{
         //Is only displayed when on map screen
         if(CommandExecutor.isInDungeon() && !(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT)) {
 
+            s.append(AbstractDungeon.bossKey).append("\r\n");
+
             ArrayList<ArrayList<MapRoomNode>> m = AbstractDungeon.map;
             //Current position
             s.append("Current= Floor:").append(AbstractDungeon.currMapNode.y + 1).append(" X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
