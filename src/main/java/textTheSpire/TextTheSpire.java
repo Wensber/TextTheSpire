@@ -301,6 +301,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (!CommandExecutor.isInDungeon())
             return;
 
+        if(input.equals("seed")){
+            inspect.setText("\r\n" + SeedHelper.getString(Settings.seed));
+        }
+
         //Potion Command. If out of combat can only discard
         if (tokens[0].equals("potion")) {
             try {
