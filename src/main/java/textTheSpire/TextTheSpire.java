@@ -765,7 +765,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     //Match and Keep can go die in a hole
     public void specialUpdates(){
-        AbstractDungeon.shrineList.remove("Match and Keep!");
+        //AbstractDungeon.shrineList.remove("Match and Keep!");
 
     }
 

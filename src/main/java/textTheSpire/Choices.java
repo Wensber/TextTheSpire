@@ -103,18 +103,9 @@ public class Choices extends AbstractWindow{
 
                     s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
-                    if (AbstractDungeon.getCurrRoom().event.imageEventText.optionList.size() > 0) {
-                        for (LargeDialogOptionButton b : AbstractDungeon.getCurrRoom().event.imageEventText.optionList) {
-                            s.append(count).append(":").append(stripColor(b.msg)).append("\r\n");
-                            count++;
-                        }
-                    } else if (AbstractDungeon.getCurrRoom().event.roomEventText.optionList.size() > 0) {
-                        for (LargeDialogOptionButton b : AbstractDungeon.getCurrRoom().event.roomEventText.optionList) {
-                            s.append(count).append(":").append(stripColor(b.msg)).append("\r\n");
-                            count++;
-                        }
+                    for(String choice : ChoiceScreenUtils.getEventScreenChoices()){
+                        s.append(count).append(": ").append(choice);
                     }
-
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
 
