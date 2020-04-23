@@ -279,7 +279,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT)
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
                     CommandExecutor.executeCommand(input);
                 return;
             } catch (Exception e) {
@@ -287,7 +287,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens)) {
                     //tokens = (input.substring(2)).split("\\s+");
                     CommandExecutor.executeCommand(input.substring(2));
                 }
@@ -660,66 +660,57 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    /*public boolean isUnlocked(String[] tokens){
-        String c = tokens[1].toLowerCase();
-        switch(c){
-            case "ironclad" :
-                if(tokens.length > 2){
-                    try {
-                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
-                            return false;
-                        }
-                    }catch(Exception e){
-                        return false;
-                    }
-                }
-                return true;
+    public static boolean characterUnlocked(String p){
+
+        switch(p){
             case "the_silent" :
             case "silent" :
-                if(UnlockTracker.isCharacterLocked("The Silent")){
-                    return false;
-                }
-                if(tokens.length > 2){
-                    try {
-                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
-                            return false;
-                        }
-                    }catch(Exception e){
-                        return false;
-                    }
-                }
-                return true;
+                return !UnlockTracker.isCharacterLocked("The Silent");
             case "defect" :
-                if(UnlockTracker.isCharacterLocked("Defect")){
-                    return false;
-                }
-                if(tokens.length > 2){
-                    try {
-                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
-                            return false;
-                        }
-                    }catch(Exception e){
-                        return false;
-                    }
-                }
-                return true;
+                return !UnlockTracker.isCharacterLocked("Defect");
             case "watcher" :
-                if(UnlockTracker.isCharacterLocked("Watcher")){
-                    return false;
-                }
-                if(tokens.length > 2){
-                    try {
-                        if (Integer.parseInt(tokens[2]) > CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 0)){
-                            return false;
-                        }
-                    }catch(Exception e){
-                        return false;
+                return !UnlockTracker.isCharacterLocked("Watcher");
+            default:
+                for(AbstractPlayer pl : CardCrawlGame.characterManager.getAllCharacters()){
+                    if(pl.getClass().getSimpleName().toLowerCase().equals(p.toLowerCase())){
+                        return true;
                     }
                 }
-                return true;
+                return false;
+        }
+
+    }
+
+    public static int ascensionLevel(String p){
+        switch(p){
+            case "ironclad" :
+                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+            case "the_silent" :
+            case "silent" :
+                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+            case "defect" :
+                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+            case "watcher" :
+                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+            default:
+                return 20;
+        }
+    }
+
+    public boolean isUnlocked(String[] tokens){
+
+        String p = tokens[1].toLowerCase();
+
+        if(characterUnlocked(p)){
+            try{
+                if(tokens.length == 2 || Integer.parseInt(tokens[2]) <= ascensionLevel(p))
+                    return true;
+            }catch (Exception ignored){
+            }
         }
         return false;
-    }*/
+
+    }
 
     //Update displays every 30 update cycles
     @Override
@@ -775,6 +766,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Match and Keep can go die in a hole
     public void specialUpdates(){
         AbstractDungeon.shrineList.remove("Match and Keep!");
+
     }
 
 }

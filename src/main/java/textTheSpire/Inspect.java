@@ -51,7 +51,7 @@ public class Inspect {
             current_y = -1;
         ArrayList<ArrayList<MapRoomNode>> m;
 
-        if(!(current_y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0))) {
+        if(!(current_y == -1)) {
 
             m = new ArrayList<ArrayList<MapRoomNode>>();
 
@@ -95,8 +95,8 @@ public class Inspect {
                 prev.add(child);
                 inspected.add(child);
                 destination = child;
-                s.append("Floor " + floor + "\r\n");
-                s.append(Map.nodeType(child) + x + "\r\n");
+                s.append("Floor ").append(floor).append("\r\n");
+                s.append(Map.nodeType(child)).append(x).append("\r\n");
                 break;
             }
         }
@@ -106,17 +106,24 @@ public class Inspect {
 
         for(int i = (floor - current_y - 2);i>=0;i--){
 
-            s.append("Floor " + (i + current_y + 1) + "\r\n");
+            s.append("Floor ").append(i + current_y + 1).append("\r\n");
 
             for(MapRoomNode node : m.get(i)){
 
+                boolean connected = false;
+
                 for(MapRoomNode parent : prev){
                     if(node.isConnectedTo(parent)){
-                        s.append(Map.nodeType(node) + node.x + "\r\n");
+                        connected = true;
+                        s.append(Map.nodeType(node)).append(node.x).append("\r\n");
                         curr.add(node);
                         inspected.add(node);
                         break;
                     }
+                }
+
+                if(!connected && AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0){
+                    s.append("Winged ").append(Map.nodeType(node)).append(node.x).append("\r\n");
                 }
 
             }

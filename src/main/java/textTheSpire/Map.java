@@ -38,7 +38,7 @@ public class Map extends AbstractWindow{
             s.append("\r\n");
 
             //Either display all nodes.
-            if(AbstractDungeon.currMapNode.y == 15 || AbstractDungeon.currMapNode.y == -1 || (AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0)) {
+            if(AbstractDungeon.currMapNode.y == 15 || AbstractDungeon.currMapNode.y == -1) {
 
                 int currFloor = AbstractDungeon.currMapNode.y;
 
@@ -79,13 +79,15 @@ public class Map extends AbstractWindow{
 
                         for (MapRoomNode child : prev) {
                             if (child.isConnectedTo(n)) {
-                                limitedNode.append(nodeType(n)).append(" Floor:" + (i + 1) + " X: ").append(n.x).append("\r\n");
+                                limitedNode.append(nodeType(n)).append(" Floor:").append(i + 1).append(" X: ").append(n.x).append("\r\n");
                                 break;
                             }
                         }
                         if(limitedNode.length() > 0) {
                             limitedFloor.append(limitedNode);
                             current.add(n);
+                        } else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0){
+                            limitedFloor.append("Winged ").append(nodeType(n)).append(" Floor:").append(i + 1).append(" X: ").append(n.x).append("\r\n");
                         }
 
                     }

@@ -28,7 +28,6 @@ public class Choices extends AbstractWindow{
     private boolean checkedSave = false;
     private boolean haveSave;
 
-    //TODO Separate this into Event and Choices windows
     public Choices(Display display){
         isVisible = true;
         window = new Window(display,"Choices", 300, 300);
@@ -149,16 +148,19 @@ public class Choices extends AbstractWindow{
 
                     }else{
 
-                        s.append("Inspected " + Map.nodeType(Inspect.destination) + (Inspect.destination.y+1) + " " + Inspect.destination.x + "\r\n");
+                        s.append("Inspected ").append(Map.nodeType(Inspect.destination)).append(Inspect.destination.y + 1).append(" ").append(Inspect.destination.x).append("\r\n");
 
                         for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
                             s.append(count).append(":");
                             s.append(Map.nodeType(n));
-                            if(Inspect.inspected_map.contains(n)) {
+                            if (Inspect.inspected_map.contains(n)) {
                                 s.append("On Track ").append(n.x).append("\r\n");
+                            }else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && n.isConnectedTo(AbstractDungeon.getCurrMapNode())){
+                                s.append("Winged ").append(n.x).append("\r\n");
                             }else{
                                 s.append("Diverge ").append(n.x).append("\r\n");
                             }
+
                             count++;
                         }
 
@@ -213,7 +215,12 @@ public class Choices extends AbstractWindow{
 
             for(AbstractPlayer p : CardCrawlGame.characterManager.getAllCharacters()){
 
-                s.append(p.getClass().getSimpleName() + "\r\n");
+                s.append(p.getClass().getSimpleName()).append(" ");
+
+                if(TextTheSpire.characterUnlocked(p.getClass().getSimpleName()))
+                    s.append(TextTheSpire.ascensionLevel(p.getClass().getSimpleName())).append("\r\n");
+                else
+                    s.append("locked\r\n");
 
             }
 
