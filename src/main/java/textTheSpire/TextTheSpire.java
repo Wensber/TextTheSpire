@@ -671,12 +671,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             case "watcher" :
                 return !UnlockTracker.isCharacterLocked("Watcher");
             default:
-                for(AbstractPlayer pl : CardCrawlGame.characterManager.getAllCharacters()){
-                    if(pl.getClass().getSimpleName().toLowerCase().equals(p.toLowerCase())){
-                        return true;
-                    }
-                }
-                return false;
+                return true;
         }
 
     }

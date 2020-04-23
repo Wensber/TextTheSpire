@@ -28,6 +28,13 @@ public class Event extends AbstractWindow{
             Gdx.app.exit();
         }
 
+        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
+            return "\r\nDeath\r\nScore " + DeathScreen.calcScore(false);
+        }
+        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
+            return "\r\nVictory\r\nScore" + VictoryScreen.calcScore(true);
+        }
+
         StringBuilder s = new StringBuilder();
         s.append("\r\n");
 
@@ -36,19 +43,10 @@ public class Event extends AbstractWindow{
             return "";
         }
 
-        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
-            return "\r\nDeath\r\n Score " + DeathScreen.calcScore(false);
-        }
-        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
-            return "\r\nVictory\r\n Score" + VictoryScreen.calcScore(true);
-        }
-
         s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
-
-
-        //return s.toString();
-        return "";
+        return s.toString();
+        //return "";
     }
 
 }

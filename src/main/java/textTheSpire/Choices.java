@@ -104,7 +104,8 @@ public class Choices extends AbstractWindow{
                     s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
                     for(String choice : ChoiceScreenUtils.getEventScreenChoices()){
-                        s.append(count).append(": ").append(choice);
+                        s.append(count).append(": ").append(choice).append("\r\n");
+                        count++;
                     }
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
@@ -204,12 +205,12 @@ public class Choices extends AbstractWindow{
 
             TipTracker.disableAllFtues();
 
-            for(AbstractPlayer p : CardCrawlGame.characterManager.getAllCharacters()){
+            for(AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()){
 
-                s.append(p.getClass().getSimpleName()).append(" ");
+                s.append(p.name().toLowerCase()).append(" ");
 
-                if(TextTheSpire.characterUnlocked(p.getClass().getSimpleName()))
-                    s.append(TextTheSpire.ascensionLevel(p.getClass().getSimpleName())).append("\r\n");
+                if(TextTheSpire.characterUnlocked(p.name().toLowerCase()))
+                    s.append(TextTheSpire.ascensionLevel(p.name().toLowerCase())).append("\r\n");
                 else
                     s.append("locked\r\n");
 
