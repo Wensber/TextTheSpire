@@ -6,15 +6,12 @@ Description:
 
 This is a mod for the game Slay the Spire and provides screen reader accessibility.
 It does so by providing lots of windows displaying the game information and a prompt window for inputting commands.
-Descriptions of the windows and commands are provided in the sections Display and Controls.
+Descriptions of the windows and commands are provided with the help command.
 
 Status of Completion:
 
-TextTheSpire is almost done. I hesitate to call it done for the following reason.
-There are still potentially unknown bugs that need to be fixed.
-For example, I previously discovered that TextTheSpire did not behave correctly with the relic Runic Dome.
-You are not supposed to be able to see enemy intents while owning Runic Dome but TextTheSpire displayed the intents anyway.
-I have not been able to check every single relic, card, and potential interactions between them that could cause bugs that are game breaking or simply messes up the display.
+TextTheSpire is in a functional state. There have been about 250 hours of use from a blind person.
+There are currently no known bugs but there are some quality of life changes and features like daily run that can be added.
 If you decide to use this mod and run into issues, let me know at textthespire@gmail.com.
 
 Limitations:
@@ -37,6 +34,8 @@ CommunicationMod - https://github.com/ForgottenArbiter/CommunicationMod/releases
 BaseMod - https://steamcommunity.com/workshop/filedetails/?id=1605833019
 
 ModTheSpire - https://steamcommunity.com/sharedfiles/filedetails/?id=1605060445
+
+If you don't already have a screen reader, you can NVDA for free from https://www.nvaccess.org/
 
 Installation:
 
@@ -70,5 +69,3 @@ Step 7:
 Double click mts-launder to launch the mod. The first time you will need to select the mods.
 There is a select all option on the Mod the Spire window that will show up.
 Afterwards they will be auto selected. Hit enter to start the game.
-
-Display and Controls are currently a work in progress.

@@ -141,42 +141,42 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //TODO Create help commands
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input) {
-
+        input = input.toLowerCase();
         switch(input){
             case "quit":
                 dispose();
                 Gdx.app.exit();
-                break;
+                return;
             case "deck":
                 inspect.setText(deck.getText());
-                break;
+                return;
             case "discard":
                 inspect.setText(discard.getText());
-                break;
+                return;
             case "choices":
                 inspect.setText(choice.getText());
-                break;
+                return;
             case "hand":
                 inspect.setText(hand.getText());
-                break;
+                return;
             case "map":
                 inspect.setText(map.getText());
-                break;
+                return;
             case "monster":
                 inspect.setText(monster.getText());
-                break;
+                return;
             case "orbs":
                 inspect.setText(orbs.getText());
-                break;
+                return;
             case "player":
                 inspect.setText(player.getText());
-                break;
+                return;
             case "relic":
                 inspect.setText(relic.getText());
-                break;
+                return;
             case "event":
                 inspect.setText(event.getText());
-                break;
+                return;
         }
 
         //Continue command. Only usable when not in dungeon and save file exists
@@ -201,39 +201,44 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         AbstractDungeon d = CardCrawlGame.dungeon;
         String[] tokens = input.split("\\s+");
 
+        if(tokens[0].equals("help")){
+            inspect.setText(displayHelp(tokens));
+            return;
+        }
+
         if(tokens[0].equals("show") && tokens.length >= 2){
 
             switch(tokens[1]){
                 case "deck":
                     deck.isVisible = true;
-                    break;
+                    return;
                 case "discard":
                     discard.isVisible = true;
-                    break;
+                    return;
                 case "choices":
                     choice.isVisible = true;
-                    break;
+                    return;
                 case "hand":
                     hand.isVisible = true;
-                    break;
+                    return;
                 case "map":
                     map.isVisible = true;
-                    break;
+                    return;
                 case "monster":
                     monster.isVisible = true;
-                    break;
+                    return;
                 case "orbs":
                     orbs.isVisible = true;
-                    break;
+                    return;
                 case "player":
                     player.isVisible = true;
-                    break;
+                    return;
                 case "relic":
                     relic.isVisible = true;
-                    break;
+                    return;
                 case "event":
                     event.isVisible = true;
-                    break;
+                    return;
             }
 
         }
@@ -243,34 +248,34 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             switch(tokens[1]){
                 case "deck":
                     deck.isVisible = false;
-                    break;
+                    return;
                 case "discard":
                     discard.isVisible = false;
-                    break;
+                    return;
                 case "choices":
                     choice.isVisible = false;
-                    break;
+                    return;
                 case "hand":
                     hand.isVisible = false;
-                    break;
+                    return;
                 case "map":
                     map.isVisible = false;
-                    break;
+                    return;
                 case "monster":
                     monster.isVisible = false;
-                    break;
+                    return;
                 case "orbs":
                     orbs.isVisible = false;
-                    break;
+                    return;
                 case "player":
                     player.isVisible = false;
-                    break;
+                    return;
                 case "relic":
                     relic.isVisible = false;
-                    break;
+                    return;
                 case "event":
                     event.isVisible = false;
-                    break;
+                    return;
             }
 
         }
@@ -592,6 +597,177 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             }
         }
+    }
+
+    public String displayHelp(String[] tokens){
+
+        if(tokens.length == 1){
+            return  "\r\nHere are a list of commands you can perform." +
+                    "\r\nFor more details enter help followed by a command." +
+                    "\r\nAll commands are input in the prompt window." +
+                    "\r\nstart" +
+                    "\r\nrestart" +
+                    "\r\ncontinue" +
+                    "\r\nquit" +
+                    "\r\nseed" +
+                    "\r\nplay" +
+                    "\r\npotion" +
+                    "\r\nchoice" +
+                    "\r\nend" +
+                    "\r\nshow" +
+                    "\r\nhide" +
+                    "\r\nChoices" +
+                    "\r\nDeck" +
+                    "\r\nDiscard" +
+                    "\r\nEvent" +
+                    "\r\nHand" +
+                    "\r\nOutput" +
+                    "\r\nMap" +
+                    "\r\nMonster" +
+                    "\r\nOrbs" +
+                    "\r\nPlayer" +
+                    "\r\nRelic";
+        }else{
+            switch(tokens[1].toLowerCase()){
+                case "start":
+                case "restart":
+                case "continue":
+                    return  "\r\nstart, restart, and continue" +
+                            "\r\nThese commands let you enter a run. You see these options while on the start menu." +
+                            "\r\nIf there is no save file, you can start a run." +
+                            "\r\nThe format is" +
+                            "\r\nstart, class name, ascension level, seed" +
+                            "\r\nThe second 2 are optional." +
+                            "\r\nIf you want to enter a seed you will need to enter an ascension level." +
+                            "\r\nIf there is a save file, you will have the continue and restart options." +
+                            "\r\nrestart follows the same format as start." +
+                            "\r\nThe only reason for the command difference is to help make sure you don't overwrite a file on accident." +
+                            "\r\nThe choices window will display all of the classes and their unlocked ascension level." +
+                            "\r\nIf the character is locked it will display locked.";
+                case "quit":
+                    return  "\r\nquit" +
+                            "\r\nThis command quits the game." +
+                            "\r\nYou will still need to close the mod the spire window." +
+                            "\r\nClosing the mod the spire window will close all the other mod windows.";
+                case "seed":
+                    return  "\r\nseed" +
+                            "\r\nThis command displays the run's seed to the output window." +
+                            "\r\nA seed is used for random number generation." +
+                            "\r\nIt can be input when starting a run to have a set seed,";
+                case "play":
+                    return  "\r\nplay" +
+                            "\r\nThis command lets you play cards from your hand." +
+                            "\r\nThe format is" +
+                            "\r\nplay, card number, enemy number" +
+                            "\r\nEnemy number is optional for cards without targets." +
+                            "\r\nNote that the card number is the index in your hand." +
+                            "\r\nIt changes as cards are played." +
+                            "\r\nEnemy number does not change.";
+                case "potion":
+                    return  "\r\npotion" +
+                            "\r\nThis command lets you interact with your potions." +
+                            "\r\nThere are 3 different options." +
+                            "\r\nuse, discard, and inspect." +
+                            "\r\nThe format for use is" +
+                            "\r\npotion, use, potion number, enemy number" +
+                            "\r\nEnemy number is optional for potions without targets." +
+                            "\r\nThe format for discard is" +
+                            "\r\npotion, discard, potion number" +
+                            "\r\nThe format for inspect is" +
+                            "\r\npotion, inspect, potion number" +
+                            "\r\nInspect displays what the potion does to the output window.";
+                case "choice":
+                    return  "\r\nchoice" +
+                            "\r\nNot to be confused with choices, which is one of the windows." +
+                            "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
+                            "\r\nThe format is" +
+                            "\r\nchoice, choice number.";
+                case "end":
+                    return  "\r\nend" +
+                            "\r\nThis command ends your turn.";
+                case "show":
+                case "hide":
+                    return  "\r\nshow and hide" +
+                            "\r\nThese commands allow you to hide and unhide windows." +
+                            "\r\nThe format is" +
+                            "\r\nshow/hide, window name";
+                case "choices":
+                    return  "\r\nchoices" +
+                            "\r\nThis command displays the text in the choices window in the output window." +
+                            "\r\nThe choices window has all of the available choices you can make." +
+                            "\r\nChoices are either numbered or are a single word." +
+                            "\r\nEntering either the number or the word selects that choice.";
+                case "deck":
+                    return  "\r\ndeck" +
+                            "\r\nThis command displays the text in the deck window in the output window." +
+                            "\r\nThe deck window displays your deck size and all cards in the deck." +
+                            "\r\nOut of combat it displays your master deck." +
+                            "\r\nIn combat it displays your current deck.";
+                case "discard":
+                    return  "\r\ndiscard" +
+                            "\r\nThis command displays the text in the discard window in the output window." +
+                            "\r\nThe discard window displays your discard size and all cards in your discard.";
+                case "event":
+                    return  "\r\nevent" +
+                            "\r\nThis command displays the text in the event window in the output window." +
+                            "\r\nThe event window is currently a work in progress." +
+                            "\r\nCurrent it displays the event name while in an event and run score on death or victory." +
+                            "\r\nIn a future update it is planned to also display event dialogue.";
+                case "hand":
+                    return  "\r\nhand" +
+                            "\r\nThis command has two options." +
+                            "\r\nThe first option displays the text in the hand window in the output window." +
+                            "\r\nThe hand window contains the cards in your hand and your potions." +
+                            "\r\nThe second option displays the info of a card in your hand in the output window." +
+                            "\r\nThe format is" +
+                            "\r\nhand, card number.";
+                case "output":
+                    return  "\r\ninspect" +
+                            "\r\nThis window displays output from various sources." +
+                            "\r\nThis is the only window that cannot display its text to the output window." +
+                            "\r\nIt also cannot be hidden.";
+                case "map":
+                    return  "\r\nmap" +
+                            "\r\nThis command has two options." +
+                            "\r\nThe first option displays the text in the map window in the output window." +
+                            "\r\nThe map displays the map nodes." +
+                            "\r\nThe nodes include its floor, x coordinate, and what kind of node it is." +
+                            "\r\nThe map only displays nodes you can reach from where you are." +
+                            "\r\nThe second options lets you inspect a map node." +
+                            "\r\nInspecting the map selects the node as a destination." +
+                            "\r\nThe inspect window will display a filtered map with only nodes you can reach and on the path to the destination." +
+                            "\r\nThe choices window will also display if a given map choice is on track or diverging." +
+                            "\r\nIf you have the relic Winged Greaves which allow you to travel to map nodes ignoring connections twice, nodes will display Winged if it needs Winged Greaves to reach.";
+                case "monster":
+                    return  "\r\nmonster" +
+                            "\r\nThis command displays the text in the monster window in the output window." +
+                            "\r\nThe monster window display the info of all alive monsters." +
+                            "\r\nYou can view what number monsters are assigned in this window.";
+                case "orbs":
+                    return  "\r\nevent" +
+                            "\r\nThis command displays the text in the orbs window in the output window." +
+                            "\r\nThis window displays the orbs the player has." +
+                            "\r\nThis is usually exclusive to the class Defect.";
+                case "player":
+                    return  "\r\nplayer" +
+                            "\r\nThis command displays the text in the player window in the output window." +
+                            "\r\nThis window displays your character's info." +
+                            "\r\nOut of combat it also displays your potions.";
+                case "relic":
+                    return  "\r\nrelic" +
+                            "\r\nThis command has two options." +
+                            "\r\nThe first option displays the text in the relic window in the output window." +
+                            "\r\nThe relic window contains all the relics you own." +
+                            "\r\nThey are ordered in reverse acquired order." +
+                            "\r\nThe second option displays a relic's info in the inspect window." +
+                            "\r\nThe format is" +
+                            "\r\nrelic, relic number";
+
+            }
+        }
+
+        return "";
+
     }
 
     public String inspectPotion(AbstractPotion p){
