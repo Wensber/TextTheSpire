@@ -10,7 +10,7 @@ abstract class AbstractWindow {
         if(isVisible) {
             String s = getText();
 
-            if (s.length() > 0) {
+            if (s.length() > 0 && !s.equals("\r\n")) {
                 window.setVisible(true);
                 window.setText(s);
             } else {

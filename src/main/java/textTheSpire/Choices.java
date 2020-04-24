@@ -1,11 +1,15 @@
 package textTheSpire;
 
+import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.TheSilent;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
+import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
 import com.megacrit.cardcrawl.helpers.Prefs;
 import com.megacrit.cardcrawl.helpers.SaveHelper;
 import com.megacrit.cardcrawl.helpers.TipTracker;
@@ -19,6 +23,8 @@ import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
+import communicationmod.CommunicationMod;
+import communicationmod.patches.GremlinMatchGamePatch;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -103,9 +109,24 @@ public class Choices extends AbstractWindow{
 
                     s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
-                    for(String choice : ChoiceScreenUtils.getEventScreenChoices()){
-                        s.append(count).append(": ").append(choice).append("\r\n");
-                        count++;
+                    ArrayList<LargeDialogOptionButton> activeButtons = ChoiceScreenUtils.getActiveEventButtons();
+
+                    if (activeButtons.size() > 0) {
+                        for(LargeDialogOptionButton button : activeButtons) {
+                            s.append(count).append(": ").append(stripColor(button.msg).toLowerCase()).append("\r\n");
+                            count++;
+                        }
+                    } else if(AbstractDungeon.getCurrRoom().event instanceof GremlinWheelGame) {
+                        s.append(count).append(": ").append("spin").append("\r\n");
+                    } else if(AbstractDungeon.getCurrRoom().event instanceof GremlinMatchGame) {
+                        GremlinMatchGame event = (GremlinMatchGame) (AbstractDungeon.getCurrRoom().event);
+                        CardGroup gameCardGroup = (CardGroup) ReflectionHacks.getPrivate(event, GremlinMatchGame.class, "cards");
+                        for (AbstractCard c : gameCardGroup.group) {
+                            if (c.isFlipped) {
+                                s.append(count).append(": ").append(String.format("card%d", GremlinMatchGamePatch.cardPositions.get(c.uuid))).append("\r\n");
+                                count++;
+                            }
+                        }
                     }
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
