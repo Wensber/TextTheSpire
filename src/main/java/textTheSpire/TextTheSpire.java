@@ -18,6 +18,7 @@ import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
+import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
@@ -36,6 +37,7 @@ import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import communicationmod.GameStateListener;
 import communicationmod.InvalidCommandException;
+import org.eclipse.swt.internal.ole.win32.EXCEPINFO;
 import org.eclipse.swt.widgets.Display;
 
 import javax.swing.*;
@@ -392,34 +394,36 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     } catch (Exception e) {
                         return;
                     }
-                    break;
+                    return;
                 case "end":
                     try {
                         CommandExecutor.executeCommand(tokens[0]);
                     } catch (Exception e) {
                         return;
                     }
-                    break;
-                case "hand": {
-                    int in;
+                    return;
+                case "hand":
                     try {
+                        int in;
                         in = Integer.parseInt(tokens[1]);
                         choiceCard(in, AbstractDungeon.player.hand.group);
                     } catch (Exception e) {
                         return;
                     }
-                    break;
-                }
-                default: {
-                    int in;
+                    return;
+                case "power":
+                case "pow":
+                    parsePower(tokens);
+                    return;
+                default:
                     try {
+                        int in;
                         in = Integer.parseInt(input) - 1;
                         ChoiceScreenUtils.executeChoice(in);
                     } catch (Exception e) {
                         return;
                     }
-                    break;
-                }
+                    return;
             }
         } else if (tokens[0].equals("map")){
 
@@ -599,6 +603,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
     }
 
+    public void parsePower(String[] tokens){
+
+        if(tokens.length >= 3) {
+            switch (tokens[1]){
+                case "mon":
+                case "monster":
+                    if(tokens.length >= 4){
+                        try{
+                            int mon = Integer.parseInt(tokens[2]);
+                            int pow = Integer.parseInt(tokens[3]);
+                            inspect.setText(inspectPower(AbstractDungeon.getCurrRoom().monsters.monsters.get(mon).powers.get(pow)));
+                        }catch(Exception ignored){
+                        }
+                    }
+                case "player":
+                    try{
+                        int pow = Integer.parseInt(tokens[2]);
+                        inspect.setText(inspectPower(AbstractDungeon.player.powers.get(pow)));
+                    }catch(Exception ignored){
+                    }
+            }
+        }
+
+    }
+
     public String displayHelp(String[] tokens){
 
         if(tokens.length == 1){
@@ -613,6 +642,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nplay" +
                     "\r\npotion" +
                     "\r\nchoice" +
+                    "\r\npower" +
                     "\r\nend" +
                     "\r\nshow" +
                     "\r\nhide" +
@@ -682,6 +712,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
                             "\r\nThe format is" +
                             "\r\nchoice, choice number.";
+                case "power":
+                    return  "\r\npower" +
+                            "\r\nThis command inspects one of your or a monster's powers." +
+                            "\r\nThe format to inspect one of your powers is" +
+                            "\r\npower, player, power number" +
+                            "\r\nThe format to inspect a monster's power is" +
+                            "\r\npower, monster, monster number, power number" +
+                            "\r\npower can be shortened to pow." +
+                            "\r\nmonster can be shortened to mon.";
                 case "end":
                     return  "\r\nend" +
                             "\r\nThis command ends your turn.";
@@ -767,6 +806,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         return "";
+
+    }
+
+    public String inspectPower(AbstractPower p){
+        String s = "\r\n";
+
+        s += "Power\r\n";
+        s += p.name + "\r\n";
+        s += Choices.stripColor(p.description) + "\r\n";
+
+        return s;
 
     }
 

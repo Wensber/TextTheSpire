@@ -53,11 +53,13 @@ public class Player extends AbstractWindow{
                 s.append("Stance: ").append(p.stance.name).append("\r\n");
             }
 
+            int count = 0;
             ArrayList<AbstractPower> po = p.powers;
             if(po.size() > 0) {
                 s.append("Powers:\r\n");
                 for (AbstractPower ap : po) {
-                    s.append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                    s.append(count).append(": ").append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                    count++;
                 }
             }
 

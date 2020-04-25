@@ -57,13 +57,16 @@ public class Monster extends AbstractWindow{
                     if (!haveRunic && !runicDome())
                         s.append(monsterIntent(m));
 
+                    int powCount = 0;
                     ArrayList<AbstractPower> p = m.powers;
                     if(p.size() > 0) {
                         s.append("Powers:\r\n");
                         for (AbstractPower ap : p) {
-                            s.append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                            s.append(powCount).append(": ").append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                            powCount++;
                         }
                     }
+                    s.append("\r\n");
                 }
                 count++;
 
