@@ -122,10 +122,6 @@ public class Inspect {
                     }
                 }
 
-                if(!connected && AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0){
-                    s.append("Winged ").append(Map.nodeType(node)).append(node.x).append("\r\n");
-                }
-
             }
 
             prev.clear();

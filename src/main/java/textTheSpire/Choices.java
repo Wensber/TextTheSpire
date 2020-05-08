@@ -155,7 +155,11 @@ public class Choices extends AbstractWindow{
                         //Displays node type and xPos for each choice
                         for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
                             s.append(count).append(":");
-                            s.append(Map.nodeType(n)).append(n.x).append("\r\n");
+                            if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && !AbstractDungeon.getCurrMapNode().isConnectedTo(n)) {
+                                s.append(Map.nodeType(n)).append("Winged ").append(n.x).append("\r\n");
+                            } else {
+                                s.append(Map.nodeType(n)).append(n.x).append("\r\n");
+                            }
                             count++;
                         }
 
@@ -168,7 +172,7 @@ public class Choices extends AbstractWindow{
                             s.append(Map.nodeType(n));
                             if (Inspect.inspected_map.contains(n)) {
                                 s.append("On Track ").append(n.x).append("\r\n");
-                            }else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && n.isConnectedTo(AbstractDungeon.getCurrMapNode())){
+                            }else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && !AbstractDungeon.getCurrMapNode().isConnectedTo(n)){
                                 s.append("Winged ").append(n.x).append("\r\n");
                             }else{
                                 s.append("Diverge ").append(n.x).append("\r\n");

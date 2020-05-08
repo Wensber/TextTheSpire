@@ -86,7 +86,7 @@ public class Map extends AbstractWindow{
                         if(limitedNode.length() > 0) {
                             limitedFloor.append(limitedNode);
                             current.add(n);
-                        } else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0){
+                        } else if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && n.getParents().size() > 0){
                             limitedFloor.append("Winged ").append(nodeType(n)).append(" Floor:").append(i + 1).append(" X: ").append(n.x).append("\r\n");
                         }
 

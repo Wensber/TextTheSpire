@@ -11,6 +11,7 @@ import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.red.Whirlwind;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.CharacterManager;
+import com.megacrit.cardcrawl.characters.Ironclad;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
@@ -617,12 +618,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                         }catch(Exception ignored){
                         }
                     }
+                    return;
                 case "player":
                     try{
                         int pow = Integer.parseInt(tokens[2]);
                         inspect.setText(inspectPower(AbstractDungeon.player.powers.get(pow)));
                     }catch(Exception ignored){
                     }
+                    return;
             }
         }
 
@@ -688,7 +691,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nplay" +
                             "\r\nThis command lets you play cards from your hand." +
                             "\r\nThe format is" +
-                            "\r\nplay, card number, enemy number" +
+                            "\r\nplay [card number] [enemy number]" +
                             "\r\nEnemy number is optional for cards without targets." +
                             "\r\nNote that the card number is the index in your hand." +
                             "\r\nIt changes as cards are played." +
@@ -697,28 +700,28 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\npotion" +
                             "\r\nThis command lets you interact with your potions." +
                             "\r\nThere are 3 different options." +
-                            "\r\nuse, discard, and inspect." +
+                            "\r\nuse. discard, and inspect." +
                             "\r\nThe format for use is" +
-                            "\r\npotion, use, potion number, enemy number" +
+                            "\r\npotion use [potion number] [enemy number]" +
                             "\r\nEnemy number is optional for potions without targets." +
                             "\r\nThe format for discard is" +
-                            "\r\npotion, discard, potion number" +
+                            "\r\npotion discard [potion number]" +
                             "\r\nThe format for inspect is" +
-                            "\r\npotion, inspect, potion number" +
+                            "\r\npotion inspect [potion number]" +
                             "\r\nInspect displays what the potion does to the output window.";
                 case "choice":
                     return  "\r\nchoice" +
                             "\r\nNot to be confused with choices, which is one of the windows." +
                             "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
                             "\r\nThe format is" +
-                            "\r\nchoice, choice number.";
+                            "\r\nchoice [choice number]";
                 case "power":
                     return  "\r\npower" +
                             "\r\nThis command inspects one of your or a monster's powers." +
                             "\r\nThe format to inspect one of your powers is" +
-                            "\r\npower, player, power number" +
+                            "\r\npower player [power number]" +
                             "\r\nThe format to inspect a monster's power is" +
-                            "\r\npower, monster, monster number, power number" +
+                            "\r\npower monster [monster number] [power number]" +
                             "\r\npower can be shortened to pow." +
                             "\r\nmonster can be shortened to mon.";
                 case "end":
@@ -729,7 +732,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nshow and hide" +
                             "\r\nThese commands allow you to hide and unhide windows." +
                             "\r\nThe format is" +
-                            "\r\nshow/hide, window name";
+                            "\r\n[show/hide] window name";
                 case "choices":
                     return  "\r\nchoices" +
                             "\r\nThis command displays the text in the choices window in the output window." +
@@ -759,7 +762,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe hand window contains the cards in your hand and your potions." +
                             "\r\nThe second option displays the info of a card in your hand in the output window." +
                             "\r\nThe format is" +
-                            "\r\nhand, card number.";
+                            "\r\nhand [card number]";
                 case "output":
                     return  "\r\ninspect" +
                             "\r\nThis window displays output from various sources." +
@@ -774,6 +777,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe map only displays nodes you can reach from where you are." +
                             "\r\nThe second options lets you inspect a map node." +
                             "\r\nInspecting the map selects the node as a destination." +
+                            "\r\nThe format is" +
+                            "\r\nmap [floor] [x coordinate]" +
                             "\r\nThe inspect window will display a filtered map with only nodes you can reach and on the path to the destination." +
                             "\r\nThe choices window will also display if a given map choice is on track or diverging." +
                             "\r\nIf you have the relic Winged Greaves which allow you to travel to map nodes ignoring connections twice, nodes will display Winged if it needs Winged Greaves to reach.";
@@ -800,7 +805,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThey are ordered in reverse acquired order." +
                             "\r\nThe second option displays a relic's info in the inspect window." +
                             "\r\nThe format is" +
-                            "\r\nrelic, relic number";
+                            "\r\nrelic [relic number]";
 
             }
         }
@@ -907,19 +912,35 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     }
 
     public static int ascensionLevel(String p){
+
+        int asc;
+
         switch(p){
             case "ironclad" :
-                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 1);
+                if(asc == 21)
+                    return 20;
+                return asc;
             case "the_silent" :
             case "silent" :
-                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 1);
+                if(asc == 21)
+                    return 20;
+                return asc;
             case "defect" :
-                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 1);
+                if(asc == 21)
+                    return 20;
+                return asc;
             case "watcher" :
-                return CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 0);
+                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 1);
+                if(asc == 21)
+                    return 20;
+                return asc;
             default:
                 return 20;
         }
+
     }
 
     public boolean isUnlocked(String[] tokens){
