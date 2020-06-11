@@ -5,7 +5,7 @@
 
     <groupId>textthespire</groupId>
     <artifactId>TextTheSpire</artifactId>
-    <version>0.10</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <name>TextTheSpire</name>
     <description>Screen Reader Assistance. Requires CommunicationMod.</description>
@@ -17,7 +17,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <SlayTheSpire.version>01-21-2020</SlayTheSpire.version>
         <ModTheSpire.version>3.15.0</ModTheSpire.version>
-        <BaseMod.version>5.17.0</BaseMod.version>
+        <BaseMod.version>5.23.2</BaseMod.version>
         <CommunicationMod.version>1.0.0</CommunicationMod.version>
         <Steam.path>C:/Program Files (x86)/Steam/steamapps</Steam.path>
     </properties>

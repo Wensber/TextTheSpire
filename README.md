@@ -10,7 +10,7 @@ Descriptions of the windows and commands are provided with the help command.
 
 Status of Completion:
 
-TextTheSpire is in a functional state. There have been about 250 hours of use from a blind person.
+TextTheSpire works but can be improved.
 There are currently no known bugs but there are some quality of life changes and features like daily run that can be added.
 If you decide to use this mod and run into issues, let me know at textthespire@gmail.com.
 
@@ -68,4 +68,10 @@ Step 7:
 
 Double click mts-launder to launch the mod. The first time you will need to select the mods.
 There is a select all option on the Mod the Spire window that will show up.
-Afterwards they will be auto selected. Hit enter to start the game.
+Afterwards they will be auto selected. Hit enter to start the game. One more step.
+
+Step 8:
+
+You will need to set a save file name if you don't have a save file yet. Output should mention this as well.
+Go to the main Slay the Spire window, type your name, and hit enter.
+You are now free to play the game. Type help in the prompt to read about controls.

@@ -3,6 +3,8 @@ package textTheSpire;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DeathScreen;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
@@ -44,6 +46,10 @@ public class Event extends AbstractWindow{
         }
 
         s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
+
+        String body = (String) basemod.ReflectionHacks.getPrivate(AbstractDungeon.getCurrRoom().event, AbstractEvent.class, "body");
+
+        s.append(Choices.stripColor(body));
 
         return s.toString();
         //return "";

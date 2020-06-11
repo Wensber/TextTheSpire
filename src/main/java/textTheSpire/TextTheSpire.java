@@ -18,6 +18,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.map.MapRoomNode;
+import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.random.Random;
@@ -27,6 +28,7 @@ import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import com.megacrit.cardcrawl.screens.mainMenu.SaveSlot;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
@@ -41,6 +43,7 @@ import communicationmod.InvalidCommandException;
 import org.eclipse.swt.internal.ole.win32.EXCEPINFO;
 import org.eclipse.swt.widgets.Display;
 
+import javax.smartcardio.Card;
 import javax.swing.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -53,6 +56,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     int iter;
 
     private boolean setSettings = false;
+    boolean slotOnlyOnce = true;
 
     private Hand hand;
     private Map map;
@@ -283,7 +287,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         }
 
-
         //Start a new run. Only does anything if not in dungeon.
         if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
             try {
@@ -391,6 +394,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             switch (tokens[0]) {
                 case "play":
                     try {
+                        if(tokens.length == 2){
+                            int index = singleMonster();
+                            if(index != -1){
+                                input = input + " " + index;
+                            }
+                        }
                         CommandExecutor.executeCommand(input);
                     } catch (Exception e) {
                         return;
@@ -692,7 +701,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThis command lets you play cards from your hand." +
                             "\r\nThe format is" +
                             "\r\nplay [card number] [enemy number]" +
-                            "\r\nEnemy number is optional for cards without targets." +
+                            "\r\nEnemy number is optional for cards without targets or if there is only 1 target." +
                             "\r\nNote that the card number is the index in your hand." +
                             "\r\nIt changes as cards are played." +
                             "\r\nEnemy number does not change.";
@@ -751,10 +760,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe discard window displays your discard size and all cards in your discard.";
                 case "event":
                     return  "\r\nevent" +
-                            "\r\nThis command displays the text in the event window in the output window." +
-                            "\r\nThe event window is currently a work in progress." +
-                            "\r\nCurrent it displays the event name while in an event and run score on death or victory." +
-                            "\r\nIn a future update it is planned to also display event dialogue.";
+                            "\r\nThis command displays the event name and text in the event window in the output window." +
+                            "\r\nThe event window displays the event dialogue." +
+                            "\r\nThe dialogue does have some extra symbols and is often a single line of text." +
+                            "\r\bI apologize for the inconvenience." +
+                            "\r\nIt also displays the run score on death or victory.";
                 case "hand":
                     return  "\r\nhand" +
                             "\r\nThis command has two options." +
@@ -958,6 +968,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
+    public int singleMonster(){
+        int count = 0;
+        int numAliveMonsters = 0;
+        int index = -1;
+        for(AbstractMonster m : AbstractDungeon.getCurrRoom().monsters.monsters){
+            if(m.currentHealth > 0){
+                if(numAliveMonsters == 0){
+                    index = count;
+                    numAliveMonsters++;
+                }else{
+                    return -1;
+                }
+            }
+            count++;
+        }
+        return index;
+    }
+
+    public void parseFileCommand(String[] tokens){
+        try{
+            int slotIndex = Integer.parseInt(tokens[2]);
+            if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(slotIndex).emptySlot){
+                CardCrawlGame.mainMenuScreen.saveSlotScreen.openRenamePopup(slotIndex, true);
+            }else{
+                CardCrawlGame.saveSlot = slotIndex;
+            }
+        } catch (Exception e){
+            return;
+        }
+    }
+
     //Update displays every 30 update cycles
     @Override
     public void receivePostUpdate() {
@@ -985,6 +1026,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         event.update();
 
         specialUpdates();
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT && slotOnlyOnce){
+            slotOnlyOnce = false;
+            if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(2).emptySlot) {
+                inspect.setText("\r\nYou are on the save slot screen.\r\nType a name into the Slay the Spire window and hit enter.");
+                CardCrawlGame.mainMenuScreen.saveSlotScreen.openRenamePopup(2, true);
+            }else{
+                inspect.setText("\r\nSomething has gone wrong.\r\nYou are on the save select screen but the first slot has a save file.\r\nTry restarting the mod.");
+            }
+
+        }
 
         if(!setSettings){
 
