@@ -16,6 +16,7 @@ import com.megacrit.cardcrawl.helpers.TipTracker;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
@@ -27,6 +28,7 @@ import communicationmod.CommunicationMod;
 import communicationmod.patches.GremlinMatchGamePatch;
 import org.eclipse.swt.widgets.Display;
 
+import javax.smartcardio.Card;
 import java.util.ArrayList;
 
 public class Choices extends AbstractWindow{
@@ -63,6 +65,10 @@ public class Choices extends AbstractWindow{
             }else if(currChoice == ChoiceScreenUtils.ChoiceType.GRID){
                 s.append("Grid Selection\r\n");
                 s.append("Number Selected: " + AbstractDungeon.gridSelectScreen.selectedCards.size() + "\r\n");
+                if(AbstractDungeon.gridSelectScreen.upgradePreviewCard != null){
+                    AbstractCard preview = AbstractDungeon.gridSelectScreen.upgradePreviewCard;
+                    s.append("Upgrade Preview : " + TextTheSpire.inspectCard(preview));
+                }
             }
 
             //If in combat check if choices exists, otherwise remove window

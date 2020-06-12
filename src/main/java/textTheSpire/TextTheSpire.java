@@ -427,6 +427,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return;
                 default:
                     try {
+                        if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE){
+                            String playInput = "play " + input;
+                            String[] playTokens = playInput.split("\\s+");
+                            if(playTokens.length == 2){
+                                int index = singleMonster();
+                                if(index != -1){
+                                    playInput = playInput + " " + index;
+                                }
+                            }
+                            CommandExecutor.executeCommand(playInput);
+                        }
                         int in;
                         in = Integer.parseInt(input) - 1;
                         ChoiceScreenUtils.executeChoice(in);
@@ -859,7 +870,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public String inspectCard(AbstractCard card){
+    public static String inspectCard(AbstractCard card){
 
         String s = "\r\n";
 
@@ -880,7 +891,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public String cardText(AbstractCard c){
+    public static String cardText(AbstractCard c){
 
         String s = Choices.stripColor(c.rawDescription);
 
