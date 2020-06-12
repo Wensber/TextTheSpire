@@ -10,6 +10,8 @@ public class Window {
     Shell shell;
     Text label;
 
+    String currentText;
+
     public Window(Display d, String header, int w, int h){
         shell = new Shell(d);
         shell.setSize(w,h);
@@ -21,9 +23,14 @@ public class Window {
         shell.setVisible(true);
         shell.open();
 
+        currentText = "";
+
     }
 
     public void setText(String s){
+
+        currentText = s;
+
         label.getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -33,6 +40,10 @@ public class Window {
             }
         });
 
+    }
+
+    public String getText(){
+        return currentText;
     }
 
     public void setVisible(boolean b){

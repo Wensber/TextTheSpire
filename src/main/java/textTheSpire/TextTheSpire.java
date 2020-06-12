@@ -8,6 +8,7 @@ import basemod.BaseMod;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.cards.AbstractCard;
+import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.cards.red.Whirlwind;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.CharacterManager;
@@ -16,6 +17,8 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
+import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
@@ -40,6 +43,7 @@ import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import communicationmod.GameStateListener;
 import communicationmod.InvalidCommandException;
+import communicationmod.patches.GremlinMatchGamePatch;
 import org.eclipse.swt.internal.ole.win32.EXCEPINFO;
 import org.eclipse.swt.widgets.Display;
 
@@ -47,6 +51,7 @@ import javax.smartcardio.Card;
 import javax.swing.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 @SpireInitializer
@@ -71,6 +76,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     private Inspect inspect;
 
+    private HashMap<String, String> savedOutput;
+
     private JTextField promptFrame;
 
     private String queuedCommand = "";
@@ -94,6 +101,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             event = new Event(display);
 
             inspect = new Inspect(display);
+
+            savedOutput = new HashMap<>();
 
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
@@ -213,6 +222,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        if(tokens[0].equals("save") && tokens.length == 2){
+            savedOutput.put(tokens[1], inspect.inspect.getText());
+        }
+
+        if(tokens[0].equals("load") && tokens.length == 2 && savedOutput.containsKey(tokens[1])){
+            inspect.setText(savedOutput.get(tokens[1]));
+        }
+
         if(tokens[0].equals("show") && tokens.length >= 2){
 
             switch(tokens[1]){
@@ -244,6 +261,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     relic.isVisible = true;
                     return;
                 case "event":
+                    event.isVisible = true;
+                    return;
+                case "all":
+                    deck.isVisible = true;
+                    discard.isVisible = true;
+                    choice.isVisible = true;
+                    hand.isVisible = true;
+                    map.isVisible = true;
+                    monster.isVisible = true;
+                    orbs.isVisible = true;
+                    player.isVisible = true;
+                    relic.isVisible = true;
                     event.isVisible = true;
                     return;
             }
@@ -281,6 +310,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     relic.isVisible = false;
                     return;
                 case "event":
+                    event.isVisible = false;
+                    return;
+                case "all":
+                    deck.isVisible = false;
+                    discard.isVisible = false;
+                    choice.isVisible = false;
+                    hand.isVisible = false;
+                    map.isVisible = false;
+                    monster.isVisible = false;
+                    orbs.isVisible = false;
+                    player.isVisible = false;
+                    relic.isVisible = false;
                     event.isVisible = false;
                     return;
             }
@@ -457,6 +498,21 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             int in;
             try {
                 in = Integer.parseInt(input) - 1;
+
+                if(AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getCurrRoom().event instanceof GremlinMatchGame){
+                    ArrayList<AbstractCard> choiceList = new ArrayList<>();
+                    GremlinMatchGame event = (GremlinMatchGame) (AbstractDungeon.getCurrRoom().event);
+                    CardGroup gameCardGroup = (CardGroup) ReflectionHacks.getPrivate(event, GremlinMatchGame.class, "cards");
+                    for (AbstractCard c : gameCardGroup.group) {
+                        if (c.isFlipped) {
+                            choiceList.add(c);
+                        }
+                    }
+                    if(choiceList.size() > in){
+                        inspect.setText("Goblin Match Card\r\nPosition " + GremlinMatchGamePatch.cardPositions.get(choiceList.get(in).uuid) + "\r\n" + inspectCard(choiceList.get(in)));
+                    }
+                }
+
                 ChoiceScreenUtils.executeChoice(in);
             } catch (Exception ignored) {
             }
@@ -675,6 +731,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nEvent" +
                     "\r\nHand" +
                     "\r\nOutput" +
+                    "\r\nSave" +
+                    "\r\nLoad" +
                     "\r\nMap" +
                     "\r\nMonster" +
                     "\r\nOrbs" +
@@ -715,7 +773,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nEnemy number is optional for cards without targets or if there is only 1 target." +
                             "\r\nNote that the card number is the index in your hand." +
                             "\r\nIt changes as cards are played." +
-                            "\r\nEnemy number does not change.";
+                            "\r\nEnemy number does not change." +
+                            "\r\nIf there are no active choices then you can skip play and just use the numbers.";
                 case "potion":
                     return  "\r\npotion" +
                             "\r\nThis command lets you interact with your potions." +
@@ -752,7 +811,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nshow and hide" +
                             "\r\nThese commands allow you to hide and unhide windows." +
                             "\r\nThe format is" +
-                            "\r\n[show/hide] window name";
+                            "\r\n[show/hide] window name" +
+                            "\r\nYou may also use all for window name to show or hide all windows besides output and prompt.";
                 case "choices":
                     return  "\r\nchoices" +
                             "\r\nThis command displays the text in the choices window in the output window." +
@@ -785,10 +845,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe format is" +
                             "\r\nhand [card number]";
                 case "output":
-                    return  "\r\ninspect" +
+                    return  "\r\noutput" +
                             "\r\nThis window displays output from various sources." +
                             "\r\nThis is the only window that cannot display its text to the output window." +
                             "\r\nIt also cannot be hidden.";
+                case "save":
+                case "load":
+                    return  "\r\nsave/load" +
+                            "\r\nThese commands let you save and load the output window for later viewing." +
+                            "\r\nFormat is" +
+                            "\r\nsave/load [anything no spaces]";
                 case "map":
                     return  "\r\nmap" +
                             "\r\nThis command has two options." +
@@ -995,19 +1061,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             count++;
         }
         return index;
-    }
-
-    public void parseFileCommand(String[] tokens){
-        try{
-            int slotIndex = Integer.parseInt(tokens[2]);
-            if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(slotIndex).emptySlot){
-                CardCrawlGame.mainMenuScreen.saveSlotScreen.openRenamePopup(slotIndex, true);
-            }else{
-                CardCrawlGame.saveSlot = slotIndex;
-            }
-        } catch (Exception e){
-            return;
-        }
     }
 
     //Update displays every 30 update cycles
