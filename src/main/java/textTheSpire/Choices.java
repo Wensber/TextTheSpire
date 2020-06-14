@@ -65,7 +65,7 @@ public class Choices extends AbstractWindow{
             }else if(currChoice == ChoiceScreenUtils.ChoiceType.GRID){
                 s.append("Grid Selection\r\n");
                 s.append("Number Selected: " + AbstractDungeon.gridSelectScreen.selectedCards.size() + "\r\n");
-                if(AbstractDungeon.gridSelectScreen.upgradePreviewCard != null){
+                if(AbstractDungeon.gridSelectScreen.forUpgrade && AbstractDungeon.gridSelectScreen.upgradePreviewCard != null){
                     AbstractCard preview = AbstractDungeon.gridSelectScreen.upgradePreviewCard;
                     s.append("Upgrade Preview : " + TextTheSpire.inspectCard(preview));
                 }

@@ -59,6 +59,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     //Used to only update display every number of update cycles
     int iter;
+    int choiceTimeout;
 
     private boolean setSettings = false;
     boolean slotOnlyOnce = true;
@@ -102,8 +103,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             inspect = new Inspect(display);
 
-            savedOutput = new HashMap<>();
-
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
                     display.sleep();
@@ -114,6 +113,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         ui.start();
 
         iter = 0;
+        choiceTimeout = 0;
+
+        savedOutput = new HashMap<>();
+
         BaseMod.subscribe(this);
 
         JFrame prompt = new JFrame("Prompt");
@@ -142,9 +145,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Correct timing to execute commands
     @Override
     public void receivePreUpdate() {
-        if (hasQueuedCommand) {
+        if (hasQueuedCommand && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
+            choiceTimeout = 100;
+        }else if(choiceTimeout > 0){
+            choiceTimeout--;
         }
     }
 
