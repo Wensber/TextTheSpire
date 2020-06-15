@@ -9,47 +9,32 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
-import com.megacrit.cardcrawl.cards.red.Whirlwind;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
-import com.megacrit.cardcrawl.characters.CharacterManager;
-import com.megacrit.cardcrawl.characters.Ironclad;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
-import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
-import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
 import com.megacrit.cardcrawl.helpers.*;
-import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.powers.AbstractPower;
-import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
-import com.megacrit.cardcrawl.screens.mainMenu.SaveSlot;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
-import com.megacrit.cardcrawl.ui.buttons.CancelButton;
-import com.megacrit.cardcrawl.ui.buttons.ProceedButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
-import communicationmod.GameStateListener;
-import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
-import org.eclipse.swt.internal.ole.win32.EXCEPINFO;
 import org.eclipse.swt.widgets.Display;
 
-import javax.smartcardio.Card;
 import javax.swing.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -60,6 +45,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Used to only update display every number of update cycles
     int iter;
     int choiceTimeout;
+    int commandCheckIter;
 
     private boolean setSettings = false;
     boolean slotOnlyOnce = true;
@@ -77,12 +63,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     private Inspect inspect;
 
+    private Prompt prompt;
+
     private HashMap<String, String> savedOutput;
 
     private JTextField promptFrame;
 
-    private String queuedCommand = "";
-    private boolean hasQueuedCommand = false;
+    private static String queuedCommand = "";
+    private static boolean hasQueuedCommand = false;
 
     public TextTheSpire() {
 
@@ -103,6 +91,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             inspect = new Inspect(display);
 
+            prompt = new Prompt(display, choice, deck, discard, event, hand, map, monster, orbs, player, relic);
+
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
                     display.sleep();
@@ -114,6 +104,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         iter = 0;
         choiceTimeout = 0;
+        commandCheckIter = 0;
 
         savedOutput = new HashMap<>();
 
@@ -138,6 +129,36 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
+    public class DisplayThread implements Runnable{
+
+        @Override
+        public void run() {
+            Display display = new Display();
+
+            hand = new Hand(display);
+            map = new Map(display);
+            choice = new Choices(display);
+            monster = new Monster(display);
+            deck = new Deck(display);
+            discard = new Discard(display);
+            relic = new Relic(display);
+            player = new Player(display);
+            orbs = new Orbs(display);
+            event = new Event(display);
+
+            inspect = new Inspect(display);
+
+            //prompt = new Prompt(display, choice, deck, discard, event, hand, map, monster, orbs, player, relic);
+
+            while(!display.isDisposed()){
+                if(!display.readAndDispatch()){
+                    display.sleep();
+                }
+            }
+        }
+
+    }
+
     public static void initialize() {
         new TextTheSpire();
     }
@@ -145,6 +166,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Correct timing to execute commands
     @Override
     public void receivePreUpdate() {
+
+        /*String command;
+        if(commandCheckIter >= 20) {
+            command = prompt.checkCommand();
+            commandCheckIter = 0;
+        }else{
+            command = "";
+            commandCheckIter++;
+        }*/
+
         if (hasQueuedCommand && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
@@ -152,15 +183,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }else if(choiceTimeout > 0){
             choiceTimeout--;
         }
+
     }
 
     //Queues input for correct timing
-    public void queueInput(String input){
+    public static void queueInput(String input){
         queuedCommand = input;
         hasQueuedCommand = true;
     }
 
-    //TODO Create help commands
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input) {
         input = input.toLowerCase();
@@ -332,6 +363,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return;
             }
 
+        }
+
+        if(tokens[0].equals("pin") && tokens.length >= 2){
+            prompt.pin(tokens[1], true);
+        }
+
+        if(tokens[0].equals("unpin") && tokens.length >= 2){
+            prompt.pin(tokens[1], false);
         }
 
         //Start a new run. Only does anything if not in dungeon.
@@ -1094,6 +1133,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         choice.update();
         orbs.update();
         event.update();
+        prompt.update();
 
         specialUpdates();
 
@@ -1131,7 +1171,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         Display.getDefault().dispose();
     }
 
-    //Match and Keep can go die in a hole
     public void specialUpdates(){
         //AbstractDungeon.shrineList.remove("Match and Keep!");
 
