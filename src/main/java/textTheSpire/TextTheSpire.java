@@ -45,7 +45,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Used to only update display every number of update cycles
     int iter;
     int choiceTimeout;
-    int commandCheckIter;
 
     private boolean setSettings = false;
     boolean slotOnlyOnce = true;
@@ -62,8 +61,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Event event;
 
     private Inspect inspect;
-
-    private Prompt prompt;
 
     private HashMap<String, String> savedOutput;
 
@@ -91,8 +88,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             inspect = new Inspect(display);
 
-            prompt = new Prompt(display, choice, deck, discard, event, hand, map, monster, orbs, player, relic);
-
             while(!display.isDisposed()){
                 if(!display.readAndDispatch()){
                     display.sleep();
@@ -104,7 +99,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         iter = 0;
         choiceTimeout = 0;
-        commandCheckIter = 0;
 
         savedOutput = new HashMap<>();
 
@@ -129,36 +123,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public class DisplayThread implements Runnable{
-
-        @Override
-        public void run() {
-            Display display = new Display();
-
-            hand = new Hand(display);
-            map = new Map(display);
-            choice = new Choices(display);
-            monster = new Monster(display);
-            deck = new Deck(display);
-            discard = new Discard(display);
-            relic = new Relic(display);
-            player = new Player(display);
-            orbs = new Orbs(display);
-            event = new Event(display);
-
-            inspect = new Inspect(display);
-
-            //prompt = new Prompt(display, choice, deck, discard, event, hand, map, monster, orbs, player, relic);
-
-            while(!display.isDisposed()){
-                if(!display.readAndDispatch()){
-                    display.sleep();
-                }
-            }
-        }
-
-    }
-
     public static void initialize() {
         new TextTheSpire();
     }
@@ -166,15 +130,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     //Correct timing to execute commands
     @Override
     public void receivePreUpdate() {
-
-        /*String command;
-        if(commandCheckIter >= 20) {
-            command = prompt.checkCommand();
-            commandCheckIter = 0;
-        }else{
-            command = "";
-            commandCheckIter++;
-        }*/
 
         if (hasQueuedCommand && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
@@ -363,14 +318,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return;
             }
 
-        }
-
-        if(tokens[0].equals("pin") && tokens.length >= 2){
-            prompt.pin(tokens[1], true);
-        }
-
-        if(tokens[0].equals("unpin") && tokens.length >= 2){
-            prompt.pin(tokens[1], false);
         }
 
         //Start a new run. Only does anything if not in dungeon.
@@ -794,6 +741,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe format is" +
                             "\r\nstart, class name, ascension level, seed" +
                             "\r\nThe second 2 are optional." +
+                            "\r\nDefault ascension is 0." +
                             "\r\nIf you want to enter a seed you will need to enter an ascension level." +
                             "\r\nIf there is a save file, you will have the continue and restart options." +
                             "\r\nrestart follows the same format as start." +
@@ -1133,7 +1081,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         choice.update();
         orbs.update();
         event.update();
-        prompt.update();
 
         specialUpdates();
 
