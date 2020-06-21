@@ -134,7 +134,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (hasQueuedCommand && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
-            choiceTimeout = 100;
+            choiceTimeout = 50;
         }else if(choiceTimeout > 0){
             choiceTimeout--;
         }
@@ -917,7 +917,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public String inspectRelic(AbstractRelic r){
+    public static String inspectRelic(AbstractRelic r){
 
         String s = "\r\n";
 

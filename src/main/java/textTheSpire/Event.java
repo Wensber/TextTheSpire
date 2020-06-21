@@ -4,15 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.AbstractEvent;
+import com.megacrit.cardcrawl.events.AbstractImageEvent;
+import com.megacrit.cardcrawl.events.GenericEventDialog;
+import com.megacrit.cardcrawl.events.RoomEventDialog;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DeathScreen;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
 import com.megacrit.cardcrawl.ui.DialogWord;
+import com.megacrit.cardcrawl.unlock.AbstractUnlock;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Event extends AbstractWindow{
@@ -23,6 +28,7 @@ public class Event extends AbstractWindow{
         window = new Window(display,"Event",400,500);
     }
 
+    @SuppressWarnings("unchecked")
     public String getText(){
 
         if(window.shell.isDisposed()){
@@ -30,15 +36,52 @@ public class Event extends AbstractWindow{
             Gdx.app.exit();
         }
 
-        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
-            return "\r\nDeath\r\nScore " + DeathScreen.calcScore(false);
-        }
-        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
-            return "\r\nVictory\r\nScore" + VictoryScreen.calcScore(true);
-        }
-
         StringBuilder s = new StringBuilder();
         s.append("\r\n");
+
+        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
+            s.append("\r\nDeath\r\nScore ").append(DeathScreen.calcScore(false));
+
+            if(AbstractDungeon.deathScreen.unlockBundle != null){
+                for(AbstractUnlock u : AbstractDungeon.deathScreen.unlockBundle){
+                    switch (u.type){
+                        case CARD:
+                            s.append("\r\nUnlock Card ").append(TextTheSpire.inspectCard(u.card));
+                            break;
+                        case RELIC:
+                            s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
+                            break;
+                        case CHARACTER:
+                            s.append("\r\nUnlock Character ").append(u.player.getClass().getSimpleName());
+                            break;
+                    }
+                }
+            }
+
+            return s.toString();
+        }
+        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
+            s.append("\r\nVictory\r\nScore").append(VictoryScreen.calcScore(true));
+
+            if(AbstractDungeon.victoryScreen.unlockBundle != null){
+                for(AbstractUnlock u : AbstractDungeon.victoryScreen.unlockBundle){
+                    switch (u.type){
+                        case CARD:
+                            s.append("\r\nUnlock Card ").append(TextTheSpire.inspectCard(u.card));
+                            break;
+                        case RELIC:
+                            s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
+                            break;
+                        case CHARACTER:
+                            s.append("\r\nUnlock Character ").append(u.player.getClass().getSimpleName());
+                            break;
+                    }
+                }
+            }
+
+            return s.toString();
+        }
+
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || ChoiceScreenUtils.getCurrentChoiceType() != ChoiceScreenUtils.ChoiceType.EVENT){
@@ -47,12 +90,29 @@ public class Event extends AbstractWindow{
 
         s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
-        String body = (String) basemod.ReflectionHacks.getPrivate(AbstractDungeon.getCurrRoom().event, AbstractEvent.class, "body");
+        StringBuilder body = new StringBuilder();
+        ArrayList<DialogWord> words;
 
-        s.append(Choices.stripColor(body));
+        if (AbstractDungeon.getCurrRoom().event instanceof AbstractImageEvent) {
+            words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "words");
+        } else {
+            words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivateStatic(RoomEventDialog.class, "words");
+        }
+
+
+        for(DialogWord w : words){
+            body.append(w.word);
+            char punctuation = w.word.charAt(w.word.length()-1);
+            if(punctuation == '.' || punctuation == '?' || punctuation == '!'){
+                body.append("\r\n");
+            }else{
+                body.append(" ");
+            }
+        }
+
+        s.append(body.toString());
 
         return s.toString();
-        //return "";
     }
 
 }
