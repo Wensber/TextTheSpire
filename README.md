@@ -2,6 +2,9 @@ TextTheSpire
 
 Author: Wensber - textthespire@gmail.com
 
+https://steamcommunity.com/sharedfiles/filedetails/?edit=true&id=2130936088
+https://github.com/Wensber/TextTheSpire
+
 Description:
 
 This is a mod for the game Slay the Spire and provides screen reader accessibility.
@@ -10,8 +13,9 @@ Descriptions of the windows and commands are provided with the help command.
 
 Limitations:
 
-TextTheSpire is currently not capable of accessing menus or screens not reached automatically by playing the game.
-This includes save slots, statistics, achievements, compendium, run history, settings, patch notes, custom game, daily climb, etc.
+TextTheSpire is currently not capable of accessing various menus or screens.
+This includes save slots, statistics, achievements, compendium, run history, settings, patch notes, custom game, etc.
+Daily Climb is supported but the Modifiers Draft and Sealed Deck are not yet.
 
 Requirements:
 
@@ -30,6 +34,14 @@ BaseMod - https://steamcommunity.com/workshop/filedetails/?id=1605833019
 ModTheSpire - https://steamcommunity.com/sharedfiles/filedetails/?id=1605060445
 
 If you don't already have a screen reader, you can NVDA for free from https://www.nvaccess.org/
+
+Recommendations:
+
+Read the Spire, mod that can auto read changes in windows: https://github.com/pitermach/ReadTheSpire
+
+Mod to enable achievements: https://steamcommunity.com/sharedfiles/filedetails/?id=1692554109
+
+Gameplay mechanics guide: https://slay-the-spire.fandom.com/wiki/Gameplay
 
 Installation:
 
