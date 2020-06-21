@@ -16,6 +16,7 @@ import com.megacrit.cardcrawl.helpers.TipTracker;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
@@ -214,37 +215,44 @@ public class Choices extends AbstractWindow{
         }else{
 
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
-            if(!checkedSave) {
-                if (CardCrawlGame.characterManager.anySaveFileExists()) {
-                    s.append("restart [class] [ascension] [seed]\r\n");
-                    s.append("continue\r\n");
-                    haveSave = true;
+            if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
+                if (!checkedSave) {
+                    if (CardCrawlGame.characterManager.anySaveFileExists()) {
+                        s.append("restart [class] [ascension] [seed]\r\n");
+                        s.append("continue\r\n");
+                        haveSave = true;
+                    } else {
+                        s.append("start [class] [ascension] [seed]\r\n");
+                        haveSave = false;
+                    }
+
+                    checkedSave = true;
                 } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
-                    haveSave = false;
+                    if (haveSave) {
+                        s.append("restart [class] [ascension] [seed]\r\n");
+                        s.append("continue\r\n");
+                    } else {
+                        s.append("start [class] [ascension] [seed]\r\n");
+                        if(CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+                            s.append("daily\r\n");
+                        }
+                    }
                 }
 
-                checkedSave = true;
-            }else{
-                if (haveSave) {
-                    s.append("restart [class] [ascension] [seed]\r\n");
-                    s.append("continue\r\n");
-                } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
+                TipTracker.disableAllFtues();
+
+                for (AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()) {
+
+                    s.append(p.name().toLowerCase()).append(" ");
+
+                    if (TextTheSpire.characterUnlocked(p.name().toLowerCase()))
+                        s.append(TextTheSpire.ascensionLevel(p.name().toLowerCase())).append("\r\n");
+                    else
+                        s.append("locked\r\n");
+
                 }
-            }
-
-            TipTracker.disableAllFtues();
-
-            for(AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()){
-
-                s.append(p.name().toLowerCase()).append(" ");
-
-                if(TextTheSpire.characterUnlocked(p.name().toLowerCase()))
-                    s.append(TextTheSpire.ascensionLevel(p.name().toLowerCase())).append("\r\n");
-                else
-                    s.append("locked\r\n");
-
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+                s.append("embark");
             }
 
             return s.toString();

@@ -12,6 +12,8 @@ import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.daily.DailyScreen;
+import com.megacrit.cardcrawl.daily.mods.AbstractDailyMod;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
@@ -28,12 +30,15 @@ import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
+import com.megacrit.cardcrawl.ui.buttons.CancelButton;
+import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import communicationmod.patches.GremlinMatchGamePatch;
 import org.eclipse.swt.widgets.Display;
 
+import javax.smartcardio.Card;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +53,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     private boolean setSettings = false;
     boolean slotOnlyOnce = true;
+
+    boolean enterDaily = false;
 
     private Hand hand;
     private Map map;
@@ -220,6 +227,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         if(tokens[0].equals("load") && tokens.length == 2 && savedOutput.containsKey(tokens[1])){
             inspect.setText(savedOutput.get(tokens[1]));
+        }
+
+        if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+            CardCrawlGame.mainMenuScreen.dailyScreen.open();
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+            if(input.equals("embark")){
+                ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
+                c.hb.clicked = true;
+            }
         }
 
         if(tokens[0].equals("show") && tokens.length >= 2){
@@ -1054,6 +1072,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             count++;
         }
         return index;
+    }
+
+
+    public static String inspectDaily(){
+        StringBuilder s = new StringBuilder("Daily Climb\r\n");
+        if(CardCrawlGame.mainMenuScreen.dailyScreen.todaysChar != null) {
+            s.append(CardCrawlGame.mainMenuScreen.dailyScreen.todaysChar.getClass().getSimpleName());
+            for (AbstractDailyMod m : ModHelper.enabledMods) {
+                s.append("\r\n").append(m.modID).append("\r\n").append(m.description);
+            }
+        }
+        return s.toString();
     }
 
     //Update displays every 30 update cycles

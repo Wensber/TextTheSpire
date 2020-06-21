@@ -11,6 +11,7 @@ import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DeathScreen;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.ui.DialogWord;
 import com.megacrit.cardcrawl.unlock.AbstractUnlock;
 import communicationmod.ChoiceScreenUtils;
@@ -82,6 +83,10 @@ public class Event extends AbstractWindow{
             }
         }
 
+        if(CardCrawlGame.dungeon == null && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+            s.append(TextTheSpire.inspectDaily());
+            return s.toString();
+        }
 
         //Not in dungeon
         if(CardCrawlGame.dungeon == null || ChoiceScreenUtils.getCurrentChoiceType() != ChoiceScreenUtils.ChoiceType.EVENT){
