@@ -96,7 +96,7 @@ public class Event extends AbstractWindow{
         if (AbstractDungeon.getCurrRoom().event instanceof AbstractImageEvent) {
             words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "words");
         } else {
-            words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivateStatic(RoomEventDialog.class, "words");
+            words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivate(AbstractDungeon.getCurrRoom().event.roomEventText, RoomEventDialog.class, "words");
         }
 
 
