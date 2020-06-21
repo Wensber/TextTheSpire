@@ -51,9 +51,6 @@ public class Event extends AbstractWindow{
                         case RELIC:
                             s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
                             break;
-                        case CHARACTER:
-                            s.append("\r\nUnlock Character ").append(u.player.getClass().getSimpleName());
-                            break;
                     }
                 }
             }
@@ -72,14 +69,17 @@ public class Event extends AbstractWindow{
                         case RELIC:
                             s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
                             break;
-                        case CHARACTER:
-                            s.append("\r\nUnlock Character ").append(u.player.getClass().getSimpleName());
-                            break;
                     }
                 }
             }
 
             return s.toString();
+        }
+        if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.UNLOCK){
+            if(AbstractDungeon.unlockScreen.unlock.type == AbstractUnlock.UnlockType.CHARACTER){
+                s.append("\r\nUnlock Character\r\n").append(AbstractDungeon.unlockScreen.unlock.player.getClass().getSimpleName());
+                return s.toString();
+            }
         }
 
 
