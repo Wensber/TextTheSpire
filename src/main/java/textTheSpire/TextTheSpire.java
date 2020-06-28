@@ -27,6 +27,8 @@ import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
+import com.megacrit.cardcrawl.screens.stats.AchievementItem;
+import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
@@ -221,16 +223,24 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        if(tokens[0].equals("achieve") || tokens[0].equals("a")){
+            inspect.setText(inspectAchievements(tokens));
+            return;
+        }
+
         if(tokens[0].equals("save") && tokens.length == 2){
             savedOutput.put(tokens[1], inspect.inspect.getText());
+            return;
         }
 
         if(tokens[0].equals("load") && tokens.length == 2 && savedOutput.containsKey(tokens[1])){
             inspect.setText(savedOutput.get(tokens[1]));
+            return;
         }
 
         if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
             CardCrawlGame.mainMenuScreen.dailyScreen.open();
+            return;
         }
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
@@ -238,6 +248,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
             }
+            return;
         }
 
         if(tokens[0].equals("show") && tokens.length >= 2){
@@ -764,7 +775,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nMonster" +
                     "\r\nOrbs" +
                     "\r\nPlayer" +
-                    "\r\nRelic";
+                    "\r\nRelic" +
+                    "\r\bachieve";
         }else{
             switch(tokens[1].toLowerCase()){
                 case "start":
@@ -815,13 +827,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\npotion discard [potion number]" +
                             "\r\nThe format for inspect is" +
                             "\r\npotion inspect [potion number]" +
-                            "\r\nInspect displays what the potion does to the output window.";
+                            "\r\nInspect displays what the potion does to the output window." +
+                            "\r\npotion can be shortened to pot, use to u, discard to d, and inspect to i.";
                 case "choice":
                     return  "\r\nchoice" +
                             "\r\nNot to be confused with choices, which is one of the windows." +
                             "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
                             "\r\nThe format is" +
-                            "\r\nchoice [choice number]";
+                            "\r\nchoice [choice number]" +
+                            "\r\nchoice can be shortened to c.";
                 case "power":
                     return  "\r\npower" +
                             "\r\nThis command inspects one of your or a monster's powers." +
@@ -829,8 +843,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\npower player [power number]" +
                             "\r\nThe format to inspect a monster's power is" +
                             "\r\npower monster [monster number] [power number]" +
-                            "\r\npower can be shortened to pow." +
-                            "\r\nmonster can be shortened to mon.";
+                            "\r\npower can be shortened to pow, monster to m, and player to p.";
                 case "end":
                     return  "\r\nend" +
                             "\r\nThis command ends your turn.";
@@ -871,7 +884,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe hand window contains the cards in your hand and your potions." +
                             "\r\nThe second option displays the info of a card in your hand in the output window." +
                             "\r\nThe format is" +
-                            "\r\nhand [card number]";
+                            "\r\nhand [card number]" +
+                            "\r\nhand can be shortened to h.";
                 case "output":
                     return  "\r\noutput" +
                             "\r\nThis window displays output from various sources." +
@@ -894,6 +908,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nInspecting the map selects the node as a destination." +
                             "\r\nThe format is" +
                             "\r\nmap [floor] [x coordinate]" +
+                            "\r\nmap can be shortened to m." +
                             "\r\nThe inspect window will display a filtered map with only nodes you can reach and on the path to the destination." +
                             "\r\nThe choices window will also display if a given map choice is on track or diverging." +
                             "\r\nIf you have the relic Winged Greaves which allow you to travel to map nodes ignoring connections twice, nodes will display Winged if it needs Winged Greaves to reach.";
@@ -921,6 +936,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe second option displays a relic's info in the inspect window." +
                             "\r\nThe format is" +
                             "\r\nrelic [relic number]";
+                case "achieve":
+                    return  "\r\nachieve" +
+                            "\r\nThis displays to output the list of locked and unlocked achievements." +
+                            "\r\nachieve number displays the description of a given achievement." +
+                            "\r\nachieve can be shortened to a.";
 
             }
         }
@@ -1100,6 +1120,50 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 s.append("\r\n").append(m.modID).append("\r\n").append(m.description);
             }
         }
+        return s.toString();
+    }
+
+    public String inspectAchievements(String[] tokens){
+        StringBuilder s = new StringBuilder("\r\nAchievements");
+
+
+
+        if(tokens.length < 2 && StatsScreen.achievements != null){
+
+            ArrayList<String> locked = new ArrayList<>();
+            ArrayList<String> unlocked = new ArrayList<>();
+
+            for(int i = 0; i < StatsScreen.achievements.items.size() ; i ++ ){
+                if(StatsScreen.achievements.items.get(i).isUnlocked){
+                    unlocked.add("" + i + " : " + StatsScreen.achievements.items.get(i).key);
+                }else{
+                    locked.add("" + i + " : " + StatsScreen.achievements.items.get(i).key);
+                }
+            }
+
+            s.append("\r\nUnlocked:");
+            for(String un : unlocked){
+                s.append("\r\n").append(un);
+            }
+            s.append("\r\nLocked:");
+            for(String l : locked){
+                s.append("\r\n").append(l);
+            }
+
+        }else{
+
+            try{
+                int in = Integer.parseInt(tokens[1]);
+                if(in >= 0 && in < StatsScreen.achievements.items.size()){
+                    AchievementItem item = StatsScreen.achievements.items.get(in);
+                    s.append("\r\n").append(item.key).append("\r\n");
+                    s.append((String)basemod.ReflectionHacks.getPrivate(item, AchievementItem.class, "desc"));
+                }
+            }catch (Exception ignored){
+            }
+
+        }
+
         return s.toString();
     }
 
