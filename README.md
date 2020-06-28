@@ -14,7 +14,7 @@ Descriptions of the windows and commands are provided with the help command.
 Limitations:
 
 TextTheSpire is currently not capable of accessing various menus or screens.
-This includes save slots, statistics, achievements, compendium, run history, settings, patch notes, custom game, etc.
+This includes save slots, statistics, compendium, run history, settings, patch notes, custom game, etc.
 Daily Climb is supported but the Modifiers Draft and Sealed Deck are not yet.
 
 Requirements:
@@ -42,6 +42,10 @@ Read the Spire, mod that can auto read changes in windows: https://github.com/pi
 Mod to enable achievements: https://steamcommunity.com/sharedfiles/filedetails/?id=1692554109
 
 Gameplay mechanics guide: https://slay-the-spire.fandom.com/wiki/Gameplay
+
+Donations:
+
+As of right now, I am not accepting donations and recommend you support NVDA instead. https://www.nvaccess.org/support-us/
 
 Installation:
 
