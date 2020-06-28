@@ -166,7 +166,7 @@ public class Monster extends AbstractWindow{
         } else if (i == AbstractMonster.Intent.UNKNOWN) {
             return "Intent: Unknown" + "\r\n";
         } else{
-            return "Intent: Debug (Shouldn't Happen)" + "\r\n";
+            return "Intent: Loading" + "\r\n";
         }
     }
 

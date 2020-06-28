@@ -138,7 +138,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     @Override
     public void receivePreUpdate() {
 
-        if (hasQueuedCommand && choiceTimeout == 0) {
+        if (hasQueuedCommand && inspect != null && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
             choiceTimeout = 50;
@@ -368,9 +368,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         //Potion Command. If out of combat can only discard
-        if (tokens[0].equals("potion")) {
+        if (tokens[0].equals("potion") || tokens[0].equals("pot")) {
             try {
-                if(tokens.length >= 3 && tokens[1].equals("inspect")){
+                if(tokens.length >= 3 && tokens[1].equals("inspect") || tokens.length >= 3 && tokens[1].equals("i")){
 
                     int in = Integer.parseInt(tokens[2]);
                     if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
@@ -381,7 +381,22 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     }
                     return;
                 }else {
-                    CommandExecutor.executeCommand(input);
+                    StringBuilder command = new StringBuilder("potion ");
+                    switch(tokens[1]){
+                        case "use":
+                        case "u":
+                            command.append("use ");
+                            break;
+                        case "discard":
+                        case "d":
+                            command.append("discard ");
+                            break;
+                    }
+                    for(int i=2;i<tokens.length;i++){
+                        command.append(tokens[i]).append(" ");
+                    }
+                    System.out.println(command);
+                    CommandExecutor.executeCommand(command.toString());
                 }
                 return;
             } catch (Exception e) {
@@ -389,7 +404,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
-        if (tokens[0].equals("choice")) {
+        if (tokens[0].equals("choice") || tokens[0].equals("c")) {
             executeChoice(tokens);
         }
 
@@ -464,6 +479,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     }
                     return;
                 case "hand":
+                case "h":
                     try {
                         int in;
                         in = Integer.parseInt(tokens[1]);
@@ -497,7 +513,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     }
                     return;
             }
-        } else if (tokens[0].equals("map")){
+        } else if (tokens[0].equals("map") || tokens[0].equals("m")){
 
             if(tokens.length >= 3){
                 inspect.setText(Inspect.inspectMap(tokens));
@@ -694,7 +710,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         if(tokens.length >= 3) {
             switch (tokens[1]){
-                case "mon":
+                case "m":
                 case "monster":
                     if(tokens.length >= 4){
                         try{
@@ -706,6 +722,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     }
                     return;
                 case "player":
+                case "p":
                     try{
                         int pow = Integer.parseInt(tokens[2]);
                         inspect.setText(inspectPower(AbstractDungeon.player.powers.get(pow)));
