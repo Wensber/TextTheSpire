@@ -783,7 +783,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nOrbs" +
                     "\r\nPlayer" +
                     "\r\nRelic" +
-                    "\r\bachieve";
+                    "\r\nachieve";
         }else{
             switch(tokens[1].toLowerCase()){
                 case "start":
