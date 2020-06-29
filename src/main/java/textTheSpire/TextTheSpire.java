@@ -22,6 +22,7 @@ import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
+import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
@@ -530,6 +531,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 inspect.setText(Inspect.inspectMap(tokens));
             }
 
+        } else if (AbstractDungeon.getCurrRoom() instanceof TreasureRoomBoss && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.CHEST) {
+            AbstractChest chest = ((TreasureRoomBoss) AbstractDungeon.getCurrRoom()).chest;
+            if(!chest.isOpen) {
+                chest.isOpen = true;
+                chest.open(false);
+            }
         } else {
             //Everything else is a choice screen command. Only a number is needed.
             int in;
