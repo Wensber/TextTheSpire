@@ -15,7 +15,6 @@ Limitations:
 
 TextTheSpire is currently not capable of accessing various menus or screens.
 This includes save slots, statistics, compendium, run history, settings, patch notes, custom game, etc.
-Daily Climb is supported but the Modifiers Draft and Sealed Deck are not yet.
 
 Requirements:
 
@@ -40,6 +39,7 @@ Recommendations:
 Read the Spire, mod that can auto read changes in windows: https://github.com/pitermach/ReadTheSpire
 
 Mod to enable achievements: https://steamcommunity.com/sharedfiles/filedetails/?id=1692554109
+This one is almost a requirement as one of the characters Watcher does not seem to unlock without this.
 
 Gameplay mechanics guide: https://slay-the-spire.fandom.com/wiki/Gameplay
 
@@ -49,7 +49,7 @@ As of right now, I am not accepting donations and recommend you support NVDA ins
 
 Installation:
 
-Note: This guide is for the steam version of the game.
+Note: If you use gog go here https://forum.audiogames.net/topic/35130/slay-the-spire-now-accessible/
 
 Step 1:
 

@@ -83,7 +83,7 @@ public class Event extends AbstractWindow{
             }
         }
 
-        if(CardCrawlGame.dungeon == null && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
             s.append(TextTheSpire.inspectDaily());
             return s.toString();
         }

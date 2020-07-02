@@ -27,6 +27,8 @@ import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import com.megacrit.cardcrawl.screens.options.OptionsPanel;
+import com.megacrit.cardcrawl.screens.options.Slider;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.AchievementItem;
 import com.megacrit.cardcrawl.screens.stats.StatsScreen;
@@ -159,6 +161,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
     public void parsePrompt(String input) {
+
         input = input.toLowerCase();
         switch(input){
             case "quit":
@@ -239,17 +242,71 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        if(tokens[0].equals("volume")){
+            if(tokens.length == 1) {
+
+                String s = "\r\nVolume\r\n";
+                s += "Master " + Settings.MASTER_VOLUME + "\r\n";
+                s += "Music " + Settings.MUSIC_VOLUME + "\r\n";
+                s += "Sound " + Settings.SOUND_VOLUME;
+
+                inspect.setText(s);
+
+                return;
+            }else if(tokens.length >= 3){
+                try{
+                    float volume = Float.parseFloat(tokens[2]);
+
+                    if(volume < 0 || volume > 1){
+                        return;
+                    }
+
+                    switch (tokens[1]){
+                        case "master":
+                            Settings.MASTER_VOLUME = volume;
+                            Settings.soundPref.putFloat("Master Volume", volume);
+                            CardCrawlGame.music.updateVolume();
+                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume(); break;
+                            }  if (AbstractDungeon.scene != null) {
+                                AbstractDungeon.scene.updateAmbienceVolume();
+                            }
+                            break;
+                        case "music":
+                            Settings.MUSIC_VOLUME = volume;
+                            Settings.soundPref.putFloat("Music Volume", volume);
+                            CardCrawlGame.music.updateVolume();
+                            break;
+                        case "sound":
+                            Settings.SOUND_VOLUME = volume;
+                            Settings.soundPref.putFloat("Sound Volume", volume);
+                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume();
+                            } else if (AbstractDungeon.scene != null) {
+                                AbstractDungeon.scene.updateAmbienceVolume();
+                            }
+                            break;
+                    }
+
+
+
+                }catch(Exception ignored){
+                }
+            }
+        }
+
         if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
             CardCrawlGame.mainMenuScreen.dailyScreen.open();
             return;
         }
 
-        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
+
             if(input.equals("embark")){
                 ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
             }
-            return;
+
         }
 
         if(tokens[0].equals("show") && tokens.length >= 2){
@@ -763,6 +820,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\ncontinue" +
                     "\r\nquit" +
                     "\r\nseed" +
+                    "\r\nvolume" +
+                    "\r\nachieve" +
                     "\r\nplay" +
                     "\r\npotion" +
                     "\r\nchoice" +
@@ -782,8 +841,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nMonster" +
                     "\r\nOrbs" +
                     "\r\nPlayer" +
-                    "\r\nRelic" +
-                    "\r\nachieve";
+                    "\r\nRelic";
         }else{
             switch(tokens[1].toLowerCase()){
                 case "start":
@@ -812,6 +870,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThis command displays the run's seed to the output window." +
                             "\r\nA seed is used for random number generation." +
                             "\r\nIt can be input when starting a run to have a set seed,";
+                case "volume":
+                    return  "\r\nvolume" +
+                            "\r\nThis displays the current volume settings to output." +
+                            "\r\nIt can also change the settings." +
+                            "\r\nThe different volume types are master, music, and sound effects." +
+                            "\r\nThe format is" +
+                            "\r\nvolume master/music/sound number" +
+                            "\r\nThe number needs to be a decimal between 0 and 1.";
+                case "achieve":
+                    return  "\r\nachieve" +
+                            "\r\nThis displays to output the list of locked and unlocked achievements." +
+                            "\r\nachieve number displays the description of a given achievement." +
+                            "\r\nachieve can be shortened to a.";
                 case "play":
                     return  "\r\nplay" +
                             "\r\nThis command lets you play cards from your hand." +
@@ -943,12 +1014,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe second option displays a relic's info in the inspect window." +
                             "\r\nThe format is" +
                             "\r\nrelic [relic number]";
-                case "achieve":
-                    return  "\r\nachieve" +
-                            "\r\nThis displays to output the list of locked and unlocked achievements." +
-                            "\r\nachieve number displays the description of a given achievement." +
-                            "\r\nachieve can be shortened to a.";
-
             }
         }
 
