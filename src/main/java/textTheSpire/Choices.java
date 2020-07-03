@@ -18,6 +18,7 @@ import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
+import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
@@ -236,6 +237,9 @@ public class Choices extends AbstractWindow{
                         if(CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
                             s.append("daily\r\n");
                         }
+                        if(StatsScreen.all.highestDaily > 0){
+                            s.append("custom\r\n");
+                        }
                     }
                 }
 
@@ -251,7 +255,7 @@ public class Choices extends AbstractWindow{
                         s.append("locked\r\n");
 
                 }
-            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+            }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark");
             }
 

@@ -24,6 +24,8 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
 import com.megacrit.cardcrawl.rooms.*;
+import com.megacrit.cardcrawl.screens.custom.CustomMod;
+import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
@@ -37,6 +39,7 @@ import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.ui.buttons.CancelButton;
 import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
+import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
@@ -71,6 +74,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Relic relic;
     private Orbs orbs;
     private Event event;
+    private Custom custom;
 
     private Inspect inspect;
 
@@ -97,6 +101,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             player = new Player(display);
             orbs = new Orbs(display);
             event = new Event(display);
+            custom = new Custom(display);
 
             inspect = new Inspect(display);
 
@@ -160,6 +165,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     }
 
     //Parse a command to see if its an allowed command and send to CommunicationMod to execute
+    @SuppressWarnings("unchecked")
     public void parsePrompt(String input) {
 
         input = input.toLowerCase();
@@ -300,11 +306,83 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        if(input.equals("custom")){
+            if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen != MainMenuScreen.CurScreen.CUSTOM && !CardCrawlGame.characterManager.anySaveFileExists() && StatsScreen.all.highestDaily > 0) {
+                CardCrawlGame.mainMenuScreen.customModeScreen.open();
+                return;
+            }else{
+                inspect.setText(custom.getText());
+            }
+        }
+
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
 
             if(input.equals("embark")){
                 ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
+                return;
+            }
+
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM && !CommandExecutor.isInDungeon()){
+
+            if(input.equals("embark")){
+                GridSelectConfirmButton c = (GridSelectConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "confirmButton");
+                c.hb.clicked = true;
+                return;
+            }
+
+            switch(tokens[0]){
+
+                case "char":
+                    try{
+                        int in = Integer.parseInt(tokens[1]);
+                        CardCrawlGame.mainMenuScreen.customModeScreen.options.get(in).hb.clicked = true;
+                    }catch(Exception ignored){
+                    }
+                    return;
+                case "asc":
+                    if(tokens.length == 1){
+                        Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "ascensionModeHb");
+                        hb.clicked = true;
+                    }else if(CardCrawlGame.mainMenuScreen.customModeScreen.isAscensionMode){
+                        try{
+                            int in = Integer.parseInt(tokens[1]);
+                            if(in >= 1 && in <= 20) {
+                                CardCrawlGame.mainMenuScreen.customModeScreen.ascensionLevel = in;
+                            }
+                        }catch(Exception ignored){
+                        }
+                    }
+                    return;
+                case "seed":
+                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "seedHb");
+                    hb.clicked = true;
+                    return;
+                case "mod":
+
+                    if(tokens.length > 2 && tokens[1].equals("i")){
+                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
+                        try{
+                            int in = Integer.parseInt(tokens[2]);
+                            String s = modList.get(in).name + "\r\n" + modList.get(in).description;
+                            inspect.setText(s);
+                        }catch(Exception ignored){
+                        }
+                    } else if(tokens.length > 1) {
+                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
+                        try{
+                            int in = Integer.parseInt(tokens[1]);
+                            modList.get(in).hb.clicked = true;
+                        }catch(Exception ignored){
+                        }
+                    }
+                    return;
+                case "simple":
+                    inspect.setText(custom.getSimpleText());
+                    return;
+
             }
 
         }
@@ -342,6 +420,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "event":
                     event.isVisible = true;
                     return;
+                case "custom":
+                    custom.isVisible = true;
+                    return;
                 case "all":
                     deck.isVisible = true;
                     discard.isVisible = true;
@@ -353,6 +434,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     player.isVisible = true;
                     relic.isVisible = true;
                     event.isVisible = true;
+                    custom.isVisible = true;
                     return;
             }
 
@@ -391,6 +473,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "event":
                     event.isVisible = false;
                     return;
+                case "custom":
+                    custom.isVisible = false;
+                    return;
                 case "all":
                     deck.isVisible = false;
                     discard.isVisible = false;
@@ -402,6 +487,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     player.isVisible = false;
                     relic.isVisible = false;
                     event.isVisible = false;
+                    custom.isVisible = false;
                     return;
             }
 
@@ -823,6 +909,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nvolume" +
                     "\r\nachieve" +
                     "\r\nplay" +
+                    "\r\ncustom" +
                     "\r\npotion" +
                     "\r\nchoice" +
                     "\r\npower" +
@@ -893,6 +980,26 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nIt changes as cards are played." +
                             "\r\nEnemy number does not change." +
                             "\r\nIf there are no active choices then you can skip play and just use the numbers.";
+                case "custom":
+                    return  "\r\ncustom" +
+                            "\r\nFrom the main menu this opens up the custom mode panel." +
+                            "\r\nIt opens the Custom window which displays the options for a custom game." +
+                            "\r\nYou may display to output a simplified version of the current settings with the command simple." +
+                            "\r\ncustom will also display its text to output but only while in this screen." +
+                            "\r\nThe commands to set settings are char, asc, seed, and mod." +
+                            "\r\nchar is the character command. The format is" +
+                            "\r\nchar number" +
+                            "\r\nasc is the ascension command." +
+                            "\r\nasc on its own will toggle whether asc is on or off. The format for setting the level is" +
+                            "\r\nasc number" +
+                            "\r\nseed opens the seed panel." +
+                            "\r\nYou will need to to go to the main game window, type or paste the seed, and hit enter." +
+                            "\r\nAn empty seed generates a random seed when you embark." +
+                            "\r\nmod lets you select and inspect modifiers." +
+                            "\r\nThe format to select a mod is" +
+                            "\r\nmod number" +
+                            "\r\nThe format to inspect a mod is" +
+                            "\r\nmod i number";
                 case "potion":
                     return  "\r\npotion" +
                             "\r\nThis command lets you interact with your potions." +
@@ -953,7 +1060,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThis command displays the event name and text in the event window in the output window." +
                             "\r\nThe event window displays the event dialogue." +
                             "\r\nThe dialogue does have some extra symbols and is often a single line of text." +
-                            "\r\bI apologize for the inconvenience." +
+                            "\r\nI apologize for the inconvenience." +
                             "\r\nIt also displays the run score on death or victory.";
                 case "hand":
                     return  "\r\nhand" +
@@ -1264,6 +1371,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         choice.update();
         orbs.update();
         event.update();
+        custom.update();
 
         specialUpdates();
 
