@@ -674,6 +674,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 inspect.setText(Inspect.inspectMap(tokens));
             }
 
+        }else if (tokens[0].equals("path")){
+
+            if(tokens.length >= 3){
+                inspect.setText(Inspect.inspectPaths(tokens));
+            }
+
         } else if (AbstractDungeon.getCurrRoom() instanceof TreasureRoomBoss && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.CHEST) {
             AbstractChest chest = ((TreasureRoomBoss) AbstractDungeon.getCurrRoom()).chest;
             if(!chest.isOpen) {
@@ -900,6 +906,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if(tokens.length == 1){
             return  "\r\nHere are a list of commands you can perform." +
                     "\r\nFor more details enter help followed by a command." +
+                    "\r\nExample:" +
+                    "\r\nhelp start" +
                     "\r\nAll commands are input in the prompt window." +
                     "\r\nstart" +
                     "\r\nrestart" +
@@ -925,6 +933,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nSave" +
                     "\r\nLoad" +
                     "\r\nMap" +
+                    "\r\npath" +
                     "\r\nMonster" +
                     "\r\nOrbs" +
                     "\r\nPlayer" +
@@ -940,6 +949,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe format is" +
                             "\r\nstart, class name, ascension level, seed" +
                             "\r\nThe second 2 are optional." +
+                            "\r\nExamples:" +
+                            "\r\nstart ironclad" +
+                            "\r\nstart defect 10" +
                             "\r\nDefault ascension is 0." +
                             "\r\nIf you want to enter a seed you will need to enter an ascension level." +
                             "\r\nIf there is a save file, you will have the continue and restart options." +
@@ -964,7 +976,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe different volume types are master, music, and sound effects." +
                             "\r\nThe format is" +
                             "\r\nvolume master/music/sound number" +
-                            "\r\nThe number needs to be a decimal between 0 and 1.";
+                            "\r\nThe number needs to be a decimal between 0 and 1." +
+                            "\r\nExample:" +
+                            "\r\nvolume master 0.5";
                 case "achieve":
                     return  "\r\nachieve" +
                             "\r\nThis displays to output the list of locked and unlocked achievements." +
@@ -985,7 +999,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nFrom the main menu this opens up the custom mode panel." +
                             "\r\nIt opens the Custom window which displays the options for a custom game." +
                             "\r\nYou may display to output a simplified version of the current settings with the command simple." +
-                            "\r\ncustom will also display its text to output but only while in this screen." +
                             "\r\nThe commands to set settings are char, asc, seed, and mod." +
                             "\r\nchar is the character command. The format is" +
                             "\r\nchar number" +
@@ -999,7 +1012,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe format to select a mod is" +
                             "\r\nmod number" +
                             "\r\nThe format to inspect a mod is" +
-                            "\r\nmod i number";
+                            "\r\nmod i number" +
+                            "\r\nExample series of commands to start a custom game:" +
+                            "\r\ncustom" +
+                            "\r\nchar 2" +
+                            "\r\nasc" +
+                            "\r\nasc 15" +
+                            "\r\nmod 10" +
+                            "\r\nmod 15" +
+                            "\r\nmod 13" +
+                            "\r\nembark";
                 case "potion":
                     return  "\r\npotion" +
                             "\r\nThis command lets you interact with your potions." +
@@ -1013,14 +1035,20 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe format for inspect is" +
                             "\r\npotion inspect [potion number]" +
                             "\r\nInspect displays what the potion does to the output window." +
-                            "\r\npotion can be shortened to pot, use to u, discard to d, and inspect to i.";
+                            "\r\npotion can be shortened to pot, use to u, discard to d, and inspect to i." +
+                            "\r\nExamples:" +
+                            "\r\npot u 1 1" +
+                            "\r\npot d 2" +
+                            "\r\npot i 1";
                 case "choice":
                     return  "\r\nchoice" +
                             "\r\nNot to be confused with choices, which is one of the windows." +
                             "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
                             "\r\nThe format is" +
                             "\r\nchoice [choice number]" +
-                            "\r\nchoice can be shortened to c.";
+                            "\r\nchoice can be shortened to c." +
+                            "\r\nExample:" +
+                            "\r\nc 1";
                 case "power":
                     return  "\r\npower" +
                             "\r\nThis command inspects one of your or a monster's powers." +
@@ -1028,7 +1056,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\npower player [power number]" +
                             "\r\nThe format to inspect a monster's power is" +
                             "\r\npower monster [monster number] [power number]" +
-                            "\r\npower can be shortened to pow, monster to m, and player to p.";
+                            "\r\npower can be shortened to pow, monster to m, and player to p." +
+                            "\r\nExample:" +
+                            "\r\npow p 1" +
+                            "\r\npow m 1 2";
                 case "end":
                     return  "\r\nend" +
                             "\r\nThis command ends your turn.";
@@ -1038,7 +1069,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThese commands allow you to hide and unhide windows." +
                             "\r\nThe format is" +
                             "\r\n[show/hide] window name" +
-                            "\r\nYou may also use all for window name to show or hide all windows besides output and prompt.";
+                            "\r\nYou may also use all for window name to show or hide all windows besides output and prompt." +
+                            "\r\nExamples:" +
+                            "\r\nhide all" +
+                            "\r\nshow map";
                 case "choices":
                     return  "\r\nchoices" +
                             "\r\nThis command displays the text in the choices window in the output window." +
@@ -1070,7 +1104,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe second option displays the info of a card in your hand in the output window." +
                             "\r\nThe format is" +
                             "\r\nhand [card number]" +
-                            "\r\nhand can be shortened to h.";
+                            "\r\nhand can be shortened to h." +
+                            "\r\nExample:" +
+                            "\r\nh 1";
                 case "output":
                     return  "\r\noutput" +
                             "\r\nThis window displays output from various sources." +
@@ -1081,22 +1117,40 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nsave/load" +
                             "\r\nThese commands let you save and load the output window for later viewing." +
                             "\r\nFormat is" +
-                            "\r\nsave/load [anything no spaces]";
+                            "\r\nsave/load [anything no spaces]" +
+                            "\r\nExample that saves the output of a map command:" +
+                            "\r\nmap 6 4" +
+                            "\r\nsave 6-4" +
+                            "\r\nload 6-4";
                 case "map":
                     return  "\r\nmap" +
-                            "\r\nThis command has two options." +
-                            "\r\nThe first option displays the text in the map window in the output window." +
-                            "\r\nThe map displays the map nodes." +
-                            "\r\nThe nodes include its floor, x coordinate, and what kind of node it is." +
-                            "\r\nThe map only displays nodes you can reach from where you are." +
-                            "\r\nThe second options lets you inspect a map node." +
-                            "\r\nInspecting the map selects the node as a destination." +
-                            "\r\nThe format is" +
-                            "\r\nmap [floor] [x coordinate]" +
-                            "\r\nmap can be shortened to m." +
-                            "\r\nThe inspect window will display a filtered map with only nodes you can reach and on the path to the destination." +
-                            "\r\nThe choices window will also display if a given map choice is on track or diverging." +
-                            "\r\nIf you have the relic Winged Greaves which allow you to travel to map nodes ignoring connections twice, nodes will display Winged if it needs Winged Greaves to reach.";
+                            "\r\nThe map window displays the map that the user can reach." +
+                            "\r\nThe map command has several uses." +
+                            "\r\nThe first is to simply display the text in the map window to the output window." +
+                            "\r\nThe next is to inspect the map." +
+                            "\r\nThis lets you set a destination and display a map that the user can reach and can reach the destination." +
+                            "\r\nThis destination will also be tracked in the choice window when moving on the map." +
+                            "\r\nOptionally you can set a different starting position." +
+                            "\r\nIf you do so the destination will not be tracked in the choice window." +
+                            "\r\nmap can be shortened to m" +
+                            "\r\nFormat is:" +
+                            "\r\nmap [start floor] [start x] [floor] [x]" +
+                            "\r\nExamples:" +
+                            "\r\nmap 6 4" +
+                            "\r\nmap 3 1 6 4" +
+                            "\r\nBoth examples had destination 6 4." +
+                            "\r\nFor a different way to inspect the map check the path command.";
+                case "path":
+                    return  "\r\npath" +
+                            "\r\nThe path command is closely related to the map command." +
+                            "\r\nIt displays all of the unique paths from point a to point b and tallies the types of nodes on each path." +
+                            "\r\nIf point a is not set if defaults to where the user is." +
+                            "\r\nFormat is:" +
+                            "\r\npath [a floor] [a x] [b floor] [b x]" +
+                            "\r\nExamples:" +
+                            "\r\npath 6 4" +
+                            "\r\npath 3 1 6 4" +
+                            "\r\nBoth examples had destination 6 4.";
                 case "monster":
                     return  "\r\nmonster" +
                             "\r\nThis command displays the text in the monster window in the output window." +
@@ -1120,12 +1174,54 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThey are ordered in reverse acquired order." +
                             "\r\nThe second option displays a relic's info in the inspect window." +
                             "\r\nThe format is" +
-                            "\r\nrelic [relic number]";
+                            "\r\nrelic [relic number]" +
+                            "\r\nExample:" +
+                            "\r\nrelic 5";
             }
         }
 
         return "";
 
+    }
+
+    public void language(String[] tokens){
+        StringBuilder s = new StringBuilder("\r\n");
+        String[] langs = {
+                "English",
+                "Brazilian Portuguese",
+                "Chinese (Simplified)",
+                "Chinese (Traditional)",
+                "French",
+                "German",
+                "Greek",
+                "Italian",
+                "Indonesian",
+                "Japanese",
+                "Korean",
+                "Norwegian",
+                "Polish",
+                "Russian",
+                "Spanish",
+                "Serbian-Cyrillic",
+                "Serbian-Latin",
+                "Thai",
+                "Turkish",
+                "Ukrainian",
+                "Vietnamese"};
+        if(tokens.length == 1){
+            s.append("Current ").append(Settings.gamePref.getString("LANGUAGE")).append("\r\n");
+            for(int i=0;i<langs.length;i++){
+                s.append(i).append(": ").append(langs[i]).append("\r\n");
+            }
+            inspect.setText(s.toString());
+        }else{
+            try{
+                int in = Integer.parseInt(tokens[1]);
+                Settings.setLanguageLegacy(langs[in], false);
+                inspect.setText("\r\nLanguage set to " + langs[in]);
+            }catch(Exception ignored){
+            }
+        }
     }
 
     public String inspectPower(AbstractPower p){
