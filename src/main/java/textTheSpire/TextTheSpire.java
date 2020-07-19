@@ -10,6 +10,7 @@ import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
+import com.megacrit.cardcrawl.characters.CharacterManager;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.daily.DailyScreen;
@@ -34,6 +35,7 @@ import com.megacrit.cardcrawl.screens.options.OptionsPanel;
 import com.megacrit.cardcrawl.screens.options.Slider;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.AchievementItem;
+import com.megacrit.cardcrawl.screens.stats.CharStat;
 import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
@@ -246,6 +248,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         if(tokens[0].equals("help")){
             inspect.setText(displayHelp(tokens));
+            return;
+        }
+
+        if(input.equals("stats") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+            inspect.setText(getStats());
             return;
         }
 
@@ -921,6 +928,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\ncontinue" +
                     "\r\nquit" +
                     "\r\nseed" +
+                    "\r\bstats" +
                     "\r\nvolume" +
                     "\r\nachieve" +
                     "\r\nplay" +
@@ -975,6 +983,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThis command displays the run's seed to the output window." +
                             "\r\nA seed is used for random number generation." +
                             "\r\nIt can be input when starting a run to have a set seed,";
+                case "stats":
+                    return  "\r\nstats" +
+                            "\r\nThis command displays your save file's statistics to output." +
+                            "\r\nWill not work on a fresh save file.";
                 case "volume":
                     return  "\r\nvolume" +
                             "\r\nThis displays the current volume settings to output." +
@@ -1228,6 +1240,38 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }catch(Exception ignored){
             }
         }
+    }
+
+    public String getStats(){
+
+        if(CardCrawlGame.characterManager == null){
+            return "";
+        }
+
+        StringBuilder s = new StringBuilder("\r\n");
+
+        StringBuilder charStats = new StringBuilder("");
+
+        ArrayList<CharStat> allCharStats = new ArrayList<>();
+        for (AbstractPlayer c : CardCrawlGame.characterManager.getAllCharacters()) {
+            CharStat stat = c.getCharStat();
+            allCharStats.add(stat);
+
+            charStats.append(c.chosenClass.name()).append("\r\n");
+            String info = (String)basemod.ReflectionHacks.getPrivate(stat, CharStat.class, "info");
+            String info2 = (String)basemod.ReflectionHacks.getPrivate(stat, CharStat.class, "info2");
+            charStats.append(Choices.stripColor(info)).append(Choices.stripColor(info2));
+
+        }
+
+        CharStat overall = new CharStat(allCharStats);
+        s.append("Overall").append("\r\n");
+        String info = (String)basemod.ReflectionHacks.getPrivate(overall, CharStat.class, "info");
+        String info2 = (String)basemod.ReflectionHacks.getPrivate(overall, CharStat.class, "info2");
+        s.append(Choices.stripColor(info)).append(Choices.stripColor(info2));
+        s.append(charStats.toString());
+
+        return s.toString();
     }
 
     public String inspectPower(AbstractPower p){
