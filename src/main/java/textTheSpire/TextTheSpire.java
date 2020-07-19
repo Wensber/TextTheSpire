@@ -28,6 +28,7 @@ import com.megacrit.cardcrawl.screens.custom.CustomMod;
 import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
+import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.options.OptionsPanel;
 import com.megacrit.cardcrawl.screens.options.Slider;
@@ -223,6 +224,21 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
             return;
 
+        }
+
+        if(CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN && input.equals("abandon")){
+            CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).hb.clicked = true;
+            return;
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
+            if(input.equals("yes")){
+                CardCrawlGame.mainMenuScreen.abandonPopup.yesHb.clicked = true;
+                return;
+            }else if(input.equals("no")){
+                CardCrawlGame.mainMenuScreen.abandonPopup.noHb.clicked = true;
+                return;
+            }
         }
 
         AbstractDungeon d = CardCrawlGame.dungeon;
@@ -494,20 +510,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         //Start a new run. Only does anything if not in dungeon.
-        if (tokens[0].equals("start") && !CardCrawlGame.characterManager.anySaveFileExists()) {
+
+        if (tokens[0].equals("start") && CardCrawlGame.mainMenuScreen != null && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-1).result == MenuButton.ClickResult.PLAY) {
             try {
                 if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
                     CommandExecutor.executeCommand(input);
-                return;
-            } catch (Exception e) {
-                return;
-            }
-        } else if (tokens[0].equals("restart") && CardCrawlGame.characterManager.anySaveFileExists()) {
-            try {
-                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens)) {
-                    //tokens = (input.substring(2)).split("\\s+");
-                    CommandExecutor.executeCommand(input.substring(2));
-                }
                 return;
             } catch (Exception e) {
                 return;
@@ -910,7 +917,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nhelp start" +
                     "\r\nAll commands are input in the prompt window." +
                     "\r\nstart" +
-                    "\r\nrestart" +
+                    "\r\nabandon" +
                     "\r\ncontinue" +
                     "\r\nquit" +
                     "\r\nseed" +
@@ -941,9 +948,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }else{
             switch(tokens[1].toLowerCase()){
                 case "start":
-                case "restart":
+                case "abandon":
                 case "continue":
-                    return  "\r\nstart, restart, and continue" +
+                    return  "\r\nstart, abandon, and continue" +
                             "\r\nThese commands let you enter a run. You see these options while on the start menu." +
                             "\r\nIf there is no save file, you can start a run." +
                             "\r\nThe format is" +
@@ -954,9 +961,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nstart defect 10" +
                             "\r\nDefault ascension is 0." +
                             "\r\nIf you want to enter a seed you will need to enter an ascension level." +
-                            "\r\nIf there is a save file, you will have the continue and restart options." +
-                            "\r\nrestart follows the same format as start." +
-                            "\r\nThe only reason for the command difference is to help make sure you don't overwrite a file on accident." +
+                            "\r\nIf there is a save file, you will have the continue and abandon options." +
+                            "\r\nabandon will delete your current run after a confirmation popup." +
                             "\r\nThe choices window will display all of the classes and their unlocked ascension level." +
                             "\r\nIf the character is locked it will display locked.";
                 case "quit":
@@ -1241,6 +1247,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         s += "Potion\r\n";
         s += p.name + "\r\n";
+        s += p.rarity.name() + "\r\n";
         s += Choices.stripColor(p.description) + "\r\n";
 
         return s;
@@ -1253,6 +1260,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         s += "Relic\r\n";
         s += r.name + "\r\n";
+        s += r.tier.name() + "\r\n";
+        s += "Charges " + r.counter + "\r\n";
         s += Choices.stripColor(r.description) + "\r\n";
 
         return s;
@@ -1266,6 +1275,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         int cost = Hand.handCost(card);
 
         s += card.name + "\r\n";
+
+        s += card.rarity.name() + "\r\n";
 
         if(cost == -1)
             s += "Cost : X"+ "\r\n";

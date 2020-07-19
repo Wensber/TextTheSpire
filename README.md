@@ -43,6 +43,12 @@ This one is almost a requirement as one of the characters Watcher does not seem 
 
 Gameplay mechanics guide: https://slay-the-spire.fandom.com/wiki/Gameplay
 
+Known Issues:
+
+If a old run that you finished or overwrote appears again you can delete the run in the saves folder in the main Slay the Spire directory.
+This folder is just the run saves and won't delete anything else.
+This issue should be fixed now that restart has been replaced with abandon but might still appear for a bit if you've used the restart command recently.
+
 Donations:
 
 As of right now, I am not accepting donations and recommend you support NVDA instead. https://www.nvaccess.org/support-us/

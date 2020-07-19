@@ -267,7 +267,7 @@ public class Inspect {
 
     public static void pathRecursion(MapRoomNode curr, ArrayList<ArrayList<MapRoomNode>> m, int source_y, String path){
 
-        String newPath = Map.nodeType(curr) + (curr.y+1) + " " + curr.x + " " + path;
+        String newPath = Map.nodeType(curr) + (curr.y+1) + " " + curr.x + ", " + path;
 
         if(curr.y - source_y - 1 >= 0) {
 
@@ -312,22 +312,22 @@ public class Inspect {
 
             String pathEntry = "";
             if (emerald > 0) {
-                pathEntry += "Emerald ";
+                pathEntry += "Emerald, ";
             }
             if (elite > 0) {
-                pathEntry += "Elite " + elite + " ";
+                pathEntry += "Elite " + elite + ", ";
             }
             if (rest > 0) {
-                pathEntry += "Rest " + rest + " ";
+                pathEntry += "Rest " + rest + ", ";
             }
             if (shop > 0) {
-                pathEntry += "Shop " + shop + " ";
+                pathEntry += "Shop " + shop + ", ";
             }
             if (unknown > 0) {
-                pathEntry += "Unknown " + unknown + " ";
+                pathEntry += "Unknown " + unknown + ", ";
             }
             if (monster > 0) {
-                pathEntry += "Monster " + monster + " ";
+                pathEntry += "Monster " + monster + ", ";
             }
             pathEntry += "\r\n" + newPath;
 

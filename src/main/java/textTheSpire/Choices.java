@@ -17,6 +17,7 @@ import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
@@ -35,9 +36,6 @@ import java.util.ArrayList;
 
 public class Choices extends AbstractWindow{
 
-    private boolean checkedSave = false;
-    private boolean haveSave;
-
     public Choices(Display display){
         isVisible = true;
         window = new Window(display,"Choices", 300, 300);
@@ -54,8 +52,6 @@ public class Choices extends AbstractWindow{
         s.append("\r\n");
 
         if(CommandExecutor.isInDungeon()){
-
-            checkedSave = false;
 
             ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();
 
@@ -217,31 +213,15 @@ public class Choices extends AbstractWindow{
 
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
-                if (!checkedSave) {
-                    if (CardCrawlGame.characterManager.anySaveFileExists()) {
-                        s.append("restart [class] [ascension] [seed]\r\n");
-                        s.append("continue\r\n");
-                        haveSave = true;
-                    } else {
-                        s.append("start [class] [ascension] [seed]\r\n");
-                        haveSave = false;
-                    }
 
-                    checkedSave = true;
+
+                if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN) {
+                    s.append("abandon\r\n");
+                    s.append("continue\r\n");
                 } else {
-                    if (haveSave) {
-                        s.append("restart [class] [ascension] [seed]\r\n");
-                        s.append("continue\r\n");
-                    } else {
-                        s.append("start [class] [ascension] [seed]\r\n");
-                        if(CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
-                            s.append("daily\r\n");
-                        }
-                        if(StatsScreen.all.highestDaily > 0){
-                            s.append("custom\r\n");
-                        }
-                    }
+                    s.append("start [class] [ascension] [seed]\r\n");
                 }
+
 
                 TipTracker.disableAllFtues();
 
@@ -257,6 +237,8 @@ public class Choices extends AbstractWindow{
                 }
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark");
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
+                s.append("Abandon Confirm\r\nyes\r\nno");
             }
 
             return s.toString();
