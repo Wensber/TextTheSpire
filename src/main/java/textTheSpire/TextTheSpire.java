@@ -31,6 +31,7 @@ import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
+import com.megacrit.cardcrawl.screens.mainMenu.SaveSlotScreen;
 import com.megacrit.cardcrawl.screens.options.OptionsPanel;
 import com.megacrit.cardcrawl.screens.options.Slider;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
@@ -43,6 +44,7 @@ import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.ui.buttons.CancelButton;
 import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
 import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
+import com.megacrit.cardcrawl.ui.panels.DeleteSaveConfirmPopup;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
@@ -324,7 +326,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
-        if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+        if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
             CardCrawlGame.mainMenuScreen.dailyScreen.open();
             return;
         }
@@ -332,10 +334,76 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if(input.equals("custom")){
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen != MainMenuScreen.CurScreen.CUSTOM && !CardCrawlGame.characterManager.anySaveFileExists() && StatsScreen.all.highestDaily > 0) {
                 CardCrawlGame.mainMenuScreen.customModeScreen.open();
-                return;
             }else{
                 inspect.setText(custom.getText());
             }
+            return;
+        }
+
+
+        if(input.equals("slot") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU){
+            CardCrawlGame.mainMenuScreen.saveSlotScreen.open(CardCrawlGame.playerName);
+            CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.SAVE_SLOT;
+            return;
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT){
+            if(input.equals("back") && !CardCrawlGame.mainMenuScreen.saveSlotScreen.cancelButton.isHidden){
+                CardCrawlGame.mainMenuScreen.saveSlotScreen.cancelButton.hb.clicked = true;
+                return;
+            }
+            if(tokens[0].equals("new")){
+                try{
+                    int in = Integer.parseInt(tokens[1]);
+                    if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(in).emptySlot) {
+                        CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(in).slotHb.clicked = true;
+                    }
+                    return;
+                }catch(Exception ignored){
+                }
+            }
+            if(tokens[0].equals("rename")){
+                try{
+                    int in = Integer.parseInt(tokens[1]);
+                    CardCrawlGame.mainMenuScreen.saveSlotScreen.openRenamePopup(in, false);
+                    return;
+                }catch(Exception ignored){
+                }
+            }
+            if(tokens[0].equals("delete")){
+                try{
+                    int in = Integer.parseInt(tokens[1]);
+                    CardCrawlGame.mainMenuScreen.saveSlotScreen.openDeletePopup(in);
+                    return;
+                }catch(Exception ignored){
+                }
+            }
+            if(tokens[0].equals("open")){
+                try{
+                    int in = Integer.parseInt(tokens[1]);
+                    if(!CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(in).emptySlot) {
+                        CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(in).slotHb.clicked = true;
+                    }
+                    return;
+                }catch(Exception ignored){
+                }
+            }
+
+            if(CardCrawlGame.mainMenuScreen.saveSlotScreen.curPop == SaveSlotScreen.CurrentPopup.DELETE){
+                if(input.equals("yes")){
+                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "yesHb");
+                    hb.clicked = true;
+                    return;
+                }
+                if(input.equals("no")){
+                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "noHb");
+                    hb.clicked = true;
+                    return;
+                }
+            }
+
         }
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
@@ -926,6 +994,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nstart" +
                     "\r\nabandon" +
                     "\r\ncontinue" +
+                    "\r\nslot" +
                     "\r\nquit" +
                     "\r\nseed" +
                     "\r\bstats" +
@@ -973,6 +1042,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nabandon will delete your current run after a confirmation popup." +
                             "\r\nThe choices window will display all of the classes and their unlocked ascension level." +
                             "\r\nIf the character is locked it will display locked.";
+                case "slot":
+                    return  "\r\nslot" +
+                            "\r\nFrom the main menu this opens up the save slot screen." +
+                            "\r\nDetails on how to navigate this screen will appear in the Choices window.";
                 case "quit":
                     return  "\r\nquit" +
                             "\r\nThis command quits the game." +
@@ -1526,6 +1599,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         specialUpdates();
 
+        /*
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT && slotOnlyOnce){
             slotOnlyOnce = false;
             if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(2).emptySlot) {
@@ -1536,6 +1610,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
 
         }
+        */
 
         if(!setSettings){
 

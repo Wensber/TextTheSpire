@@ -18,6 +18,8 @@ import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
+import com.megacrit.cardcrawl.screens.mainMenu.SaveSlot;
+import com.megacrit.cardcrawl.screens.mainMenu.SaveSlotScreen;
 import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
@@ -214,6 +216,7 @@ public class Choices extends AbstractWindow{
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
 
+                s.append("Slot ").append(CardCrawlGame.saveSlot).append(" ").append(CardCrawlGame.playerName).append("\r\n");
 
                 if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN) {
                     s.append("abandon\r\n");
@@ -235,10 +238,35 @@ public class Choices extends AbstractWindow{
                         s.append("locked\r\n");
 
                 }
+
+                s.append("slot");
+
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
                 s.append("Abandon Confirm\r\nyes\r\nno");
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT){
+                if(CardCrawlGame.mainMenuScreen.saveSlotScreen.curPop == SaveSlotScreen.CurrentPopup.NONE){
+                    s.append("Save Slots\r\n");
+                    if(!CardCrawlGame.mainMenuScreen.saveSlotScreen.cancelButton.isHidden){
+                        s.append("back\r\n");
+                    }
+                    int slot_index = 0;
+                    for(SaveSlot slot : CardCrawlGame.mainMenuScreen.saveSlotScreen.slots){
+                        if(slot.emptySlot){
+                            s.append(slot_index).append(" Empty\r\n");
+                        }else{
+                            s.append(slot_index).append(" ").append(slot.getName()).append("\r\n");
+                            s.append("Completion ").append(CardCrawlGame.saveSlotPref.getFloat(SaveHelper.slotName("COMPLETION", slot_index), 0.0F)).append("%\r\n");
+                        }
+                        slot_index++;
+                    }
+                    s.append("Possible commands:\r\nnew\r\ndelete\r\nrename\r\nopen\r\nInclude save slot index after command.\r\nExample:\r\nrename 2\r\n");
+                }else if(CardCrawlGame.mainMenuScreen.saveSlotScreen.curPop == SaveSlotScreen.CurrentPopup.RENAME){
+                    s.append("Go to main game window, type a name, and hit enter.\r\nName cannot be empty.\r\nHit esc to cancel.\r\n");
+                }else if(CardCrawlGame.mainMenuScreen.saveSlotScreen.curPop == SaveSlotScreen.CurrentPopup.DELETE){
+                    s.append("Delete Confirm\r\nyes\r\nno\r\n");
+                }
             }
 
             return s.toString();
