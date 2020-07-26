@@ -175,10 +175,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         input = input.toLowerCase();
         switch(input){
-            case "quit":
-                dispose();
-                Gdx.app.exit();
-                return;
             case "deck":
                 inspect.setText(deck.getText());
                 return;
@@ -232,6 +228,26 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         if(CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN && input.equals("abandon")){
             CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).hb.clicked = true;
+            return;
+        }
+
+        if(input.equals("quit")){
+            if(CommandExecutor.isInDungeon()) {
+                CardCrawlGame.music.fadeAll();
+
+                AbstractDungeon.getCurrRoom().clearEvent();
+                AbstractDungeon.closeCurrentScreen();
+                CardCrawlGame.startOver();
+
+                if (RestRoom.lastFireSoundId != 0L) {
+                    CardCrawlGame.sound.fadeOut("REST_FIRE_WET", RestRoom.lastFireSoundId);
+                }
+                if (AbstractDungeon.player.stance != null && !AbstractDungeon.player.stance.ID.equals("Neutral")) {
+                    AbstractDungeon.player.stance.stopIdleSfx();
+                }
+            } else if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT){
+                CardCrawlGame.mainMenuScreen.buttons.get(0).hb.clicked = true;
+            }
             return;
         }
 

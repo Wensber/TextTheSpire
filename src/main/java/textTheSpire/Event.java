@@ -88,8 +88,8 @@ public class Event extends AbstractWindow{
             return s.toString();
         }
 
-        //Not in dungeon
-        if(CardCrawlGame.dungeon == null || ChoiceScreenUtils.getCurrentChoiceType() != ChoiceScreenUtils.ChoiceType.EVENT){
+        //Not in Event
+        if(!CommandExecutor.isInDungeon() || ChoiceScreenUtils.getCurrentChoiceType() != ChoiceScreenUtils.ChoiceType.EVENT){
             return "";
         }
 
