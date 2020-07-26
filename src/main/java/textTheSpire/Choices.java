@@ -38,7 +38,12 @@ import java.util.ArrayList;
 
 public class Choices extends AbstractWindow{
 
+    boolean disableTips;
+
     public Choices(Display display){
+
+        disableTips = false;
+
         isVisible = true;
         window = new Window(display,"Choices", 300, 300);
     }
@@ -216,17 +221,12 @@ public class Choices extends AbstractWindow{
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
 
-                s.append("Slot ").append(CardCrawlGame.saveSlot).append(" ").append(CardCrawlGame.playerName).append("\r\n");
-
-                if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN) {
-                    s.append("abandon\r\n");
-                    s.append("continue\r\n");
-                } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
+                if(!disableTips) {
+                    TipTracker.disableAllFtues();
+                    disableTips = true;
                 }
 
-
-                TipTracker.disableAllFtues();
+                s.append("Slot ").append(CardCrawlGame.saveSlot).append(" ").append(CardCrawlGame.playerName).append("\r\n");
 
                 for (AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()) {
 
@@ -239,7 +239,22 @@ public class Choices extends AbstractWindow{
 
                 }
 
-                s.append("slot");
+                s.append("Commands\r\n");
+
+                if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN) {
+                    s.append("abandon\r\n");
+                    s.append("continue\r\n");
+                } else {
+                    s.append("start [class] [ascension] [seed]\r\n");
+                    if(CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+                        s.append("daily\r\n");
+                    }
+                    if(StatsScreen.all.highestDaily > 0){
+                        s.append("custom\r\n");
+                    }
+                }
+
+                s.append("slot\r\nquit");
 
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark");

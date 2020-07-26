@@ -45,19 +45,22 @@ public class Orbs extends AbstractWindow{
 
             s.append("Front\r\n");
 
+            int count = 0;
+
             if (p.chosenClass == AbstractPlayer.PlayerClass.DEFECT) {
                 for (AbstractOrb o : ol) {
                     if (o instanceof Dark) {
-                        s.append("Dark ").append(o.evokeAmount).append("\r\n");
+                        s.append(count).append(". Dark ").append(o.evokeAmount).append("\r\n");
                     } else if (o instanceof Lightning) {
-                        s.append("Lightning\r\n");
+                        s.append(count).append(". Lightning\r\n");
                     } else if (o instanceof Frost) {
-                        s.append("Frost\r\n");
+                        s.append(count).append(". Frost\r\n");
                     } else if (o instanceof Plasma) {
-                        s.append("Plasma\r\n");
+                        s.append(count).append(". Plasma\r\n");
                     } else {
-                        s.append("Empty\r\n");
+                        s.append(count).append(". Empty\r\n");
                     }
+                    count++;
                 }
             }else if(ol.size() > 0 && !(ol.get(0) instanceof  EmptyOrbSlot)){
                 for (AbstractOrb o : ol) {

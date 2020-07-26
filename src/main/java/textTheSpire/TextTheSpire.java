@@ -19,6 +19,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
@@ -745,6 +746,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "pow":
                     parsePower(tokens);
                     return;
+                case "orbs":
+                    try {
+                        int in;
+                        in = Integer.parseInt(tokens[1]);
+                        ArrayList<AbstractOrb> ol = AbstractDungeon.player.orbs;
+                        if(in >= 0 && in < ol.size()) {
+                            inspect.setText(inspectOrb(AbstractDungeon.player.orbs.get(in)));
+                        }
+                    } catch (Exception e) {
+                        return;
+                    }
+                    return;
                 default:
                     try {
                         if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE){
@@ -1399,6 +1412,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         return s;
 
+    }
+
+    public static String inspectOrb(AbstractOrb o){
+        String s = "\r\n";
+
+        s = s + o.name + "\r\n";
+        s = s + "Passive " + o.passiveAmount + "\r\n";
+        s = s + "Evoke " + o.evokeAmount + "\r\n";
+
+        return s;
     }
 
     public static String inspectCard(AbstractCard card){
