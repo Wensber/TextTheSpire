@@ -14,7 +14,7 @@ Descriptions of the windows and commands are provided with the help command.
 Limitations:
 
 TextTheSpire is currently not capable of accessing various menus or screens.
-This includes save slots, statistics, compendium, run history, settings, patch notes, etc.
+This includes run history, settings, patch notes, etc.
 
 Requirements:
 

@@ -1307,7 +1307,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nevent" +
                             "\r\nThis command displays the text in the orbs window in the output window." +
                             "\r\nThis window displays the orbs the player has." +
-                            "\r\nThis is usually exclusive to the class Defect.";
+                            "\r\nThis is usually exclusive to the class Defect." +
+                            "\r\nYou can inspect an orb with the format:" +
+                            "\r\norbs index" +
+                            "\r\nExample:" +
+                            "\r\norbs 1";
                 case "player":
                     return  "\r\nplayer" +
                             "\r\nThis command displays the text in the player window in the output window." +
