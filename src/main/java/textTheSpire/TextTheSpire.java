@@ -1031,7 +1031,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nslot" +
                     "\r\nquit" +
                     "\r\nseed" +
-                    "\r\bstats" +
+                    "\r\nstats" +
+                    "\r\ncomp" +
                     "\r\nvolume" +
                     "\r\nachieve" +
                     "\r\nplay" +
@@ -1082,9 +1083,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nDetails on how to navigate this screen will appear in the Choices window.";
                 case "quit":
                     return  "\r\nquit" +
-                            "\r\nThis command quits the game." +
-                            "\r\nYou will still need to close the mod the spire window." +
-                            "\r\nClosing the mod the spire window will close all the other mod windows.";
+                            "\r\nWhile in a run, this command saves and quits to main menu." +
+                            "\r\nWhile on the main menu, this command quits the game." +
+                            "\r\nAnother easy way to close the game would be to close the ModTheSpire window.";
                 case "seed":
                     return  "\r\nseed" +
                             "\r\nThis command displays the run's seed to the output window." +
@@ -1094,6 +1095,27 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return  "\r\nstats" +
                             "\r\nThis command displays your save file's statistics to output." +
                             "\r\nWill not work on a fresh save file.";
+                case "comp":
+                    return  "\r\ncomp" +
+                            "\r\nThis is the Compendium command." +
+                            "\r\nThere are various categories and subcategories." +
+                            "\r\nThe Categories are" +
+                            "\r\ni for Ironclad" +
+                            "\r\ns for Silent" +
+                            "\r\nd for Defect" +
+                            "\r\nw for Watcher" +
+                            "\r\np for Potions" +
+                            "\r\nr for Relics" +
+                            "\r\nRelics has subcategories." +
+                            "\r\nThese are i, s, d, w, and sh." +
+                            "\r\nsh is shared and is all of the shared relics." +
+                            "\r\nFollowing any command by a number will inspect the item at that index." +
+                            "\r\nExamples" +
+                            "\r\ncomp i" +
+                            "\r\ncomp s 5" +
+                            "\r\ncomp p" +
+                            "\r\ncomp r w" +
+                            "\r\ncomp r sh 10";
                 case "volume":
                     return  "\r\nvolume" +
                             "\r\nThis displays the current volume settings to output." +
@@ -1554,22 +1576,27 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     @SuppressWarnings("unchecked")
     public String parseRelicLibrary(String[] tokens){
-        String s = "";
+        String s = "\r\nRelics\r\n";
         HashMap<String, AbstractRelic> list;
         switch (tokens[2]){
             case "i":
+                s = s + "Ironclad\r\n";
                 list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "redRelics");
                 break;
             case "s":
+                s = s + "Silent\r\n";
                 list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "greenRelics");
                 break;
             case "d":
+                s = s + "Defect\r\n";
                 list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "blueRelics");
                 break;
             case "w":
+                s = s + "Watcher\r\n";
                 list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "purpleRelics");
                 break;
             case "sh":
+                s = s + "Shared\r\n";
                 list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "sharedRelics");
                 break;
             default:
@@ -1579,15 +1606,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         int total = relicList.size();
         int count = 0;
 
+        String relicString = "";
         for(AbstractRelic r : relicList){
             if(UnlockTracker.isRelicSeen(r.relicId)){
-                s = s + count + ". " + r.name + "\r\n";
+                relicString = relicString + count + ". " + r.name + "\r\n";
                 count++;
             }
         }
 
         if(tokens.length == 3){
-            s = "\r\nRelics\r\nSeen " + count + "/" + total + "\r\n" + s;
+            s = s + "Seen " + count + "/" + total + "\r\n" + relicString;
             return s;
         }else{
             try{
