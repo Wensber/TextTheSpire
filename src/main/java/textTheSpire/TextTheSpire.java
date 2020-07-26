@@ -275,6 +275,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             return;
         }
 
+        if(tokens[0].equals("comp")){
+            inspect.setText(compendium(tokens));
+            return;
+        }
+
         if(tokens[0].equals("achieve") || tokens[0].equals("a")){
             inspect.setText(inspectAchievements(tokens));
             return;
@@ -1376,6 +1381,227 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         return s.toString();
     }
 
+    public String compendium(String[] tokens){
+        String s = "";
+
+        if(tokens.length == 1){
+            return  "\r\nCompendium" +
+                    "\r\nCategories are:" +
+                    "\r\ni for Ironclad" +
+                    "\r\ns for Silent" +
+                    "\r\nd for Defect" +
+                    "\r\nw for Watcher" +
+                    "\r\ncl for Colorless" +
+                    "\r\nc for Curses" +
+                    "\r\np for Potions" +
+                    "\r\nr for Relics";
+        } else if(tokens.length == 2){
+            ArrayList<AbstractCard> list;
+            ArrayList<AbstractCard> fullList;
+            switch(tokens[1]){
+                case "i":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.RED);
+                    list = seenCardList(fullList);
+                    s = "\r\nIronclad\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "s":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.GREEN);
+                    list = seenCardList(fullList);
+                    s = "\r\nSilent\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "d":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.BLUE);
+                    list = seenCardList(fullList);
+                    s = "\r\nDefect\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "w":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.PURPLE);
+                    list = seenCardList(fullList);
+                    s = "\r\nWatcher\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "cl":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.COLORLESS);
+                    list = seenCardList(fullList);
+                    s = "\r\nColorless\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "c":
+                    fullList = CardLibrary.getCardList(CardLibrary.LibraryType.CURSE);
+                    list = seenCardList(fullList);
+                    s = "\r\nCurse\r\nSeen " + list.size() + "/" + fullList.size() + "\r\n" + cardListString(list);
+                    return s;
+                case "p":
+                    ArrayList<AbstractPotion> potList = getPotList();
+                    s = "\r\nPotions\r\n" + potListString(potList);
+                    return s;
+                case "r":
+                    s =     "\r\nRelics" +
+                            "\r\nCategories are" +
+                            "\r\ni for Ironclad" +
+                            "\r\ns for Silent" +
+                            "\r\nd for Defect" +
+                            "\r\nw for Watcher" +
+                            "\r\nsh for Shared";
+                    return s;
+            }
+        } else {
+            if(tokens[1].equals("r")){
+                s = parseRelicLibrary(tokens);
+                return s;
+            }
+            ArrayList<AbstractCard> list;
+            ArrayList<AbstractCard> fullList;
+            try {
+                int in = Integer.parseInt(tokens[2]);
+                if(in < 0){
+                    return "";
+                }
+                switch (tokens[1]) {
+                    case "i":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.RED);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "s":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.GREEN);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "d":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.BLUE);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "w":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.PURPLE);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "cl":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.COLORLESS);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "c":
+                        fullList = CardLibrary.getCardList(CardLibrary.LibraryType.CURSE);
+                        list = seenCardList(fullList);
+                        if(in < list.size()){
+                            return inspectCard(list.get(in));
+                        }
+                        break;
+                    case "p":
+                        ArrayList<AbstractPotion> potList = getPotList();
+                        if(in < potList.size()){
+                            return inspectPotion(potList.get(in));
+                        }
+                        break;
+                }
+            }catch(Exception ignored){
+            }
+        }
+        return s;
+    }
+
+    public ArrayList<AbstractCard> seenCardList(ArrayList<AbstractCard> fullList){
+        ArrayList<AbstractCard> list = new ArrayList<>();
+
+        for(AbstractCard c : fullList){
+            if(UnlockTracker.isCardSeen(c.cardID)){
+                list.add(c);
+            }
+        }
+
+        return list;
+    }
+
+    public String cardListString(ArrayList<AbstractCard> list){
+        int count = 0;
+        String s = "";
+        for(AbstractCard c : list){
+            s = s + count + ". " + c.name + "\r\n";
+            count++;
+        }
+        return s;
+    }
+
+    public ArrayList<AbstractPotion> getPotList(){
+        ArrayList<String> potList = PotionHelper.getPotions(null, true);
+        ArrayList<AbstractPotion> list = new ArrayList<>();
+        for(String s : potList){
+            list.add(PotionHelper.getPotion(s));
+        }
+        return list;
+    }
+
+    public String potListString(ArrayList<AbstractPotion> list){
+        int count = 0;
+        String s = "";
+        for(AbstractPotion p : list){
+            s = s + count + ". " + p.name + "\r\n";
+            count++;
+        }
+        return s;
+    }
+
+    @SuppressWarnings("unchecked")
+    public String parseRelicLibrary(String[] tokens){
+        String s = "";
+        HashMap<String, AbstractRelic> list;
+        switch (tokens[2]){
+            case "i":
+                list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "redRelics");
+                break;
+            case "s":
+                list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "greenRelics");
+                break;
+            case "d":
+                list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "blueRelics");
+                break;
+            case "w":
+                list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "purpleRelics");
+                break;
+            case "sh":
+                list = (HashMap<String, AbstractRelic>)basemod.ReflectionHacks.getPrivateStatic(RelicLibrary.class, "sharedRelics");
+                break;
+            default:
+                return "";
+        }
+        ArrayList<AbstractRelic> relicList = new ArrayList<>(list.values());
+        int total = relicList.size();
+        int count = 0;
+
+        for(AbstractRelic r : relicList){
+            if(UnlockTracker.isRelicSeen(r.relicId)){
+                s = s + count + ". " + r.name + "\r\n";
+                count++;
+            }
+        }
+
+        if(tokens.length == 3){
+            s = "\r\nRelics\r\nSeen " + count + "/" + total + "\r\n" + s;
+            return s;
+        }else{
+            try{
+                int in = Integer.parseInt(tokens[3]);
+                if(in >= 0 && in < relicList.size()){
+                    return inspectRelic(relicList.get(in));
+                }
+            }catch(Exception ignored){
+            }
+        }
+
+        return s;
+    }
+
     public String inspectPower(AbstractPower p){
         String s = "\r\n";
 
@@ -1535,16 +1761,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     }
 
-    public int singleMonster(){
+    public int singleMonster() {
         int count = 0;
         int numAliveMonsters = 0;
         int index = -1;
-        for(AbstractMonster m : AbstractDungeon.getCurrRoom().monsters.monsters){
-            if(m.currentHealth > 0){
-                if(numAliveMonsters == 0){
+        for (AbstractMonster m : AbstractDungeon.getCurrRoom().monsters.monsters) {
+            if (m.currentHealth > 0) {
+                if (numAliveMonsters == 0) {
                     index = count;
                     numAliveMonsters++;
-                }else{
+                } else {
                     return -1;
                 }
             }
@@ -1552,7 +1778,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
         return index;
     }
-
 
     public static String inspectDaily(){
         StringBuilder s = new StringBuilder("Daily Climb\r\n");
