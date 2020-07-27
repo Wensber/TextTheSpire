@@ -264,6 +264,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         AbstractDungeon d = CardCrawlGame.dungeon;
         String[] tokens = input.split("\\s+");
+        if(tokens.length == 0){
+            return;
+        }
 
         if(tokens[0].equals("help")){
             inspect.setText(displayHelp(tokens));
