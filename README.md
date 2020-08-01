@@ -82,6 +82,4 @@ Afterwards they will be auto selected. Hit enter to start the game. One more ste
 
 Step 6:
 
-You will need to set a save file name if you don't have a save file yet. Output should mention this as well.
-Go to the main Slay the Spire window, type your name, and hit enter.
-You are now free to play the game. Type help in the prompt to read about controls.
+You will need to set a save file name if you don't have a save file yet. The Choices window should tell you how.
