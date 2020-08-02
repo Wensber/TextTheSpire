@@ -1073,6 +1073,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\nseed" +
                     "\r\nstats" +
                     "\r\ncomp" +
+                    "\r\nhistory" +
                     "\r\nvolume" +
                     "\r\nachieve" +
                     "\r\nplay" +
@@ -1156,6 +1157,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\ncomp p" +
                             "\r\ncomp r w" +
                             "\r\ncomp r sh 10";
+                case "history":
+                    return  "\r\nhistory" +
+                            "\r\nThis is the Run History command." +
+                            "\r\nFrom the main menu you can active the Run History screen." +
+                            "\r\nAlmost all commands will be disabled while on this screen." +
+                            "\r\nYou can input close at any time to close Run History." +
+                            "\r\nRead the Choices window to navigate Run History." +
+                            "\r\nThere is currently an issues with Run History." +
+                            "\r\nSome objects are named differently in the code than what they actually are." +
+                            "\r\nAs Run History only uses text and not abstract objects, it would be difficult to grab the actual name." +
+                            "\r\nFor now Run History is using these code names.";
                 case "volume":
                     return  "\r\nvolume" +
                             "\r\nThis displays the current volume settings to output." +
