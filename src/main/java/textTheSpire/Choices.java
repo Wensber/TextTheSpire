@@ -49,7 +49,7 @@ public class Choices extends AbstractWindow{
     boolean disableTips;
 
     public enum HistoryScreen{
-        NONE, MAIN, LIST, INSPECT, DECK, RELIC, PATH, CARD, EVENT, BATTLE, CAMP, BOSS, PURCHASE, PURGE, EVERY;
+        NONE, MAIN, LIST, INSPECT, DECK, RELIC, PATH;
     }
 
     static class Floor{
@@ -75,6 +75,18 @@ public class Choices extends AbstractWindow{
     SimpleDateFormat dateFormat;
     boolean setFormat;
 
+    public boolean includeGold;
+    public boolean includeHealth;
+    public boolean includeCard;
+    public boolean includeRelics;
+    public boolean includePotions;
+    public boolean includePurges;
+    public boolean includePurchases;
+    public boolean includeEvents;
+    public boolean includeBattles;
+    public boolean includeCampfire;
+    public boolean includeBosses;
+
     public Choices(Display display){
 
         disableTips = false;
@@ -83,6 +95,18 @@ public class Choices extends AbstractWindow{
         setFormat = false;
         isVisible = true;
         window = new Window(display,"Choices", 300, 300);
+
+        includeGold = true;
+        includeHealth = true;
+        includeCard = true;
+        includeRelics = true;
+        includePotions = true;
+        includePurges = true;
+        includePurchases = true;
+        includeEvents = true;
+        includeBattles = true;
+        includeCampfire = true;
+        includeBosses = true;
     }
 
     public String getText(){
@@ -124,7 +148,9 @@ public class Choices extends AbstractWindow{
                     s.append("7. Normal Runs ").append(TextTheSpire.include_normal).append("\r\n");
                     s.append("8. Ascension ").append(TextTheSpire.include_asc).append("\r\n");
                     s.append("9. Daily ").append(TextTheSpire.include_daily).append("\r\n");
-                    s.append("Input a single number to toggle it.\r\nview\r\n");
+                    s.append("Input a single number to toggle a filter.\r\n");
+                    s.append("Input view to view list of runs.\r\n");
+                    s.append("At any point input close to exit Run History and return to main menu.\r\n");
                     break;
 
                 case LIST:
@@ -190,14 +216,18 @@ public class Choices extends AbstractWindow{
                     s.append("1. Master Deck\r\n");
                     s.append("2. Relics\r\n");
                     s.append("3. Path\r\n");
-                    s.append("4. Card Choices\r\n");
-                    s.append("5. Event Choices\r\n");
-                    s.append("6. Battles\r\n");
-                    s.append("7. Campfire Choices\r\n");
-                    s.append("8. Boss Relic Choices\r\n");
-                    s.append("9. Purchases\r\n");
-                    s.append("10. Purges\r\n");
-                    s.append("11. Everything\r\n");
+                    s.append("Path Options:\r\n");
+                    s.append("4. Gold per turn ").append(includeGold).append("\r\n");
+                    s.append("5. Health per turn ").append(includeHealth).append("\r\n");
+                    s.append("6. Card Choices ").append(includeCard).append("\r\n");
+                    s.append("7. Relics Obtained ").append(includeRelics).append("\r\n");
+                    s.append("8. Potions Obtained ").append(includePotions).append("\r\n");
+                    s.append("9. Items Purchased ").append(includePurchases).append("\r\n");
+                    s.append("10. Cards Purged ").append(includePurges).append("\r\n");
+                    s.append("11. Events ").append(includeEvents).append("\r\n");
+                    s.append("12. Battle Details ").append(includeBattles).append("\r\n");
+                    s.append("13. Campfire Choices ").append(includeCampfire).append("\r\n");
+                    s.append("14. Boss Relic Choices").append(includeBosses).append("\r\n");
 
                     break;
 
@@ -217,183 +247,9 @@ public class Choices extends AbstractWindow{
                     }
                     break;
 
-                case CARD:
-
-                    s.append("back\r\nCard Choices\r\n");
-                    for(CardChoiceStats c : inspectRun.card_choices){
-                        s.append("Floor ").append(c.floor).append("\r\n");
-                        s.append("Picked: ").append(c.picked).append("\r\n");
-                        s.append("Rejected:\r\n");
-                        for(String rej : c.not_picked){
-                            s.append(rej).append("\r\n");
-                        }
-                    }
-                    break;
-
-                case EVENT:
-
-                    s.append("back\r\nEvent Choices\r\n");
-                    for(EventStats eve : inspectRun.event_choices){
-                        s.append("Floor ").append(eve.floor).append("\r\n");
-                        s.append(eve.event_name).append("\r\n");
-                        if(!eve.player_choice.isEmpty())
-                            s.append("Choice: ").append(eve.player_choice).append("\r\n");
-                        if(eve.cards_obtained != null && eve.cards_obtained.size() > 0){
-                            s.append("Cards Obtained:\r\n");
-                            for(String obt : eve.cards_obtained){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.cards_removed != null && eve.cards_removed.size() > 0){
-                            s.append("Cards Removed:\r\n");
-                            for(String obt : eve.cards_removed){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.cards_transformed != null && eve.cards_transformed.size() > 0){
-                            s.append("Cards Transformed:\r\n");
-                            for(String obt : eve.cards_transformed){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.cards_upgraded != null && eve.cards_upgraded.size() > 0){
-                            s.append("Cards Upgraded:\r\n");
-                            for(String obt : eve.cards_upgraded){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.relics_obtained != null && eve.relics_obtained.size() > 0){
-                            s.append("Relics Obtained:\r\n");
-                            for(String obt : eve.relics_obtained){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.relics_lost != null && eve.relics_lost.size() > 0){
-                            s.append("Relics Lost:\r\n");
-                            for(String obt : eve.relics_lost){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.potions_obtained != null && eve.potions_obtained.size() > 0){
-                            s.append("Potions Obtained:\r\n");
-                            for(String obt : eve.potions_obtained){
-                                s.append(obt).append("\r\n");
-                            }
-                        }
-                        if(eve.damage_taken > 0)
-                            s.append("Damaged Taken: ").append(eve.damage_taken).append("\r\n");
-                        if(eve.damage_healed > 0)
-                            s.append("Damaged Healed: ").append(eve.damage_healed).append("\r\n");
-                        if(eve.max_hp_loss > 0)
-                            s.append("Max HP Loss: ").append(eve.max_hp_loss).append("\r\n");
-                        if(eve.max_hp_gain > 0)
-                            s.append("Max HP Gain: ").append(eve.max_hp_gain).append("\r\n");
-                        if(eve.gold_gain > 0)
-                            s.append("Gold Gain: ").append(eve.gold_gain).append("\r\n");
-                        if(eve.gold_loss > 0)
-                            s.append("Gold Loss: ").append(eve.gold_loss).append("\r\n");
-                    }
-                    break;
-
-                case CAMP:
-
-                    s.append("back\r\nCampfire Choices\r\n");
-                    for(CampfireChoice camp : inspectRun.campfire_choices){
-                        s.append("Floor ").append(camp.floor).append("\r\n");
-                        s.append("Key: ").append(camp.key).append("\r\n");
-                        s.append("Data: ").append(camp.data).append("\r\n");
-                    }
-                    break;
-
-                case BOSS:
-
-                    s.append("back\r\nBoss Relic Choices\r\n");
-                    for(BossRelicChoiceStats b : inspectRun.boss_relics){
-                        s.append("Picked: ").append(b.picked).append("\r\n");
-                        s.append("Rejected:\r\n");
-                        for(String rej : b.not_picked){
-                            s.append(rej).append("\r\n");
-                        }
-                    }
-                    break;
-
-                case PURCHASE:
-
-                    s.append("back\r\nItem Purchases\r\n");
-                    int prev = 0;
-                    for(int i=0;i<inspectRun.items_purchased.size();i++){
-                        if(inspectRun.item_purchase_floors.get(i) != prev){
-                            s.append("Floor: ").append(inspectRun.item_purchase_floors.get(i)).append("\r\n");
-                            prev = inspectRun.item_purchase_floors.get(i);
-                        }
-                        s.append(inspectRun.items_purchased.get(i)).append("\r\n");
-                    }
-                    break;
-
-                case PURGE:
-
-                    s.append("back\r\nPurges\r\n");
-                    int prev2 = 0;
-                    for(int i=0;i<inspectRun.items_purged.size();i++){
-                        if(inspectRun.items_purged_floors.get(i) != prev2){
-                            s.append("Floor: ").append(inspectRun.items_purged_floors.get(i)).append("\r\n");
-                            prev2 = inspectRun.items_purged_floors.get(i);
-                        }
-                        s.append(inspectRun.items_purged.get(i)).append("\r\n");
-                    }
-                    break;
 
                 case PATH:
-                    ArrayList<Floor> path = new ArrayList<>();
-                    for(int i=0;i<inspectRun.gold_per_floor.size();i++){
-                        Floor newFloor = new Floor();
-                        newFloor.gold = inspectRun.gold_per_floor.get(i);
-                        newFloor.currentHP = inspectRun.current_hp_per_floor.get(i);
-                        newFloor.maxHP = inspectRun.max_hp_per_floor.get(i);
-                        newFloor.type = inspectRun.path_per_floor.get(i);
-                        newFloor.relics = new ArrayList<>();
-                        newFloor.potions = new ArrayList<>();
-                        path.add(newFloor);
-                    }
-                    for(ObtainStats p : inspectRun.relics_obtained){
-                        path.get(p.floor-1).relics.add(p.key);
-                    }
-                    for(ObtainStats p : inspectRun.potions_obtained){
-                        path.get(p.floor-1).potions.add(p.key);
-                    }
-                    s.append("back\r\nPath\r\n");
-                    for(int i=0;i<path.size();i++){
-                        s.append("Floor: ").append(i+1).append("\r\n");
-                        s.append("Type: ").append(mapType(path.get(i).type)).append("\r\n");
-                        s.append("Health: ").append(path.get(i).currentHP).append("/").append(path.get(i).maxHP).append("\r\n");
-                        s.append("Gold: ").append(path.get(i).gold).append("\r\n");
-                        if(path.get(i).relics.size() > 0){
-                            s.append("Relics Obtained:\r\n");
-                            for(String p : path.get(i).relics){
-                                s.append(p).append("\r\n");
-                            }
-                        }
-                        if(path.get(i).potions.size() > 0){
-                            s.append("Potions Obtained:\r\n");
-                            for(String p : path.get(i).potions){
-                                s.append(p).append("\r\n");
-                            }
-                        }
-                    }
-                    break;
 
-                case BATTLE:
-
-                    s.append("back\r\nBattles\r\n");
-                    for(BattleStats b : inspectRun.damage_taken){
-                        s.append("Floor: ").append(b.floor).append("\r\n");
-                        s.append("Damage: ").append(b.damage).append("\r\n");
-                        s.append("Turns: ").append(b.turns).append("\r\n");
-                        s.append("Enemies: ").append(b.enemies).append("\r\n");
-                    }
-                    break;
-
-                case EVERY:
                     ArrayList<Floor> every = new ArrayList<>();
                     for(int i=0;i<inspectRun.gold_per_floor.size();i++){
                         Floor newFloor = new Floor();
@@ -435,62 +291,73 @@ public class Choices extends AbstractWindow{
                     for(int i=0;i<inspectRun.boss_relics.size();i++){
                         every.get(((i+1)*17)-1).boss = inspectRun.boss_relics.get(i);
                     }
-                    s.append("back\r\nComplete Path\r\n");
+                    s.append("back\r\nPath\r\n");
                     for(int i=0;i<every.size();i++){
                         s.append("Floor: ").append(i+1).append("\r\n");
-                        s.append("Type: ").append(mapType(every.get(i).type)).append("\r\n");
-                        s.append("Health: ").append(every.get(i).currentHP).append("/").append(every.get(i).maxHP).append("\r\n");
-                        s.append("Gold: ").append(every.get(i).gold).append("\r\n");
-                        if(every.get(i).battle != null){
-                            s.append("Damage: ").append(every.get(i).battle.damage).append("\r\n");
-                            s.append("Turns: ").append(every.get(i).battle.turns).append("\r\n");
-                            s.append("Enemies: ").append(every.get(i).battle.enemies).append("\r\n");
+                        s.append("Type: ").append(mapType(every.get(i).type));
+                        if(every.get(i).battle != null)
+                            s.append(": ").append(every.get(i).battle.enemies);
+                        s.append("\r\n");
+                        if(includeHealth)
+                            s.append("Health: ").append(every.get(i).currentHP).append("/").append(every.get(i).maxHP).append("\r\n");
+                        if(includeGold)
+                            s.append("Gold: ").append(every.get(i).gold).append("\r\n");
+                        if(every.get(i).battle != null && includeBattles){
+                            s.append("Damage: ").append(every.get(i).battle.damage);
+                            s.append(", Turns: ").append(every.get(i).battle.turns).append("\r\n");
                         }
-                        if(every.get(i).event != null){
+                        if(every.get(i).event != null && includeEvents){
                             s.append(every.get(i).event.event_name).append("\r\n");
                             if(!every.get(i).event.player_choice.isEmpty())
                                 s.append("Choice: ").append(every.get(i).event.player_choice).append("\r\n");
                             if(every.get(i).event.cards_obtained != null && every.get(i).event.cards_obtained.size() > 0){
-                                s.append("Cards Obtained:\r\n");
+                                s.append("Cards Obtained: ");
                                 for(String obt : every.get(i).event.cards_obtained){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.cards_removed != null && every.get(i).event.cards_removed.size() > 0){
-                                s.append("Cards Removed:\r\n");
+                                s.append("Cards Removed: ");
                                 for(String obt : every.get(i).event.cards_removed){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.cards_transformed != null && every.get(i).event.cards_transformed.size() > 0){
-                                s.append("Cards Transformed:\r\n");
+                                s.append("Cards Transformed: ");
                                 for(String obt : every.get(i).event.cards_transformed){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.cards_upgraded != null && every.get(i).event.cards_upgraded.size() > 0){
-                                s.append("Cards Upgraded:\r\n");
+                                s.append("Cards Upgraded: ");
                                 for(String obt : every.get(i).event.cards_upgraded){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.relics_obtained != null && every.get(i).event.relics_obtained.size() > 0){
-                                s.append("Relics Obtained:\r\n");
+                                s.append("Relics Obtained: ");
                                 for(String obt : every.get(i).event.relics_obtained){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.relics_lost != null && every.get(i).event.relics_lost.size() > 0){
-                                s.append("Relics Lost:\r\n");
+                                s.append("Relics Lost: ");
                                 for(String obt : every.get(i).event.relics_lost){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.potions_obtained != null && every.get(i).event.potions_obtained.size() > 0){
-                                s.append("Potions Obtained:\r\n");
+                                s.append("Potions Obtained: ");
                                 for(String obt : every.get(i).event.potions_obtained){
-                                    s.append(obt).append("\r\n");
+                                    s.append(obt).append(", ");
                                 }
+                                s.append("\r\n");
                             }
                             if(every.get(i).event.damage_taken > 0)
                                 s.append("Damaged Taken: ").append(every.get(i).event.damage_taken).append("\r\n");
@@ -505,11 +372,13 @@ public class Choices extends AbstractWindow{
                             if(every.get(i).event.gold_loss > 0)
                                 s.append("Gold Loss: ").append(every.get(i).event.gold_loss).append("\r\n");
                         }
-                        if(every.get(i).campfire != null){
-                            s.append("Key: ").append(every.get(i).campfire.key).append("\r\n");
-                            s.append("Data: ").append(every.get(i).campfire.data).append("\r\n");
+                        if(every.get(i).campfire != null && includeCampfire){
+                            s.append("Campfire: ").append(every.get(i).campfire.key);
+                            if(every.get(i).campfire.data != null)
+                                s.append(": ").append(every.get(i).campfire.data);
+                            s.append("\r\n");
                         }
-                        if(every.get(i).boss != null){
+                        if(every.get(i).boss != null && includeBosses){
                             s.append("Picked: ").append(every.get(i).boss.picked).append("\r\n");
                             s.append("Rejected: ");
                             for(String rej : every.get(i).boss.not_picked){
@@ -517,19 +386,21 @@ public class Choices extends AbstractWindow{
                             }
                             s.append("\r\n");
                         }
-                        if(every.get(i).purchases.size() > 0){
-                            s.append("Purchases:\r\n");
+                        if(every.get(i).purchases.size() > 0 && includePurchases){
+                            s.append("Purchases: ");
                             for(String p : every.get(i).purchases){
-                                s.append(p).append("\r\n");
+                                s.append(p).append(", ");
                             }
+                            s.append("\r\n");
                         }
-                        if(every.get(i).purges.size() > 0){
-                            s.append("Purges:\r\n");
+                        if(every.get(i).purges.size() > 0 && includePurges){
+                            s.append("Purges: ");
                             for(String p : every.get(i).purges){
-                                s.append(p).append("\r\n");
+                                s.append(p).append(", ");
                             }
+                            s.append("\r\n");
                         }
-                        if(every.get(i).cardChoices.size() > 0){
+                        if(every.get(i).cardChoices.size() > 0 && includeCard){
                             s.append("Card Choices\r\n");
                             for(CardChoiceStats c : every.get(i).cardChoices){
                                 s.append("Picked: ").append(c.picked).append("\r\n");
@@ -540,17 +411,19 @@ public class Choices extends AbstractWindow{
                                 s.append("\r\n");
                             }
                         }
-                        if(every.get(i).relics.size() > 0){
-                            s.append("Relics Obtained:\r\n");
+                        if(every.get(i).relics.size() > 0 && includeRelics){
+                            s.append("Relics Obtained: ");
                             for(String p : every.get(i).relics){
-                                s.append(p).append("\r\n");
+                                s.append(p).append(", ");
                             }
+                            s.append("\r\n");
                         }
-                        if(every.get(i).potions.size() > 0){
-                            s.append("Potions Obtained:\r\n");
+                        if(every.get(i).potions.size() > 0 && includePotions){
+                            s.append("Potions Obtained: ");
                             for(String p : every.get(i).potions){
-                                s.append(p).append("\r\n");
+                                s.append(p).append(", ");
                             }
+                            s.append("\r\n");
                         }
                     }
                     break;

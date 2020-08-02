@@ -1407,14 +1407,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case DECK:
                 case RELIC:
                 case PATH:
-                case CARD:
-                case EVENT:
-                case BATTLE:
-                case CAMP:
-                case BOSS:
-                case PURCHASE:
-                case PURGE:
-                case EVERY:
                     choice.screen = Choices.HistoryScreen.INSPECT;
                     break;
             }
@@ -1480,28 +1472,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             choice.screen = Choices.HistoryScreen.PATH;
                             break;
                         case 4:
-                            choice.screen = Choices.HistoryScreen.CARD;
+                            choice.includeGold = !choice.includeGold;
                             break;
                         case 5:
-                            choice.screen = Choices.HistoryScreen.EVENT;
+                            choice.includeHealth = !choice.includeHealth;
                             break;
                         case 6:
-                            choice.screen = Choices.HistoryScreen.BATTLE;
+                            choice.includeCard = !choice.includeCard;
                             break;
                         case 7:
-                            choice.screen = Choices.HistoryScreen.CAMP;
+                            choice.includeRelics = !choice.includeRelics;
                             break;
                         case 8:
-                            choice.screen = Choices.HistoryScreen.BOSS;
+                            choice.includePotions = !choice.includePotions;
                             break;
                         case 9:
-                            choice.screen = Choices.HistoryScreen.PURCHASE;
+                            choice.includePurchases = !choice.includePurchases;
                             break;
                         case 10:
-                            choice.screen = Choices.HistoryScreen.PURGE;
+                            choice.includePurges = !choice.includePurges;
                             break;
                         case 11:
-                            choice.screen = Choices.HistoryScreen.EVERY;
+                            choice.includeEvents = !choice.includeEvents;
+                            break;
+                        case 12:
+                            choice.includeBattles = !choice.includeBattles;
+                            break;
+                        case 13:
+                            choice.includeCampfire = !choice.includeCampfire;
+                            break;
+                        case 14:
+                            choice.includeBosses = !choice.includeBosses;
                             break;
                     }
             }
