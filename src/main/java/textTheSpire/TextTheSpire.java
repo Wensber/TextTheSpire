@@ -68,9 +68,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     int choiceTimeout;
 
     private boolean setSettings = false;
-    boolean slotOnlyOnce = true;
-
-    boolean enterDaily = false;
 
     private Hand hand;
     private Map map;
@@ -337,6 +334,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     return;
                 case "custom":
                     custom.isVisible = false;
+                    return;
+                case "log":
                     return;
                 case "all":
                     deck.isVisible = false;

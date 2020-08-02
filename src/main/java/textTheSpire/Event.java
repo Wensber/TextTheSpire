@@ -10,6 +10,7 @@ import com.megacrit.cardcrawl.events.RoomEventDialog;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DeathScreen;
+import com.megacrit.cardcrawl.screens.GameOverStat;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.ui.DialogWord;
@@ -41,16 +42,25 @@ public class Event extends AbstractWindow{
         s.append("\r\n");
 
         if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
-            s.append("\r\nDeath\r\nScore ").append(DeathScreen.calcScore(false));
+            s.append("Death\r\nScore ").append(DeathScreen.calcScore(false)).append("\r\n");
+            for(GameOverStat g : AbstractDungeon.deathScreen.stats){
+                if(g.label != null){
+                    s.append(g.label).append(": ").append(g.value);
+                    if(g.description != null){
+                        s.append(", ").append(g.description);
+                    }
+                    s.append("\r\n");
+                }
+            }
 
             if(AbstractDungeon.deathScreen.unlockBundle != null){
                 for(AbstractUnlock u : AbstractDungeon.deathScreen.unlockBundle){
                     switch (u.type){
                         case CARD:
-                            s.append("\r\nUnlock Card ").append(TextTheSpire.inspectCard(u.card));
+                            s.append("Unlock Card ").append(TextTheSpire.inspectCard(u.card)).append("\r\n");
                             break;
                         case RELIC:
-                            s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
+                            s.append("Unlock Relic ").append(TextTheSpire.inspectRelic(u.relic)).append("\r\n");
                             break;
                     }
                 }
@@ -59,16 +69,26 @@ public class Event extends AbstractWindow{
             return s.toString();
         }
         if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
-            s.append("\r\nVictory\r\nScore").append(VictoryScreen.calcScore(true));
+            s.append("Victory\r\nScore").append(VictoryScreen.calcScore(true)).append("\r\n");
+
+            for(GameOverStat g : AbstractDungeon.victoryScreen.stats){
+                if(g.label != null){
+                    s.append(g.label).append(": ").append(g.value);
+                    if(g.description != null){
+                        s.append(", ").append(g.description);
+                    }
+                    s.append("\r\n");
+                }
+            }
 
             if(AbstractDungeon.victoryScreen.unlockBundle != null){
                 for(AbstractUnlock u : AbstractDungeon.victoryScreen.unlockBundle){
                     switch (u.type){
                         case CARD:
-                            s.append("\r\nUnlock Card ").append(TextTheSpire.inspectCard(u.card));
+                            s.append("Unlock Card ").append(TextTheSpire.inspectCard(u.card)).append("\r\n");
                             break;
                         case RELIC:
-                            s.append("\r\nUnlock Relic ").append(TextTheSpire.inspectRelic(u.relic));
+                            s.append("Unlock Relic ").append(TextTheSpire.inspectRelic(u.relic)).append("\r\n");
                             break;
                     }
                 }
@@ -78,7 +98,7 @@ public class Event extends AbstractWindow{
         }
         if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.UNLOCK){
             if(AbstractDungeon.unlockScreen.unlock.type == AbstractUnlock.UnlockType.CHARACTER){
-                s.append("\r\nUnlock Character\r\n").append(AbstractDungeon.unlockScreen.unlock.player.getClass().getSimpleName());
+                s.append("Unlock Character\r\n").append(AbstractDungeon.unlockScreen.unlock.player.getClass().getSimpleName()).append("\r\n");
                 return s.toString();
             }
         }

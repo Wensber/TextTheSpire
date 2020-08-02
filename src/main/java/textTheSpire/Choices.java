@@ -94,7 +94,7 @@ public class Choices extends AbstractWindow{
         savedFilter = "";
         setFormat = false;
         isVisible = true;
-        window = new Window(display,"Choices", 300, 300);
+        window = new Window(display,"Choices", 300, 400);
 
         includeGold = true;
         includeHealth = true;

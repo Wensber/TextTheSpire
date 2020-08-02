@@ -13,8 +13,7 @@ Descriptions of the windows and commands are provided with the help command.
 
 Limitations:
 
-TextTheSpire is currently not capable of accessing various menus or screens.
-This includes run history, settings, patch notes, etc.
+TextTheSpire currently does not provide full access to the settings menu or the game patch notes.
 
 Requirements:
 
