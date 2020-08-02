@@ -35,9 +35,11 @@ import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 import com.megacrit.cardcrawl.screens.mainMenu.SaveSlotScreen;
 import com.megacrit.cardcrawl.screens.options.OptionsPanel;
 import com.megacrit.cardcrawl.screens.options.Slider;
+import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.AchievementItem;
 import com.megacrit.cardcrawl.screens.stats.CharStat;
+import com.megacrit.cardcrawl.screens.stats.RunData;
 import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
@@ -91,6 +93,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private static String queuedCommand = "";
     private static boolean hasQueuedCommand = false;
 
+    public static ArrayList<RunData> runList;
+    public static ArrayList<RunData> runFiltered;
+    public static boolean include_win;
+    public static boolean include_lose;
+    public static boolean include_iron;
+    public static boolean include_silent;
+    public static boolean include_defect;
+    public static boolean include_watch;
+    public static boolean include_normal;
+    public static boolean include_asc;
+    public static boolean include_daily;
+
     public TextTheSpire() {
 
 
@@ -122,6 +136,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         iter = 0;
         choiceTimeout = 0;
+
+        runFiltered = new ArrayList<RunData>();
+        include_win = true;
+        include_lose = true;
+        include_iron = true;
+        include_silent = true;
+        include_defect = true;
+        include_watch = true;
+        include_normal = true;
+        include_asc = true;
+        include_daily = true;
 
         savedOutput = new HashMap<>();
 
@@ -175,6 +200,22 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     public void parsePrompt(String input) {
 
         input = input.toLowerCase();
+        String[] tokens = input.split("\\s+");
+
+        if(tokens.length == 0){
+            return;
+        }
+
+        if(choice.screen != Choices.HistoryScreen.NONE){
+            parseHistoryCommand(tokens);
+            return;
+        }else if(input.equals("history") && CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && CardCrawlGame.mainMenuScreen != null){
+            CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
+            runList = (ArrayList<RunData>)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.runHistoryScreen, RunHistoryScreen.class, "unfilteredRuns");
+            choice.screen = Choices.HistoryScreen.MAIN;
+            return;
+        }
+
         switch(input){
             case "deck":
                 inspect.setText(deck.getText());
@@ -206,6 +247,163 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             case "event":
                 inspect.setText(event.getText());
                 return;
+        }
+
+        if(tokens[0].equals("show") && tokens.length >= 2){
+
+            switch(tokens[1]){
+                case "deck":
+                    deck.isVisible = true;
+                    return;
+                case "discard":
+                    discard.isVisible = true;
+                    return;
+                case "choices":
+                    choice.isVisible = true;
+                    return;
+                case "hand":
+                    hand.isVisible = true;
+                    return;
+                case "map":
+                    map.isVisible = true;
+                    return;
+                case "monster":
+                    monster.isVisible = true;
+                    return;
+                case "orbs":
+                    orbs.isVisible = true;
+                    return;
+                case "player":
+                    player.isVisible = true;
+                    return;
+                case "relic":
+                    relic.isVisible = true;
+                    return;
+                case "event":
+                    event.isVisible = true;
+                    return;
+                case "custom":
+                    custom.isVisible = true;
+                    return;
+                case "all":
+                    deck.isVisible = true;
+                    discard.isVisible = true;
+                    choice.isVisible = true;
+                    hand.isVisible = true;
+                    map.isVisible = true;
+                    monster.isVisible = true;
+                    orbs.isVisible = true;
+                    player.isVisible = true;
+                    relic.isVisible = true;
+                    event.isVisible = true;
+                    custom.isVisible = true;
+                    return;
+            }
+
+        }
+
+        if(tokens[0].equals("hide") && tokens.length >= 2){
+
+            switch(tokens[1]){
+                case "deck":
+                    deck.isVisible = false;
+                    return;
+                case "discard":
+                    discard.isVisible = false;
+                    return;
+                case "choices":
+                    choice.isVisible = false;
+                    return;
+                case "hand":
+                    hand.isVisible = false;
+                    return;
+                case "map":
+                    map.isVisible = false;
+                    return;
+                case "monster":
+                    monster.isVisible = false;
+                    return;
+                case "orbs":
+                    orbs.isVisible = false;
+                    return;
+                case "player":
+                    player.isVisible = false;
+                    return;
+                case "relic":
+                    relic.isVisible = false;
+                    return;
+                case "event":
+                    event.isVisible = false;
+                    return;
+                case "custom":
+                    custom.isVisible = false;
+                    return;
+                case "all":
+                    deck.isVisible = false;
+                    discard.isVisible = false;
+                    choice.isVisible = false;
+                    hand.isVisible = false;
+                    map.isVisible = false;
+                    monster.isVisible = false;
+                    orbs.isVisible = false;
+                    player.isVisible = false;
+                    relic.isVisible = false;
+                    event.isVisible = false;
+                    custom.isVisible = false;
+                    return;
+            }
+
+        }
+
+        if(tokens[0].equals("volume")){
+            if(tokens.length == 1) {
+
+                String s = "\r\nVolume\r\n";
+                s += "Master " + Settings.MASTER_VOLUME + "\r\n";
+                s += "Music " + Settings.MUSIC_VOLUME + "\r\n";
+                s += "Sound " + Settings.SOUND_VOLUME;
+
+                inspect.setText(s);
+
+                return;
+            }else if(tokens.length >= 3){
+                try{
+                    float volume = Float.parseFloat(tokens[2]);
+
+                    if(volume < 0 || volume > 1){
+                        return;
+                    }
+
+                    switch (tokens[1]){
+                        case "master":
+                            Settings.MASTER_VOLUME = volume;
+                            Settings.soundPref.putFloat("Master Volume", volume);
+                            CardCrawlGame.music.updateVolume();
+                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume(); break;
+                            }  if (AbstractDungeon.scene != null) {
+                            AbstractDungeon.scene.updateAmbienceVolume();
+                        }
+                            break;
+                        case "music":
+                            Settings.MUSIC_VOLUME = volume;
+                            Settings.soundPref.putFloat("Music Volume", volume);
+                            CardCrawlGame.music.updateVolume();
+                            break;
+                        case "sound":
+                            Settings.SOUND_VOLUME = volume;
+                            Settings.soundPref.putFloat("Sound Volume", volume);
+                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume();
+                            } else if (AbstractDungeon.scene != null) {
+                                AbstractDungeon.scene.updateAmbienceVolume();
+                            }
+                            break;
+                    }
+
+                }catch(Exception ignored){
+                }
+            }
         }
 
         //Continue command. Only usable when not in dungeon and save file exists
@@ -263,10 +461,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }
 
         AbstractDungeon d = CardCrawlGame.dungeon;
-        String[] tokens = input.split("\\s+");
-        if(tokens.length == 0){
-            return;
-        }
 
         if(tokens[0].equals("help")){
             inspect.setText(displayHelp(tokens));
@@ -296,59 +490,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if(tokens[0].equals("load") && tokens.length == 2 && savedOutput.containsKey(tokens[1])){
             inspect.setText(savedOutput.get(tokens[1]));
             return;
-        }
-
-        if(tokens[0].equals("volume")){
-            if(tokens.length == 1) {
-
-                String s = "\r\nVolume\r\n";
-                s += "Master " + Settings.MASTER_VOLUME + "\r\n";
-                s += "Music " + Settings.MUSIC_VOLUME + "\r\n";
-                s += "Sound " + Settings.SOUND_VOLUME;
-
-                inspect.setText(s);
-
-                return;
-            }else if(tokens.length >= 3){
-                try{
-                    float volume = Float.parseFloat(tokens[2]);
-
-                    if(volume < 0 || volume > 1){
-                        return;
-                    }
-
-                    switch (tokens[1]){
-                        case "master":
-                            Settings.MASTER_VOLUME = volume;
-                            Settings.soundPref.putFloat("Master Volume", volume);
-                            CardCrawlGame.music.updateVolume();
-                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
-                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume(); break;
-                            }  if (AbstractDungeon.scene != null) {
-                                AbstractDungeon.scene.updateAmbienceVolume();
-                            }
-                            break;
-                        case "music":
-                            Settings.MUSIC_VOLUME = volume;
-                            Settings.soundPref.putFloat("Music Volume", volume);
-                            CardCrawlGame.music.updateVolume();
-                            break;
-                        case "sound":
-                            Settings.SOUND_VOLUME = volume;
-                            Settings.soundPref.putFloat("Sound Volume", volume);
-                            if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
-                                CardCrawlGame.mainMenuScreen.updateAmbienceVolume();
-                            } else if (AbstractDungeon.scene != null) {
-                                AbstractDungeon.scene.updateAmbienceVolume();
-                            }
-                            break;
-                    }
-
-
-
-                }catch(Exception ignored){
-                }
-            }
         }
 
         if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
@@ -503,111 +644,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         }
 
-        if(tokens[0].equals("show") && tokens.length >= 2){
 
-            switch(tokens[1]){
-                case "deck":
-                    deck.isVisible = true;
-                    return;
-                case "discard":
-                    discard.isVisible = true;
-                    return;
-                case "choices":
-                    choice.isVisible = true;
-                    return;
-                case "hand":
-                    hand.isVisible = true;
-                    return;
-                case "map":
-                    map.isVisible = true;
-                    return;
-                case "monster":
-                    monster.isVisible = true;
-                    return;
-                case "orbs":
-                    orbs.isVisible = true;
-                    return;
-                case "player":
-                    player.isVisible = true;
-                    return;
-                case "relic":
-                    relic.isVisible = true;
-                    return;
-                case "event":
-                    event.isVisible = true;
-                    return;
-                case "custom":
-                    custom.isVisible = true;
-                    return;
-                case "all":
-                    deck.isVisible = true;
-                    discard.isVisible = true;
-                    choice.isVisible = true;
-                    hand.isVisible = true;
-                    map.isVisible = true;
-                    monster.isVisible = true;
-                    orbs.isVisible = true;
-                    player.isVisible = true;
-                    relic.isVisible = true;
-                    event.isVisible = true;
-                    custom.isVisible = true;
-                    return;
-            }
-
-        }
-
-        if(tokens[0].equals("hide") && tokens.length >= 2){
-
-            switch(tokens[1]){
-                case "deck":
-                    deck.isVisible = false;
-                    return;
-                case "discard":
-                    discard.isVisible = false;
-                    return;
-                case "choices":
-                    choice.isVisible = false;
-                    return;
-                case "hand":
-                    hand.isVisible = false;
-                    return;
-                case "map":
-                    map.isVisible = false;
-                    return;
-                case "monster":
-                    monster.isVisible = false;
-                    return;
-                case "orbs":
-                    orbs.isVisible = false;
-                    return;
-                case "player":
-                    player.isVisible = false;
-                    return;
-                case "relic":
-                    relic.isVisible = false;
-                    return;
-                case "event":
-                    event.isVisible = false;
-                    return;
-                case "custom":
-                    custom.isVisible = false;
-                    return;
-                case "all":
-                    deck.isVisible = false;
-                    discard.isVisible = false;
-                    choice.isVisible = false;
-                    hand.isVisible = false;
-                    map.isVisible = false;
-                    monster.isVisible = false;
-                    orbs.isVisible = false;
-                    player.isVisible = false;
-                    relic.isVisible = false;
-                    event.isVisible = false;
-                    custom.isVisible = false;
-                    return;
-            }
-
-        }
 
         //Start a new run. Only does anything if not in dungeon.
 
@@ -1336,6 +1373,158 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         return "";
 
+    }
+
+    public void parseHistoryCommand(String[] tokens){
+        if(tokens[0].equals("close")){
+            choice.screen = Choices.HistoryScreen.NONE;
+            return;
+        }
+        if(choice.screen == Choices.HistoryScreen.MAIN && tokens[0].equals("view")){
+            filterList();
+            choice.screen = Choices.HistoryScreen.LIST;
+        }
+        if(tokens[0].equals("back")){
+            switch(choice.screen){
+                case LIST:
+                    choice.screen = Choices.HistoryScreen.MAIN;
+                    break;
+                case INSPECT:
+                    choice.screen = Choices.HistoryScreen.LIST;
+                    break;
+                case DECK:
+                case RELIC:
+                case PATH:
+                case CARD:
+                case EVENT:
+                case BATTLE:
+                case CAMP:
+                case BOSS:
+                case PURCHASE:
+                case PURGE:
+                case EVERY:
+                    choice.screen = Choices.HistoryScreen.INSPECT;
+                    break;
+            }
+        }
+
+        try{
+            int in = Integer.parseInt(tokens[0]);
+
+            switch(choice.screen){
+
+                case MAIN:
+
+                    switch (in) {
+                        case 1:
+                            include_win = !include_win;
+                            break;
+                        case 2:
+                            include_lose = !include_lose;
+                            break;
+                        case 3:
+                            include_iron = !include_iron;
+                            break;
+                        case 4:
+                            include_silent = !include_silent;
+                            break;
+                        case 5:
+                            include_defect = !include_defect;
+                            break;
+                        case 6:
+                            include_watch = !include_watch;
+                            break;
+                        case 7:
+                            include_normal = !include_normal;
+                            break;
+                        case 8:
+                            include_asc = !include_asc;
+                            break;
+                        case 9:
+                            include_daily = !include_daily;
+                            break;
+                        default:
+                            return;
+                    }
+                    choice.savedFilter = "";
+                    return;
+
+                case LIST:
+
+                    choice.inspectRun = runFiltered.get(in);
+                    choice.screen = Choices.HistoryScreen.INSPECT;
+                    return;
+
+                case INSPECT:
+
+                    switch (in){
+                        case 1:
+                            choice.screen = Choices.HistoryScreen.DECK;
+                            break;
+                        case 2:
+                            choice.screen = Choices.HistoryScreen.RELIC;
+                            break;
+                        case 3:
+                            choice.screen = Choices.HistoryScreen.PATH;
+                            break;
+                        case 4:
+                            choice.screen = Choices.HistoryScreen.CARD;
+                            break;
+                        case 5:
+                            choice.screen = Choices.HistoryScreen.EVENT;
+                            break;
+                        case 6:
+                            choice.screen = Choices.HistoryScreen.BATTLE;
+                            break;
+                        case 7:
+                            choice.screen = Choices.HistoryScreen.CAMP;
+                            break;
+                        case 8:
+                            choice.screen = Choices.HistoryScreen.BOSS;
+                            break;
+                        case 9:
+                            choice.screen = Choices.HistoryScreen.PURCHASE;
+                            break;
+                        case 10:
+                            choice.screen = Choices.HistoryScreen.PURGE;
+                            break;
+                        case 11:
+                            choice.screen = Choices.HistoryScreen.EVERY;
+                            break;
+                    }
+            }
+
+        }catch(Exception ignored){
+        }
+
+    }
+
+    public void filterList(){
+        runFiltered.clear();
+        for(RunData d : runList){
+
+            if(!include_win && d.victory){
+                continue;
+            }else if(!include_lose && !d.victory){
+                continue;
+            }else if(!include_iron && d.character_chosen.equals(AbstractPlayer.PlayerClass.IRONCLAD.name())){
+                continue;
+            }else if(!include_silent && d.character_chosen.equals(AbstractPlayer.PlayerClass.THE_SILENT.name())){
+                continue;
+            }else if(!include_defect && d.character_chosen.equals(AbstractPlayer.PlayerClass.DEFECT.name())){
+                continue;
+            }else if(!include_watch && d.character_chosen.equals(AbstractPlayer.PlayerClass.WATCHER.name())){
+                continue;
+            }else if(!include_normal && (!d.is_ascension_mode && !d.is_daily)){
+                continue;
+            }else if(!include_asc && d.is_ascension_mode){
+                continue;
+            }else if(!include_daily && d.is_daily){
+                continue;
+            }
+
+            runFiltered.add(d);
+        }
     }
 
     public void language(String[] tokens){
