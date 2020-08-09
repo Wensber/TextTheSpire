@@ -24,6 +24,10 @@ public class Map extends AbstractWindow{
             Gdx.app.exit();
         }
 
+        if(Inspect.has_inspected && AbstractDungeon.currMapNode.y >= Inspect.destination.y){
+            Inspect.has_inspected = false;
+        }
+
         StringBuilder s = new StringBuilder();
         s.append("\r\n");
 
