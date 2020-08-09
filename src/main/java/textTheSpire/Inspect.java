@@ -74,12 +74,10 @@ public class Inspect {
         if(floor < 1 || floor > 15 || x < 0 || x > 6 || source == null)
             return "";
 
-
         int current_y = source.y;
         if(current_y >= 15) {
             current_y = -1;
         }
-
 
         if(!(current_y == -1)) {
 
@@ -119,6 +117,10 @@ public class Inspect {
 
         if(current_y == -1)
             current_y = 0;
+
+        if(floor - current_y - 1 < 0){
+            return "";
+        }
 
         for(MapRoomNode child : m.get(floor - current_y - 1)){
             if(child.x == x){
@@ -248,6 +250,10 @@ public class Inspect {
             current_y = 0;
 
         paths = "";
+
+        if(floor - current_y - 1 < 0){
+            return "";
+        }
 
         for(MapRoomNode child : m.get(floor - current_y - 1)){
             if(child.x == x){
