@@ -7,6 +7,7 @@ import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 import basemod.BaseMod;
 import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
+import com.megacrit.cardcrawl.blights.AbstractBlight;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
@@ -715,6 +716,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                         AbstractRelic r = AbstractDungeon.player.relics.get(in);
 
                         inspect.setText(inspectRelic(r));
+
+                    } else if(in >= 0 && in >= AbstractDungeon.player.relics.size() && in < AbstractDungeon.player.relics.size() + AbstractDungeon.player.blights.size()){
+
+                        AbstractBlight b = AbstractDungeon.player.blights.get(in - AbstractDungeon.player.relics.size());
+
+                        inspect.setText(inspectBlight(b));
 
                     }
                 }
@@ -1869,6 +1876,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         s += "Relic\r\n";
         s += r.name + "\r\n";
         s += r.tier.name() + "\r\n";
+        s += "Charges " + r.counter + "\r\n";
+        s += Choices.stripColor(r.description) + "\r\n";
+
+        return s;
+
+    }
+
+    public static String inspectBlight(AbstractBlight r){
+
+        String s = "\r\n";
+
+        s += "Blight\r\n";
+        s += r.name + "\r\n";
         s += "Charges " + r.counter + "\r\n";
         s += Choices.stripColor(r.description) + "\r\n";
 

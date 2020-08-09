@@ -1,6 +1,7 @@
 package textTheSpire;
 
 import com.badlogic.gdx.Gdx;
+import com.megacrit.cardcrawl.blights.AbstractBlight;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
@@ -43,6 +44,21 @@ public class Relic extends AbstractWindow{
                 s.append(i).append(":").append(r.name).append("\r\n");
             }
         }
+
+        ArrayList<AbstractBlight> blights = AbstractDungeon.player.blights;
+
+        if(blights.size() > 0){
+            s.append("Blights\r\n");
+            for(int i=blights.size()-1; i>=0; i--){
+                AbstractBlight r = blights.get(i);
+                if(r.counter >= 0){
+                    s.append(i+relics.size()).append(":").append(r.name).append(" ").append(r.counter).append("\r\n");
+                }else{
+                    s.append(i+relics.size()).append(":").append(r.name).append("\r\n");
+                }
+            }
+        }
+
 
         return s.toString();
 
