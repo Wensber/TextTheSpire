@@ -406,6 +406,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             }
         }
 
+        if(tokens[0].equals("lang")){
+            language(tokens);
+            return;
+        }
+
         //Continue command. Only usable when not in dungeon and save file exists
         if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")) {
 
@@ -1087,6 +1092,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     "\r\ncomp" +
                     "\r\nhistory" +
                     "\r\nvolume" +
+                    "\r\nlang" +
                     "\r\nachieve" +
                     "\r\nplay" +
                     "\r\ncustom" +
@@ -1190,6 +1196,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                             "\r\nThe number needs to be a decimal between 0 and 1." +
                             "\r\nExample:" +
                             "\r\nvolume master 0.5";
+                case "lang":
+                    return  "\r\nlang" +
+                            "\r\nThis displays the current language and available languages." +
+                            "\r\nChange the language with lang followed by the index of the language you want." +
+                            "\r\nExample:" +
+                            "\r\nlang 0" +
+                            "\r\nOnly game text like card descriptions and monster names will change." +
+                            "\r\nThis does not affect the mod's text as it hasn't been translated yet." +
+                            "\r\nRestart the game for the display to update.";
                 case "achieve":
                     return  "\r\nachieve" +
                             "\r\nThis displays to output the list of locked and unlocked achievements." +
@@ -1554,30 +1569,21 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
     public void language(String[] tokens){
         StringBuilder s = new StringBuilder("\r\n");
-        String[] langs = {
-                "English",
-                "Brazilian Portuguese",
-                "Chinese (Simplified)",
-                "Chinese (Traditional)",
-                "French",
-                "German",
-                "Greek",
-                "Italian",
-                "Indonesian",
-                "Japanese",
-                "Korean",
-                "Norwegian",
-                "Polish",
-                "Russian",
-                "Spanish",
-                "Serbian-Cyrillic",
-                "Serbian-Latin",
-                "Thai",
-                "Turkish",
-                "Ukrainian",
-                "Vietnamese"};
+        String[] langs = AbstractDungeon.settingsScreen.panel.languageLabels();
         if(tokens.length == 1){
-            s.append("Current ").append(Settings.gamePref.getString("LANGUAGE")).append("\r\n");
+
+            int index = -1;
+            for(int i=0;i<langs.length;i++){
+                Settings.GameLanguage[] languageOptions = AbstractDungeon.settingsScreen.panel.LanguageOptions();
+                if(Settings.language == languageOptions[i]){
+                    index = i;
+                }
+            }
+
+            if(index == -1)
+                return;
+
+            s.append("Current ").append(langs[index]).append("\r\n");
             for(int i=0;i<langs.length;i++){
                 s.append(i).append(": ").append(langs[i]).append("\r\n");
             }
@@ -1585,8 +1591,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         }else{
             try{
                 int in = Integer.parseInt(tokens[1]);
-                Settings.setLanguageLegacy(langs[in], false);
-                inspect.setText("\r\nLanguage set to " + langs[in]);
+
+                for(int i=0;i<langs.length;i++){
+                    Settings.GameLanguage[] languageOptions = AbstractDungeon.settingsScreen.panel.LanguageOptions();
+                    if(Settings.language == languageOptions[i] && i == in){
+                        return;
+                    }
+                }
+
+                Settings.setLanguage(AbstractDungeon.settingsScreen.panel.LanguageOptions()[in], false);
+                Settings.gamePref.flush();
+                AbstractDungeon.settingsScreen.panel.displayRestartRequiredText();
+
+                inspect.setText("\r\nLanguage set to " + langs[in] + "\r\nOnly game text will change.\r\nThe mod's text and commands hasn't been translated yet and will remain English.\r\nRestart game to update display.");
             }catch(Exception ignored){
             }
         }
