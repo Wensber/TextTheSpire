@@ -694,6 +694,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     for(int i=2;i<tokens.length;i++){
                         command.append(tokens[i]).append(" ");
                     }
+                    if(tokens.length == 3){
+                        int index = singleMonster();
+                        if(index >= 0){
+                            command.append(index);
+                        }
+                    }
                     System.out.println(command);
                     CommandExecutor.executeCommand(command.toString());
                 }
