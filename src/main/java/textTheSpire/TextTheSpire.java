@@ -180,7 +180,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (hasQueuedCommand && inspect != null && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
-            choiceTimeout = 50;
+            choiceTimeout = 100;
         }else if(choiceTimeout > 0){
             choiceTimeout--;
         }
