@@ -1958,7 +1958,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
 
         s = s.replace("NL", " ");
 
-        if(c.magicNumber < 0)
+        if(c.magicNumber <= 0)
             s = s.replace("!M!", "" + c.baseMagicNumber);
         else
             s = s.replace("!M!", "" + c.magicNumber);

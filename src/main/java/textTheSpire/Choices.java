@@ -19,6 +19,7 @@ import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.metrics.Metrics;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
 import com.megacrit.cardcrawl.screens.mainMenu.SaveSlot;
@@ -640,7 +641,16 @@ public class Choices extends AbstractWindow{
                 s.append("history\r\nslot\r\nquit");
 
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
-                s.append("embark");
+                s.append("embark\r\n");
+                if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && CardCrawlGame.mainMenuScreen.dailyScreen.entries.size() > 0){
+                    s.append("Leaderboard Top 100\r\n");
+                    for(LeaderboardEntry e : CardCrawlGame.mainMenuScreen.dailyScreen.entries){
+                        if(e.rank > 100){
+                            break;
+                        }
+                        s.append(e.rank).append(". ").append(e.name).append(" : ").append(e.score).append("\r\n");
+                    }
+                }
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
                 s.append("Abandon Confirm\r\nyes\r\nno");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT){
