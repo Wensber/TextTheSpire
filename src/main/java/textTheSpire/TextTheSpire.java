@@ -1,17 +1,17 @@
 package textTheSpire;
 
 import basemod.ReflectionHacks;
+import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 
 import basemod.BaseMod;
-import basemod.interfaces.PostUpdateSubscriber;
-import basemod.interfaces.PreUpdateSubscriber;
 import com.megacrit.cardcrawl.blights.AbstractBlight;
 import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.cards.CardGroup;
 import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.CharacterManager;
+import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.daily.DailyScreen;
@@ -62,7 +62,7 @@ import java.util.HashMap;
 
 
 @SpireInitializer
-public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
+public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber {
 
     //Used to only update display every number of update cycles
     int iter;
@@ -82,6 +82,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     private Event event;
     private Custom custom;
 
+    private Logs logs;
     private Inspect inspect;
 
     private HashMap<String, String> savedOutput;
@@ -121,6 +122,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             event = new Event(display);
             custom = new Custom(display);
 
+            logs = new Logs(display);
             inspect = new Inspect(display);
 
             while(!display.isDisposed()){
@@ -180,7 +182,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         if (hasQueuedCommand && inspect != null && choiceTimeout == 0) {
             parsePrompt(queuedCommand);
             hasQueuedCommand = false;
-            choiceTimeout = 100;
+            choiceTimeout = 70;
         }else if(choiceTimeout > 0){
             choiceTimeout--;
         }
@@ -198,6 +200,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     public void parsePrompt(String input) {
 
         input = input.toLowerCase();
+        logs.output(input);
         String[] tokens = input.split("\\s+");
 
         if(tokens.length == 0){
@@ -245,6 +248,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
             case "event":
                 inspect.setText(event.getText());
                 return;
+            case "log":
+                inspect.setText(logs.getText());
+                return;
         }
 
         if(tokens[0].equals("show") && tokens.length >= 2){
@@ -283,6 +289,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                 case "custom":
                     custom.isVisible = true;
                     return;
+                case "log":
+                    logs.logs.setVisible(true);
+                    return;
                 case "all":
                     deck.isVisible = true;
                     discard.isVisible = true;
@@ -295,6 +304,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     relic.isVisible = true;
                     event.isVisible = true;
                     custom.isVisible = true;
+                    logs.logs.setVisible(true);
                     return;
             }
 
@@ -337,6 +347,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     custom.isVisible = false;
                     return;
                 case "log":
+                    logs.logs.setVisible(false);
                     return;
                 case "all":
                     deck.isVisible = false;
@@ -350,6 +361,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
                     relic.isVisible = false;
                     event.isVisible = false;
                     custom.isVisible = false;
+                    logs.logs.setVisible(false);
                     return;
             }
 
@@ -2117,6 +2129,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
     @Override
     public void receivePostUpdate() {
 
+        logs.update();
 
         if(iter < 30){
             iter++;
@@ -2139,21 +2152,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         orbs.update();
         event.update();
         custom.update();
-
-        specialUpdates();
-
-        /*
-        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT && slotOnlyOnce){
-            slotOnlyOnce = false;
-            if(CardCrawlGame.mainMenuScreen.saveSlotScreen.slots.get(2).emptySlot) {
-                inspect.setText("\r\nYou are on the save slot screen.\r\nType a name into the Slay the Spire window and hit enter.");
-                CardCrawlGame.mainMenuScreen.saveSlotScreen.openRenamePopup(2, true);
-            }else{
-                inspect.setText("\r\nSomething has gone wrong.\r\nYou are on the save select screen but the first slot has a save file.\r\nTry restarting the mod.");
-            }
-
-        }
-        */
 
         if(!setSettings){
 
@@ -2178,11 +2176,25 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber{
         Display.getDefault().dispose();
     }
 
-    public void specialUpdates(){
-        //AbstractDungeon.shrineList.remove("Match and Keep!");
-
+    @Override
+    public void receivePostPowerApplySubscriber(AbstractPower p, AbstractCreature target, AbstractCreature source) {
+        logs.output("Apply " + p.name + " " + p.amount + " to " + target.name);
     }
 
+    @Override
+    public void receiveCardUsed(AbstractCard abstractCard) {
+        logs.output("Played " + abstractCard.name);
+    }
+
+    @Override
+    public void receivePrePotionUse(AbstractPotion abstractPotion) {
+        logs.output("Used " + abstractPotion.name);
+    }
+
+    @Override
+    public void receivePostDraw(AbstractCard abstractCard) {
+        logs.output("Draw " + abstractCard.name);
+    }
 }
 
 
