@@ -1120,6 +1120,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nEvent" +
                     "\r\nHand" +
                     "\r\nOutput" +
+                    "\r\nLog" +
                     "\r\nSave" +
                     "\r\nLoad" +
                     "\r\nMap" +
@@ -1350,6 +1351,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             "\r\nThis window displays output from various sources." +
                             "\r\nThis is the only window that cannot display its text to the output window." +
                             "\r\nIt also cannot be hidden.";
+                case "log":
+                    return  "\r\nlog" +
+                            "\r\nThis window displays the log." +
+                            "\r\nYou can also display the log to output with the log command." +
+                            "\r\nThis log is meant to be a combat log and is still quite basic." +
+                            "\r\nIt will track:" +
+                            "\r\nChanges in health and powers for the player and monsters." +
+                            "\r\nUsed cards and potions." +
+                            "\r\nThe user's inputs.";
                 case "save":
                 case "load":
                     return  "\r\nsave/load" +
