@@ -655,6 +655,8 @@ public class Choices extends AbstractWindow{
                         s.append(e.rank).append(". ").append(e.name).append(" : ").append(e.score).append("\r\n");
                     }
                 }
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PATCH_NOTES){
+                s.append("Patch Notes are displayed in the Event window.\r\nback");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.LEADERBOARD ){
                 s.append("Leaderboard\r\nDue to technical difficulties you cannot back out of this screen.\r\n");
                 s.append("char\r\n");

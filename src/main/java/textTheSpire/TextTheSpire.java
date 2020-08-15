@@ -222,6 +222,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("tutorial")){
+            inspect.setText(getTutorial());
+            return;
+        }
+
         switch(input){
             case "deck":
                 inspect.setText(deck.getText());
@@ -378,7 +383,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 String s = "\r\nVolume\r\n";
                 s += "Master " + Settings.MASTER_VOLUME + "\r\n";
                 s += "Music " + Settings.MUSIC_VOLUME + "\r\n";
-                s += "Sound " + Settings.SOUND_VOLUME;
+                s += "Sound " + Settings.SOUND_VOLUME + "\r\n";
+                s += "Ambience " + Settings.AMBIANCE_ON;
 
                 inspect.setText(s);
 
@@ -419,6 +425,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
 
                 }catch(Exception ignored){
+                }
+            }else if(tokens.length == 2 && tokens[1] == "ambience"){
+                Settings.soundPref.putBoolean("Ambience On", !Settings.AMBIANCE_ON);
+                Settings.soundPref.flush();
+                Settings.AMBIANCE_ON = !Settings.AMBIANCE_ON;
+                if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT) {
+                    CardCrawlGame.mainMenuScreen.updateAmbienceVolume();
+                } else {
+                    AbstractDungeon.scene.updateAmbienceVolume();
                 }
             }
         }
@@ -524,6 +539,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("patch") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU){
+            CardCrawlGame.mainMenuScreen.patchNotesScreen.open();
+            return;
+        }
+
         if(input.equals("custom")){
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen != MainMenuScreen.CurScreen.CUSTOM && !CardCrawlGame.characterManager.anySaveFileExists() && StatsScreen.all.highestDaily > 0) {
                 CardCrawlGame.mainMenuScreen.customModeScreen.open();
@@ -538,6 +558,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             CardCrawlGame.mainMenuScreen.saveSlotScreen.open(CardCrawlGame.playerName);
             CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.SAVE_SLOT;
             return;
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PATCH_NOTES){
+            if(input.equals("back")){
+                CardCrawlGame.mainMenuScreen.patchNotesScreen.button.hb.clicked = true;
+                return;
+            }
         }
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.SAVE_SLOT){
@@ -1186,6 +1213,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nExample:" +
                     "\r\nhelp start" +
                     "\r\nAll commands are input in the prompt window." +
+                    "\r\ntutorial" +
                     "\r\nstart" +
                     "\r\nabandon" +
                     "\r\ncontinue" +
@@ -1225,6 +1253,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nRelic";
         }else{
             switch(tokens[1].toLowerCase()){
+                case "tutorial":
+                    return  getTutorial();
                 case "start":
                 case "abandon":
                 case "continue":
@@ -1298,11 +1328,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             "\r\nThis displays the current volume settings to output." +
                             "\r\nIt can also change the settings." +
                             "\r\nThe different volume types are master, music, and sound effects." +
+                            "\r\nThere is an additional toggle for background ambience sounds." +
                             "\r\nThe format is" +
                             "\r\nvolume master/music/sound number" +
                             "\r\nThe number needs to be a decimal between 0 and 1." +
-                            "\r\nExample:" +
-                            "\r\nvolume master 0.5";
+                            "\r\nExamples:" +
+                            "\r\nvolume master 0.5" +
+                            "\r\nvolume ambience";
                 case "lang":
                     return  "\r\nlang" +
                             "\r\nThis displays the current language and available languages." +
@@ -1553,6 +1585,63 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         return "";
 
+    }
+
+    public String getTutorial(){
+        return  "\r\ntutorial" +
+                "\r\nThe goal of each run is complete 3 acts." +
+                "\r\nEach act consists of 15 floors and a boss." +
+                "\r\nThe map will mention which boss is at the end of the current act." +
+                "\r\nYou may only proceed forward and you cannot change your path once you take it." +
+                "\r\nEach floor consists of various rooms and each node is connected to rooms on the next floor." +
+                "\r\nUse the map and path commands to inspect and understand the map." +
+                "\r\nEach room has a type that is viewable from the map." +
+                "\r\nMonster rooms contain combat against normal monsters." +
+                "\r\nElite rooms contain combat against elite monsters." +
+                "\r\nCampfire rooms contain a campfire which provides a list of services you can pick from." +
+                "\r\nTreasure rooms contain a treasure chest." +
+                "\r\nShop rooms contain a shop." +
+                "\r\nUnknown rooms can contain any of the above and can contain an event." +
+                "\r\nThroughout the game you will need to make choices." +
+                "\r\nMany of these choices will appear in the Choices window." +
+                "\r\nThese choices can appear as a numbered list or as whole words." +
+                "\r\nTo pick a numbered choice input the number." +
+                "\r\nWhole word choices require inputting the word." +
+                "\r\nCombat uses card game mechanics." +
+                "\r\nUse cards from your hand to defeat enemies." +
+                "\r\nCards cost energy to play." +
+                "\r\nAt the start of a new turn you draw a fresh hand and your energy is replenished." +
+                "\r\nPLay defensive block spells to prevent incoming damage." +
+                "\r\nBlock reduces incoming damage but wears off at the start of the next turn." +
+                "\r\nDuring your turn you can observe the enemy's intent." +
+                "\r\nView cards in your hand using the hand window or the hand command." +
+                "\r\nPlaying cards requires inputting the card number and the target number." +
+                "\r\nEnemies are all assigned a number that does not change." +
+                "\r\nCard numbers are its position in your hand so it can change as you play cards." +
+                "\r\nExamples:" +
+                "\r\n0 0" +
+                "\r\n1 4" +
+                "\r\nYou do not need to input a target if the card does not have a target or if there is only one enemy." +
+                "\r\nPotions follow similar rules to cards." +
+                "\r\nPotions have the options use, discard, and inspect." +
+                "\r\nThe format to use them is:" +
+                "\r\npot [u,d,i] [potion number] [target number]" +
+                "\r\nAgain, target number is not needed if the potion has no target or if there is only one enemy." +
+                "\r\nExamples:" +
+                "\r\npot u 0 1" +
+                "\r\npot d 1" +
+                "\r\npot i 2" +
+                "\r\npot u 3" +
+                "\r\nThroughout the run you will be provided with various rewards." +
+                "\r\nCard rewards add a card to your deck." +
+                "\r\nDo note that you always use all the cards you have and ways to remove cards are rare." +
+                "\r\nRelics are items with passive effects." +
+                "\r\nYou can check and inspect relics you have in the relic window." +
+                "\r\nYou can inspect choices too with the command:" +
+                "\r\nc [number]" +
+                "\r\nUse this to check out rewards before picking them." +
+                "\r\nThis should be enough to get you started." +
+                "\r\nBe sure to check out the rest of the commands in the help command.";
     }
 
     public void parseHistoryCommand(String[] tokens){

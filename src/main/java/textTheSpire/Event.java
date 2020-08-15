@@ -14,6 +14,7 @@ import com.megacrit.cardcrawl.screens.GameOverStat;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.PatchNotesScreen;
 import com.megacrit.cardcrawl.ui.DialogWord;
 import com.megacrit.cardcrawl.unlock.AbstractUnlock;
 import communicationmod.ChoiceScreenUtils;
@@ -114,6 +115,12 @@ public class Event extends AbstractWindow{
             for(LeaderboardEntry e : CardCrawlGame.mainMenuScreen.leaderboardsScreen.entries){
                 s.append(e.rank).append(". ").append(e.name).append(" : ").append(e.score).append("\r\n");
             }
+            return s.toString();
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PATCH_NOTES && !CommandExecutor.isInDungeon()){
+            String p = (String)basemod.ReflectionHacks.getPrivateStatic(PatchNotesScreen.class, "text");
+            s.append(p);
             return s.toString();
         }
 
