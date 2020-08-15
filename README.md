@@ -11,10 +11,6 @@ This is a mod for the game Slay the Spire and provides screen reader accessibili
 It does so by providing lots of windows displaying the game information and a prompt window for inputting commands.
 Descriptions of the windows and commands are provided with the help command.
 
-Limitations:
-
-TextTheSpire currently does not provide full access to the settings menu or the game patch notes.
-
 Requirements:
 
 Steam - https://steamcommunity.com/
