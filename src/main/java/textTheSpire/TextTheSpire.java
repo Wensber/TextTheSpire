@@ -2077,7 +2077,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         int cost = Hand.handCost(card);
 
         s += card.name + "\r\n";
-
+        s += card.color.name() + "\r\n";
         s += card.rarity.name() + "\r\n";
 
         if(cost == -1)
