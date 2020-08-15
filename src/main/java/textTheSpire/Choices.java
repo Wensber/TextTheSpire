@@ -644,7 +644,7 @@ public class Choices extends AbstractWindow{
                     }
                 }
 
-                s.append("history\r\nslot\r\nquit");
+                s.append("history\r\nslot\r\npatch\r\nquit");
 
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark\r\n");
@@ -659,15 +659,33 @@ public class Choices extends AbstractWindow{
                 s.append("Patch Notes are displayed in the Event window.\r\nback");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.LEADERBOARD ){
                 s.append("Leaderboard\r\nDue to technical difficulties you cannot back out of this screen.\r\n");
-                s.append("char\r\n");
+                s.append("char ");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.size();i++){
+                    if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.get(i).active){
+                        s.append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.get(i).label).append("\r\n");
+                        break;
+                    }
+                }
                 for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.size();i++){
                     s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.get(i).label).append("\r\n");
                 }
-                s.append("region\r\n");
+                s.append("region ");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.size();i++){
+                    if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(i).active){
+                        s.append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(i).label).append("\r\n");
+                        break;
+                    }
+                }
                 for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.size();i++){
                     s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(i).label).append("\r\n");
                 }
-                s.append("type\r\n");
+                s.append("type ");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.size();i++){
+                    if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.get(i).active){
+                        s.append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.get(i).label).append("\r\n");
+                        break;
+                    }
+                }
                 for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.size();i++){
                     s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.get(i).label).append("\r\n");
                 }
