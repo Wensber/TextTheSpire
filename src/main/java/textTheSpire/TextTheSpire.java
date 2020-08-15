@@ -15,10 +15,12 @@ import com.megacrit.cardcrawl.core.AbstractCreature;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.daily.DailyScreen;
+import com.megacrit.cardcrawl.daily.TimeHelper;
 import com.megacrit.cardcrawl.daily.mods.AbstractDailyMod;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
+import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
@@ -29,6 +31,9 @@ import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
 import com.megacrit.cardcrawl.rooms.*;
 import com.megacrit.cardcrawl.screens.custom.CustomMod;
 import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
+import com.megacrit.cardcrawl.screens.leaderboards.FilterButton;
+import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
+import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
@@ -514,6 +519,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("leader") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && DistributorFactory.isLeaderboardEnabled()){
+            CardCrawlGame.mainMenuScreen.leaderboardsScreen.open();
+            return;
+        }
+
         if(input.equals("custom")){
             if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen != MainMenuScreen.CurScreen.CUSTOM && !CardCrawlGame.characterManager.anySaveFileExists() && StatsScreen.all.highestDaily > 0) {
                 CardCrawlGame.mainMenuScreen.customModeScreen.open();
@@ -595,6 +605,33 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
                 return;
+            }else if(input.equals("mine")){
+                Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "viewMyScoreHb");
+                hb.clicked = true;
+                return;
+            }else if(input.equals("prev")){
+                Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevDayHb");
+                hb.clicked = true;
+                return;
+            }else if(input.equals("next")){
+                long day = (long)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
+                if(day != 0L && day < TimeHelper.daySince1970()){
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextDayHb");
+                    hb.clicked = true;
+                    return;
+                }
+            }else if(input.equals("+")){
+                if(CardCrawlGame.mainMenuScreen.dailyScreen.entries.size() == 20){
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextHb");
+                    hb.clicked = true;
+                    return;
+                }
+            }else if(input.equals("-")){
+                if(CardCrawlGame.mainMenuScreen.dailyScreen.currentStartIndex != 1){
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevHb");
+                    hb.clicked = true;
+                    return;
+                }
             }
 
         }
@@ -657,6 +694,61 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     inspect.setText(custom.getSimpleText());
                     return;
 
+            }
+
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.LEADERBOARD && !CommandExecutor.isInDungeon()){
+
+            if(input.equals("mine")) {
+                if(((FilterButton)CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(0)).active){
+                    return;
+                }
+                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "viewMyScoreHb");
+                hb.clicked = true;
+                return;
+            }else if(input.equals("+")){
+                if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.entries.size() == 20){
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "nextHb");
+                    hb.clicked = true;
+                    return;
+                }
+            }else if(input.equals("-")){
+                if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.currentStartIndex != 1){
+                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "prevHb");
+                    hb.clicked = true;
+                    return;
+                }
+            }
+            if(tokens.length > 1) {
+                if (tokens[0].equals("char")) {
+                    try {
+                        int in = Integer.parseInt(tokens[1]);
+                        if(in >= 0 && in < CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.size()){
+                            CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.get(in).hb.clicked = true;
+                        }
+                        return;
+                    }catch (Exception ignored){
+                    }
+                }else if (tokens[0].equals("region")) {
+                    try {
+                        int in = Integer.parseInt(tokens[1]);
+                        if(in >= 0 && in < CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.size()){
+                            CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(in).hb.clicked = true;
+                        }
+                        return;
+                    }catch (Exception ignored){
+                    }
+                }else if (tokens[0].equals("type")) {
+                    try {
+                        int in = Integer.parseInt(tokens[1]);
+                        if(in >= 0 && in < CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.size()){
+                            CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.get(in).hb.clicked = true;
+                        }
+                        return;
+                    }catch (Exception ignored){
+                    }
+                }
             }
 
         }
@@ -1108,6 +1200,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nachieve" +
                     "\r\nplay" +
                     "\r\ncustom" +
+                    "\r\ndaily" +
+                    "\r\nleader" +
                     "\r\npotion" +
                     "\r\nchoice" +
                     "\r\npower" +
@@ -1261,6 +1355,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             "\r\nmod 15" +
                             "\r\nmod 13" +
                             "\r\nembark";
+                case "daily":
+                    return  "\r\ndaily" +
+                            "\r\nFrom the main menu this opens up the daily climb screen." +
+                            "\r\nOn that screen you can view the current daily mods and embark on a daily climb." +
+                            "\r\nThere is also a Daily Climb Leaderboard." +
+                            "\r\nUse the embark command to begin a Daily Climb." +
+                            "\r\nUse the mine command to display personal scores." +
+                            "\r\nUse the prev and next commands to change the date to display." +
+                            "\r\nUse the + and - commands to shift the leaderboard by 20 ranks.";
+                case "leader":
+                    return  "\r\nleader" +
+                            "\r\nFrom the main menu this opens up the leaderboard screen." +
+                            "\r\nThe leaderboard is displayed in the Event window." +
+                            "\r\nThe Choices window displays the leaderboard options." +
+                            "\r\nOption 1 is char which is which Character." +
+                            "\r\nOption 2 is region." +
+                            "\r\nOption 3 is type." +
+                            "\r\nFor all options used the format:" +
+                            "\r\n[option] [number]" +
+                            "\r\nExamples:" +
+                            "\r\nchar 1" +
+                            "\r\nregion 0" +
+                            "\r\ntype 2" +
+                            "\r\nUse the commands + and - to shift which ranks to display on the leaderboard." +
+                            "\r\nUse the command mine while region is set to Global to display your scores.";
                 case "potion":
                     return  "\r\npotion" +
                             "\r\nThis command lets you interact with your potions." +

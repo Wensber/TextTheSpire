@@ -12,6 +12,7 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DeathScreen;
 import com.megacrit.cardcrawl.screens.GameOverStat;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
+import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.ui.DialogWord;
 import com.megacrit.cardcrawl.unlock.AbstractUnlock;
@@ -105,6 +106,14 @@ public class Event extends AbstractWindow{
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
             s.append(TextTheSpire.inspectDaily());
+            return s.toString();
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.LEADERBOARD && !CommandExecutor.isInDungeon()){
+            s.append("Leaderboard\r\n");
+            for(LeaderboardEntry e : CardCrawlGame.mainMenuScreen.leaderboardsScreen.entries){
+                s.append(e.rank).append(". ").append(e.name).append(" : ").append(e.score).append("\r\n");
+            }
             return s.toString();
         }
 

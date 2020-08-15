@@ -8,6 +8,8 @@ import com.megacrit.cardcrawl.characters.AbstractPlayer;
 import com.megacrit.cardcrawl.characters.TheSilent;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
+import com.megacrit.cardcrawl.daily.DailyScreen;
+import com.megacrit.cardcrawl.daily.TimeHelper;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
@@ -15,6 +17,7 @@ import com.megacrit.cardcrawl.helpers.Prefs;
 import com.megacrit.cardcrawl.helpers.SaveHelper;
 import com.megacrit.cardcrawl.helpers.SeedHelper;
 import com.megacrit.cardcrawl.helpers.TipTracker;
+import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.metrics.Metrics;
 import com.megacrit.cardcrawl.rewards.RewardItem;
@@ -636,20 +639,35 @@ public class Choices extends AbstractWindow{
                     if(StatsScreen.all.highestDaily > 0){
                         s.append("custom\r\n");
                     }
+                    if(DistributorFactory.isLeaderboardEnabled()){
+                        s.append("leader\r\n");
+                    }
                 }
 
                 s.append("history\r\nslot\r\nquit");
 
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark\r\n");
-                if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && CardCrawlGame.mainMenuScreen.dailyScreen.entries.size() > 0){
-                    s.append("Leaderboard Top 100\r\n");
+                if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
+                    long day = (long)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
+                    s.append("Daily Leaderboard ").append(TimeHelper.getDate(day)).append("\r\n");
                     for(LeaderboardEntry e : CardCrawlGame.mainMenuScreen.dailyScreen.entries){
-                        if(e.rank > 100){
-                            break;
-                        }
                         s.append(e.rank).append(". ").append(e.name).append(" : ").append(e.score).append("\r\n");
                     }
+                }
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.LEADERBOARD ){
+                s.append("Leaderboard\r\nDue to technical difficulties you cannot back out of this screen.\r\n");
+                s.append("char\r\n");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.size();i++){
+                    s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.charButtons.get(i).label).append("\r\n");
+                }
+                s.append("region\r\n");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.size();i++){
+                    s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(i).label).append("\r\n");
+                }
+                s.append("type\r\n");
+                for(int i=0;i<CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.size();i++){
+                    s.append(i).append(": ").append(CardCrawlGame.mainMenuScreen.leaderboardsScreen.typeButtons.get(i).label).append("\r\n");
                 }
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
                 s.append("Abandon Confirm\r\nyes\r\nno");
