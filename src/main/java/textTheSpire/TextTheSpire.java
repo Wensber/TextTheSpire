@@ -67,7 +67,7 @@ import java.util.HashMap;
 
 
 @SpireInitializer
-public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber {
+public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
     //Used to only update display every number of update cycles
     int iter;
@@ -951,6 +951,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         return;
                     }
                     return;
+                case "exhaust":
+                    CardGroup h = AbstractDungeon.player.exhaustPile;
+                    StringBuilder s = new StringBuilder("\r\nExhaust\r\n");
+                    s.append("Size: ").append(h.size()).append("\r\n");
+
+                    if(h.size() > 0) {
+                        for (AbstractCard c : h.group) {
+                            s.append(c.name).append("\r\n");
+                        }
+                    }
+                    inspect.setText(s.toString());
+                    return;
                 default:
                     try {
                         if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE){
@@ -1241,6 +1253,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nDiscard" +
                     "\r\nEvent" +
                     "\r\nHand" +
+                    "\r\nexhaust" +
                     "\r\nOutput" +
                     "\r\nLog" +
                     "\r\nSave" +
@@ -1497,6 +1510,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             "\r\nhand can be shortened to h." +
                             "\r\nExample:" +
                             "\r\nh 1";
+                case "exhaust":
+                    return  "\r\nexhaust" +
+                            "\r\nThis command displays your exhaust pile in Output." +
+                            "\r\nNote that exhaust does not have a window as there are very few reasons to need to check the exhaust pile.";
                 case "output":
                     return  "\r\noutput" +
                             "\r\nThis window displays output from various sources." +
@@ -2412,6 +2429,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     @Override
     public void receivePostDraw(AbstractCard abstractCard) {
         logs.output("Draw " + abstractCard.name);
+    }
+
+    @Override
+    public void receivePostExhaust(AbstractCard abstractCard) {
+        logs.output("Exhaust " + abstractCard.name);
     }
 }
 
