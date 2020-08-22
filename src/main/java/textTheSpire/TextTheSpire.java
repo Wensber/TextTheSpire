@@ -3,6 +3,9 @@ package textTheSpire;
 import basemod.ReflectionHacks;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
+import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
+import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.RefundFields;
+import com.evacipated.cardcrawl.modthespire.Loader;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 
 import basemod.BaseMod;
@@ -75,6 +78,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     private boolean setSettings = false;
 
+    public static boolean replayTheSpire;
+    public static boolean stslib;
+
     private Hand hand;
     private Map map;
     private Discard discard;
@@ -111,6 +117,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     public TextTheSpire() {
 
+        replayTheSpire = Loader.isModLoaded("ReplayTheSpireMod");
+        stslib = Loader.isModLoaded("stslib");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -2219,6 +2227,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s = s.replace("!B!", "" + c.baseBlock);
         else
             s = s.replace("!B!", "" + c.block);
+
+        if(stslib){
+            if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                s = s.replace("!stslib:ex!", "" + (Integer) ExhaustiveField.ExhaustiveFields.exhaustive.get(c));
+                s = s.replace("!stslib:refund!", "" + (Integer) RefundFields.refund.get(c));
+            }else{
+                s = s.replace("!stslib:ex!", "" + (Integer) ExhaustiveField.ExhaustiveFields.baseExhaustive.get(c));
+                s = s.replace("!stslib:refund!", "" + (Integer) RefundFields.baseRefund.get(c));
+            }
+            System.out.println("stslib");
+        }
 
         return s;
 

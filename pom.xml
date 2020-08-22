@@ -18,7 +18,9 @@
         <SlayTheSpire.version>01-27-2020</SlayTheSpire.version>
         <ModTheSpire.version>3.15.0</ModTheSpire.version>
         <BaseMod.version>5.23.2</BaseMod.version>
+        <StSLib.version>1.20.3</StSLib.version>
         <CommunicationMod.version>1.0.0</CommunicationMod.version>
+        <ReplayTheSpireMod.version>1.5.12</ReplayTheSpireMod.version>
         <Steam.path>C:/Program Files (x86)/Steam/steamapps</Steam.path>
     </properties>
 
@@ -52,6 +54,13 @@
             <systemPath>${Steam.path}/workshop/content/646570/1605833019/BaseMod.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>com.evacipated.cardcrawl</groupId>
+            <artifactId>StSLib</artifactId>
+            <version>${StSLib.version}</version>
+            <scope>system</scope>
+            <systemPath>${Steam.path}/workshop/content/646570/1609158507/StSLib.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.arbiter.cardcrawl</groupId>
             <artifactId>CommunicationMod</artifactId>
             <version>${CommunicationMod.version}</version>
@@ -63,6 +72,13 @@
             <groupId>org.eclipse.swt</groupId>
             <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
             <version>4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.replay.cardcrawl</groupId>
+            <artifactId>ReplayTheSpireMod</artifactId>
+            <version>${ReplayTheSpireMod.version}</version>
+            <scope>system</scope>
+            <systemPath>${Steam.path}/workshop/content/646570/1610173938/ReplayTheSpireMod.jar</systemPath>
         </dependency>
 
     </dependencies>

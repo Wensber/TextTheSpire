@@ -3,10 +3,13 @@ package textTheSpire;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.map.MapRoomNode;
+import com.megacrit.cardcrawl.mod.replay.rooms.PsuedoBonfireRoom;
+import com.megacrit.cardcrawl.mod.replay.rooms.TeleportRoom;
 import com.megacrit.cardcrawl.rooms.*;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
+import replayTheSpire.patches.BonfirePatches;
 
 import java.util.ArrayList;
 
@@ -128,17 +131,38 @@ public class Map extends AbstractWindow{
                 return "Emerald Key ";
             else
                 return "Elite ";
-        }else if(n.getRoom() instanceof MonsterRoom){
+        }else if(TextTheSpire.replayTheSpire && n == BonfirePatches.bonfireNode){
+            return "Bonfire ";
+        }else{
+            String s = n.getRoom().getClass().getSimpleName();
+            if(s.substring(s.length()-4).equals("Room")){
+                return s.substring(0, s.length()-4) + " ";
+            }else{
+                return s + " ";
+            }
+        }
+
+        /*
+        else if(n.getRoom() instanceof MonsterRoom){
             return "Monster ";
         }else if(n.getRoom() instanceof RestRoom){
-            return "Rest ";
+            if(TextTheSpire.replayTheSpire && n.getRoom() instanceof PsuedoBonfireRoom)
+                 return "Bonfire ";
+            else
+                return "Rest ";
         }else if(n.getRoom() instanceof ShopRoom){
             return "Shop ";
         }else if(n.getRoom() instanceof TreasureRoom){
             return "Treasure ";
+        }else if(TextTheSpire.replayTheSpire) {
+            if(n.getRoom() instanceof TeleportRoom){
+
+            }
         }else{
-            return "Unknown ";
+             return "Unknown ";
         }
+         */
+
     }
 
 }

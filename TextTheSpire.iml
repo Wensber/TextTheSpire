@@ -11,7 +11,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
-      <library name="Maven: com.megacrit.cardcrawl:slaythespire:01-21-2020">
+      <library name="Maven: com.megacrit.cardcrawl:slaythespire:01-27-2020">
         <CLASSES>
           <root url="jar://C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/desktop-1.0.jar!/" />
         </CLASSES>
@@ -29,9 +29,18 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="Maven: com.evacipated.cardcrawl:BaseMod:5.17.0">
+      <library name="Maven: com.evacipated.cardcrawl:BaseMod:5.23.2">
         <CLASSES>
           <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/1605833019/BaseMod.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.evacipated.cardcrawl:StSLib:1.20.3">
+        <CLASSES>
+          <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/1609158507/StSLib.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -47,5 +56,14 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: org.eclipse.swt:org.eclipse.swt.win32.win32.x86_64:4.4" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: com.replay.cardcrawl:ReplayTheSpireMod:1.5.12">
+        <CLASSES>
+          <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/1610173938/ReplayTheSpireMod.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
