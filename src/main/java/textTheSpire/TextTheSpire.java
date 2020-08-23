@@ -810,6 +810,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             inspect.setText("\r\n" + SeedHelper.getString(Settings.seed));
         }
 
+        if(tokens[0].equals("deck") && tokens.length == 2){
+            try{
+                int in = Integer.parseInt(tokens[1]);
+                inspect.setText(inspectCard(AbstractDungeon.player.masterDeck.group.get(in)));
+                return;
+            }catch (Exception ignored){
+            }
+        }
+
         //Potion Command. If out of combat can only discard
         if (tokens[0].equals("potion") || tokens[0].equals("pot")) {
             try {

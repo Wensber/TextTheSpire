@@ -53,8 +53,8 @@ public class Deck extends AbstractWindow{
             s.append("Size: ").append(h.size()).append("\r\n");
 
             if(h.size() > 0) {
-                for (AbstractCard c : h.group) {
-                    s.append(c.name).append("\r\n");
+                for (int i=0;i<h.group.size();i++) {
+                    s.append(i).append(": ").append(h.group.get(i).name).append("\r\n");
                 }
             }
 
