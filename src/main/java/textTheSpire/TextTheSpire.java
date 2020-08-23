@@ -21,9 +21,11 @@ import com.megacrit.cardcrawl.daily.DailyScreen;
 import com.megacrit.cardcrawl.daily.TimeHelper;
 import com.megacrit.cardcrawl.daily.mods.AbstractDailyMod;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
+import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
@@ -56,6 +58,7 @@ import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.ui.buttons.CancelButton;
 import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
 import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
+import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
 import com.megacrit.cardcrawl.ui.panels.DeleteSaveConfirmPopup;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
@@ -922,19 +925,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             input = input.toLowerCase();
 
             switch (tokens[0]) {
-                case "play":
-                    try {
-                        if(tokens.length == 2){
-                            int index = singleMonster();
-                            if(index != -1){
-                                input = input + " " + index;
-                            }
-                        }
-                        CommandExecutor.executeCommand(input);
-                    } catch (Exception e) {
-                        return;
-                    }
-                    return;
                 case "end":
                     try {
                         CommandExecutor.executeCommand(tokens[0]);
@@ -982,6 +972,22 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     return;
                 default:
                     try {
+                        int in;
+                        in = Integer.parseInt(input) - 1;
+                        if(TextTheSpire.replayTheSpire && AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1) instanceof FadingForestBoss){
+                            boolean show = (boolean)basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
+                            if(show){
+                                ArrayList<LargeDialogOptionButton> buttons = ((FadingForestBoss) AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1)).imageEventText.optionList;
+                                ArrayList<LargeDialogOptionButton> activeButtons = new ArrayList<>();
+                                for(LargeDialogOptionButton b : buttons){
+                                    if(!b.isDisabled){
+                                        activeButtons.add(b);
+                                    }
+                                }
+                                activeButtons.get(in).hb.clicked = true;
+                                return;
+                            }
+                        }
                         if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE){
                             String playInput = "play " + input;
                             String[] playTokens = playInput.split("\\s+");
@@ -992,14 +998,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                                 }
                             }
                             CommandExecutor.executeCommand(playInput);
+                            return;
                         }
-                        int in;
-                        in = Integer.parseInt(input) - 1;
                         ChoiceScreenUtils.executeChoice(in);
-                    } catch (Exception e) {
-                        return;
+                    } catch (Exception ignored) {
                     }
-                    return;
             }
         } else if (tokens[0].equals("map") || tokens[0].equals("m")){
 
@@ -1383,12 +1386,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     return  "\r\nplay" +
                             "\r\nThis command lets you play cards from your hand." +
                             "\r\nThe format is" +
-                            "\r\nplay [card number] [enemy number]" +
+                            "\r\n[card number] [enemy number]" +
                             "\r\nEnemy number is optional for cards without targets or if there is only 1 target." +
                             "\r\nNote that the card number is the index in your hand." +
                             "\r\nIt changes as cards are played." +
-                            "\r\nEnemy number does not change." +
-                            "\r\nIf there are no active choices then you can skip play and just use the numbers.";
+                            "\r\nEnemy number does not change.";
                 case "custom":
                     return  "\r\ncustom" +
                             "\r\nFrom the main menu this opens up the custom mode panel." +

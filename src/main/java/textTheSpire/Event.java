@@ -1,5 +1,6 @@
 package textTheSpire;
 
+import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
@@ -7,8 +8,10 @@ import com.megacrit.cardcrawl.events.AbstractEvent;
 import com.megacrit.cardcrawl.events.AbstractImageEvent;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.RoomEventDialog;
+import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.DeathScreen;
 import com.megacrit.cardcrawl.screens.GameOverStat;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
@@ -135,17 +138,31 @@ public class Event extends AbstractWindow{
             return s.toString();
         }
 
+        boolean fable = false;
         //Not in Event
         if(!CommandExecutor.isInDungeon() || ChoiceScreenUtils.getCurrentChoiceType() != ChoiceScreenUtils.ChoiceType.EVENT){
-            return "";
+            if(TextTheSpire.replayTheSpire && CommandExecutor.isInDungeon() && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT && AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1) instanceof FadingForestBoss){
+                boolean show = (boolean)basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
+                if(!show){
+                    return "";
+                }
+                fable = true;
+            }else {
+                return "";
+            }
         }
 
-        s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
+        if(!fable) {
+            s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
+        }else{
+            String name = (String) ReflectionHacks.getPrivate(((FadingForestBoss) AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1)).imageEventText, GenericEventDialog.class, "title");
+            s.append(name).append("\r\n");
+        }
 
         StringBuilder body = new StringBuilder();
         ArrayList<DialogWord> words;
 
-        if (AbstractDungeon.getCurrRoom().event instanceof AbstractImageEvent) {
+        if (AbstractDungeon.getCurrRoom().event instanceof AbstractImageEvent || fable) {
             words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "words");
         } else {
             words = (ArrayList<DialogWord>) basemod.ReflectionHacks.getPrivate(AbstractDungeon.getCurrRoom().event.roomEventText, RoomEventDialog.class, "words");

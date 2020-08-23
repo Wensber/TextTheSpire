@@ -11,6 +11,7 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.daily.DailyScreen;
 import com.megacrit.cardcrawl.daily.TimeHelper;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
 import com.megacrit.cardcrawl.helpers.Prefs;
@@ -20,6 +21,7 @@ import com.megacrit.cardcrawl.helpers.TipTracker;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.metrics.Metrics;
+import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
@@ -472,8 +474,30 @@ public class Choices extends AbstractWindow{
                 if (ChoiceScreenUtils.isCancelButtonAvailable()) {
                     s.append(ChoiceScreenUtils.getCancelButtonText()).append("\r\n");
                 }
-
                 int count = 1;
+
+                if(TextTheSpire.replayTheSpire && AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1) instanceof FadingForestBoss){
+                    boolean show = (boolean)basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
+                    if(show){
+                        String name = (String) ReflectionHacks.getPrivate(((FadingForestBoss) AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1)).imageEventText, GenericEventDialog.class, "title");
+                        s.append(name).append("\r\n");
+                        ArrayList<LargeDialogOptionButton> buttons = ((FadingForestBoss) AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1)).imageEventText.optionList;
+                        ArrayList<LargeDialogOptionButton> activeButtons = new ArrayList<>();
+                        for(LargeDialogOptionButton b : buttons){
+                            if(!b.isDisabled){
+                                activeButtons.add(b);
+                            }
+                        }
+                        if (activeButtons.size() > 0) {
+                            for(LargeDialogOptionButton button : activeButtons) {
+                                s.append(count).append(": ").append(stripColor(button.msg).toLowerCase()).append("\r\n");
+                                count++;
+                            }
+                            return s.toString();
+                        }
+                    }
+                }
+
                 ArrayList<String> cards = ChoiceScreenUtils.getCurrentChoiceList();
 
                 if (cards.size() == 0) {
