@@ -238,6 +238,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("mod")){
+            inspect.setText(modNotes());
+            return;
+        }
+
         switch(input){
             case "deck":
                 inspect.setText(deck.getText());
@@ -1237,6 +1242,32 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     }
 
+    public String modNotes(){
+        StringBuilder s = new StringBuilder("\r\n");
+        if(stslib){
+            s.append("StSLib\r\nNew Keywords:\r\n");
+            s.append("Exhaustive - Exhausts after that many uses.\r\n");
+            s.append("Refund - Returns an amount of energy on use.\r\n");
+        }
+        if(replayTheSpire){
+            s.append("Replay the Spire\r\nNew Keywords:\r\n");
+            s.append("Fleeting - Purges itself on use.\r\n");
+            s.append("Soulbound - You cannot remove it from your deck\r\n");
+            s.append("Languid - Deal 1 less dmg per stack. Reduces by 1 each turn.\r\n");
+            s.append("Decrepit - Takes 1 more dmg per stack. Reduces by 1 each turn.\r\n");
+            s.append("Autoplay - Plays itself when drawn.\r\n");
+            s.append("Grave - Starts in your discard.\r\n");
+            s.append("Startup - Effects at start of game.\r\n");
+            s.append("Reflection - Returns completely blocked damaged back to dealer. Reduces by 1 each turn and is removed at 0.\r\n");
+            s.append("Necrotic Poison - Deals double damage and is reduced by half each turn rounding down. Normal poison does not count down while Necrotic is applied.\r\n");
+            s.append("Shielding - A type of block that does not wear off between rounds.\r\n");
+            s.append("Temporary HP - Max HP that is removed at end of combat.\r\n");
+            s.append("New Boss Mechanics\r\n");
+            s.append("The boss Fading Forest uses events during combat. Between turns check the Event and Choices windows to proceed.\r\n");
+        }
+        return s.toString();
+    }
+
     public String displayHelp(String[] tokens){
 
         if(tokens.length == 1){
@@ -1258,6 +1289,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nvolume" +
                     "\r\nlang" +
                     "\r\nachieve" +
+                    "\r\nmod" +
                     "\r\nplay" +
                     "\r\ncustom" +
                     "\r\ndaily" +
@@ -1382,6 +1414,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             "\r\nThis displays to output the list of locked and unlocked achievements." +
                             "\r\nachieve number displays the description of a given achievement." +
                             "\r\nachieve can be shortened to a.";
+                case "mod":
+                    return  "\r\nmod" +
+                            "\r\nThis displays to output some notes on certain loaded content mods." +
+                            "\r\nIf a mod isn't listed here then it either works out of the box or hasn't been implemented yet.";
                 case "play":
                     return  "\r\nplay" +
                             "\r\nThis command lets you play cards from your hand." +
