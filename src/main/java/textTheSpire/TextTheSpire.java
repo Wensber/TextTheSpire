@@ -977,8 +977,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     return;
                 default:
                     try {
-                        int in;
-                        in = Integer.parseInt(input) - 1;
                         if(TextTheSpire.replayTheSpire && AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1) instanceof FadingForestBoss){
                             boolean show = (boolean)basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
                             if(show){
@@ -989,6 +987,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                                         activeButtons.add(b);
                                     }
                                 }
+                                int in;
+                                in = Integer.parseInt(input) - 1;
                                 activeButtons.get(in).hb.clicked = true;
                                 return;
                             }
@@ -1005,6 +1005,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             CommandExecutor.executeCommand(playInput);
                             return;
                         }
+                        int in;
+                        in = Integer.parseInt(input) - 1;
                         ChoiceScreenUtils.executeChoice(in);
                     } catch (Exception ignored) {
                     }
