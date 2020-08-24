@@ -73,10 +73,12 @@ public class Player extends AbstractWindow{
             //Hand window is gone so show potions in player out of combat
             ArrayList<AbstractPotion> pl = p.potions;
 
+            int count = 0;
             if (pl.size() > 0) {
                 s.append("Potions:\r\n");
                 for (AbstractPotion po : pl) {
-                    s.append(po.name).append("\r\n");
+                    s.append(count).append(": ").append(po.name).append("\r\n");
+                    count++;
                 }
             }
         }

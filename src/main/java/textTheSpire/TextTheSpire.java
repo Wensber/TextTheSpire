@@ -816,6 +816,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         if(input.equals("seed")){
             inspect.setText("\r\n" + SeedHelper.getString(Settings.seed));
+            return;
         }
 
         if(tokens[0].equals("deck") && tokens.length == 2){
@@ -827,10 +828,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             }
         }
 
-        //Potion Command. If out of combat can only discard
+        //Potion Commands
         if (tokens[0].equals("potion") || tokens[0].equals("pot")) {
             try {
-                if(tokens.length >= 3 && tokens[1].equals("inspect") || tokens.length >= 3 && tokens[1].equals("i")){
+                if(tokens.length >= 3 && (tokens[1].equals("inspect") || tokens[1].equals("i"))){
 
                     int in = Integer.parseInt(tokens[2]);
                     if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
@@ -861,11 +862,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                             command.append(index);
                         }
                     }
-                    System.out.println(command);
+                    System.out.println(command.toString());
                     CommandExecutor.executeCommand(command.toString());
                 }
                 return;
             } catch (Exception e) {
+                System.out.println(e.toString());
                 return;
             }
         }
@@ -2356,6 +2358,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     }
 
     public int singleMonster() {
+        if(AbstractDungeon.getCurrRoom().phase != AbstractRoom.RoomPhase.COMBAT)
+            return  -1;
         int count = 0;
         int numAliveMonsters = 0;
         int index = -1;
