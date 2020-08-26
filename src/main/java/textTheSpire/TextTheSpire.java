@@ -223,6 +223,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("test")){
+            StringBuilder s = new StringBuilder("\r\n");
+            for(String str : choice.inspectRun.path_taken){
+                s.append(str).append("\r\n");
+            }
+            inspect.setText(s.toString());
+            return;
+        }
+
         if(choice.screen != Choices.HistoryScreen.NONE){
             parseHistoryCommand(tokens);
             return;
@@ -1252,6 +1261,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("StSLib\r\nNew Keywords:\r\n");
             s.append("Exhaustive - Exhausts after that many uses.\r\n");
             s.append("Refund - Returns an amount of energy on use.\r\n");
+            s.append("New Mechanics\r\n");
+            s.append("Clickable Relics. Use the format \"relic [index] u\" to use a clickable relic\r\n");
         }
         if(replayTheSpire){
             s.append("Replay the Spire\r\nNew Keywords:\r\n");

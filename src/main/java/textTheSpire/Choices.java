@@ -60,6 +60,7 @@ public class Choices extends AbstractWindow{
 
     static class Floor{
         public String type;
+        public boolean wasUnknown;
         public ArrayList<CardChoiceStats> cardChoices;
         public ArrayList<String> potions;
         public ArrayList<String> relics;
@@ -270,6 +271,9 @@ public class Choices extends AbstractWindow{
                         newFloor.purges = new ArrayList<>();
                         every.add(newFloor);
                     }
+                    for(int i=0;i<inspectRun.path_taken.size();i++){
+                        every.get(i + i/16).wasUnknown = inspectRun.path_taken.get(i).equals("?");
+                    }
                     for(ObtainStats p : inspectRun.relics_obtained){
                         every.get(p.floor-1).relics.add(p.key);
                     }
@@ -300,7 +304,10 @@ public class Choices extends AbstractWindow{
                     s.append("back\r\nPath\r\n");
                     for(int i=0;i<every.size();i++){
                         s.append("Floor: ").append(i+1).append("\r\n");
-                        s.append("Type: ").append(mapType(every.get(i).type));
+                        if(!every.get(i).wasUnknown)
+                            s.append("Type: ").append(mapType(every.get(i).type));
+                        else
+                            s.append("Type: Unknown to ").append(mapType(every.get(i).type));
                         if(every.get(i).battle != null)
                             s.append(": ").append(every.get(i).battle.enemies);
                         s.append("\r\n");

@@ -135,6 +135,8 @@ public class Map extends AbstractWindow{
             return "Bonfire ";
         }else{
             String s = n.getRoom().getClass().getSimpleName();
+            if(s.equals("EventRoom"))
+                return "Unknown ";
             if(s.substring(s.length()-4).equals("Room")){
                 return s.substring(0, s.length()-4) + " ";
             }else{
