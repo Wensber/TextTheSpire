@@ -64,7 +64,9 @@ import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import communicationmod.patches.GremlinMatchGamePatch;
+import communicationmod.patches.ShopScreenPatch;
 import org.eclipse.swt.widgets.Display;
+import replayTheSpire.patches.ReplayShopInitCardsPatch;
 
 import javax.smartcardio.Card;
 import javax.swing.*;
@@ -1057,6 +1059,35 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
                     if(choiceList.size() > in){
                         inspect.setText("Goblin Match Card\r\nPosition " + GremlinMatchGamePatch.cardPositions.get(choiceList.get(in).uuid) + "\r\n" + inspectCard(choiceList.get(in)));
+                    }
+                }
+                if(TextTheSpire.replayTheSpire && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN && ReplayShopInitCardsPatch.doubleCard != null){
+                    ArrayList<Object> choices = new ArrayList<>();
+                    ShopScreen screen = AbstractDungeon.shopScreen;
+                    if(screen.purgeAvailable && AbstractDungeon.player.gold >= ShopScreen.actualPurgeCost) {
+                        choices.add("purge");
+                    }
+                    for(AbstractCard card : ChoiceScreenUtils.getShopScreenCards()) {
+                        if(card.price <= AbstractDungeon.player.gold) {
+                            choices.add(card);
+                        }
+                    }
+                    for(StoreRelic relic : ChoiceScreenUtils.getShopScreenRelics()) {
+                        if(relic.price <= AbstractDungeon.player.gold) {
+                            choices.add(relic);
+                        }
+                    }
+                    for(StorePotion potion : ChoiceScreenUtils.getShopScreenPotions()) {
+                        if(potion.price <= AbstractDungeon.player.gold) {
+                            choices.add(potion);
+                        }
+                    }
+                    if(in >= 0 && in < choices.size() && ((AbstractCard)choices.get(in)).equals(ReplayShopInitCardsPatch.doubleCard)){
+                        ShopScreenPatch.doHover = true;
+                        ShopScreenPatch.hoverCard = (AbstractCard)choices.get(in);
+                        ((AbstractCard)choices.get(in)).hb.clicked = true;
+                        ((AbstractCard)choices.get(in)).hb.hovered = true;
+                        return;
                     }
                 }
 

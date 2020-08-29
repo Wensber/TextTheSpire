@@ -43,6 +43,7 @@ import communicationmod.CommunicationMod;
 import communicationmod.patches.GremlinMatchGamePatch;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import replayTheSpire.patches.ReplayShopInitCardsPatch;
 
 import javax.smartcardio.Card;
 import java.text.ParseException;
@@ -560,10 +561,33 @@ public class Choices extends AbstractWindow{
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
 
-                    //Shop screen. Makes sure prices are shown
-                    for (String c : priceShopScreenChoices()) {
-                        s.append(count).append(":").append(c).append("\r\n");
-                        count++;
+                    if(!TextTheSpire.replayTheSpire) {
+                        for (String c : priceShopScreenChoices()) {
+                            s.append(count).append(":").append(c).append("\r\n");
+                            count++;
+                        }
+                    }else{
+                        ArrayList<String> choices = new ArrayList<>();
+                        ArrayList<Object> shopItems = getAvailableShopItems();
+                        for (Object item : shopItems) {
+                            if (item instanceof String) {
+                                choices.add((String) item);
+                            } else if (item instanceof AbstractCard) {
+                                if(item.equals(ReplayShopInitCardsPatch.doubleCard)) {
+                                    choices.add(((AbstractCard) item).name.toLowerCase() + " Two for One");
+                                }else{
+                                    choices.add(((AbstractCard) item).name.toLowerCase());
+                                }
+                            } else if (item instanceof StoreRelic) {
+                                choices.add(((StoreRelic)item).relic.name);
+                            } else if (item instanceof StorePotion) {
+                                choices.add(((StorePotion)item).potion.name);
+                            }
+                        }
+                        for (String c : choices) {
+                            s.append(count).append(":").append(c).append("\r\n");
+                            count++;
+                        }
                     }
 
                 }else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
