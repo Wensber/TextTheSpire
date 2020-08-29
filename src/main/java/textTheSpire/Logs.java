@@ -57,10 +57,10 @@ public class Logs {
                 }
             }
             for(int i=0;i<monsterHp.size();i++){
-                if(monsterHp.get(i) < AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth){
+                if(i < AbstractDungeon.getCurrRoom().monsters.monsters.size() && monsterHp.get(i) < AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth){
                     output("Monster " + i + " : " + AbstractDungeon.getCurrRoom().monsters.monsters.get(i).name + " healed " + (AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth - monsterHp.get(i)));
                     monsterHp.set(i, AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth);
-                } else if (monsterHp.get(i) > AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth){
+                } else if (i < AbstractDungeon.getCurrRoom().monsters.monsters.size() && monsterHp.get(i) > AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth){
                     output("Monster " + i + " : " + AbstractDungeon.getCurrRoom().monsters.monsters.get(i).name + " took " + (monsterHp.get(i) - AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth));
                     monsterHp.set(i, AbstractDungeon.getCurrRoom().monsters.monsters.get(i).currentHealth);
                 }

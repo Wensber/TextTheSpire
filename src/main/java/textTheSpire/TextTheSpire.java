@@ -5,6 +5,7 @@ import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.RefundFields;
+import com.evacipated.cardcrawl.mod.stslib.relics.ClickableRelic;
 import com.evacipated.cardcrawl.modthespire.Loader;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
 
@@ -26,6 +27,7 @@ import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
+import com.megacrit.cardcrawl.mod.replay.relics.WaxSeal;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
@@ -226,11 +228,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         }
 
         if(input.equals("test")){
-            StringBuilder s = new StringBuilder("\r\n");
-            for(String str : choice.inspectRun.path_taken){
-                s.append(str).append("\r\n");
-            }
-            inspect.setText(s.toString());
+            AbstractDungeon.player.relics.add(new WaxSeal());
             return;
         }
 
@@ -889,7 +887,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         if (tokens[0].equals("relic")) {
             try {
-                if(tokens.length >= 2) {
+                if(tokens.length == 2) {
                     int in = Integer.parseInt(tokens[1]);
                     if(in >= 0 && in < AbstractDungeon.player.relics.size()){
 
@@ -903,6 +901,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
                         inspect.setText(inspectBlight(b));
 
+                    }
+                }else if(TextTheSpire.replayTheSpire && tokens.length == 3 && tokens[2].equals("a")){
+                    int in = Integer.parseInt(tokens[1]);
+                    if(in >= 0 && in < AbstractDungeon.player.relics.size()){
+                        AbstractRelic r = AbstractDungeon.player.relics.get(in);
+                        if(r instanceof ClickableRelic){
+                            ((ClickableRelic) r).onRightClick();
+                        }
                     }
                 }
                 return;

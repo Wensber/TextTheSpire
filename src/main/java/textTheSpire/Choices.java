@@ -836,6 +836,7 @@ public class Choices extends AbstractWindow{
         input = input.replace("#p", "");
         input = input.replace("~", "");
         input = input.replace("@", "");
+        input = input.replace("[#2aecd7]", "");
         input = input.replace("NL", "\r\n");
         return input;
     }
