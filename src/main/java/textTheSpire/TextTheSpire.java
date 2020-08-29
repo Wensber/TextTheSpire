@@ -902,7 +902,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         inspect.setText(inspectBlight(b));
 
                     }
-                }else if(TextTheSpire.replayTheSpire && tokens.length == 3 && tokens[2].equals("a")){
+                }else if(TextTheSpire.stslib && tokens.length == 3 && tokens[2].equals("a")){
                     int in = Integer.parseInt(tokens[1]);
                     if(in >= 0 && in < AbstractDungeon.player.relics.size()){
                         AbstractRelic r = AbstractDungeon.player.relics.get(in);
@@ -1299,7 +1299,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Exhaustive - Exhausts after that many uses.\r\n");
             s.append("Refund - Returns an amount of energy on use.\r\n");
             s.append("New Mechanics\r\n");
-            s.append("Clickable Relics. Use the format \"relic [index] u\" to use a clickable relic\r\n");
+            s.append("Clickable Relics. Use the format \"relic [index] a\" to use a clickable relic\r\n");
         }
         if(replayTheSpire){
             s.append("Replay the Spire\r\nNew Keywords:\r\n");
@@ -1314,8 +1314,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Necrotic Poison - Deals double damage and is reduced by half each turn rounding down. Normal poison does not count down while Necrotic is applied.\r\n");
             s.append("Shielding - A type of block that does not wear off between rounds.\r\n");
             s.append("Temporary HP - Max HP that is removed at end of combat.\r\n");
-            s.append("New Boss Mechanics\r\n");
+            s.append("New Mechanics\r\n");
             s.append("The boss Fading Forest uses events during combat. Between turns check the Event and Choices windows to proceed.\r\n");
+            s.append("The shop can include 2 for 1 sales which will be noted after the name in the shop.\r\n");
         }
         return s.toString();
     }
