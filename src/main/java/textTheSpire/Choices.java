@@ -83,6 +83,8 @@ public class Choices extends AbstractWindow{
     SimpleDateFormat dateFormat;
     boolean setFormat;
 
+    public static int doubleIndex;
+
     public boolean includeGold;
     public boolean includeHealth;
     public boolean includeCard;
@@ -104,6 +106,8 @@ public class Choices extends AbstractWindow{
         isVisible = true;
         window = new Window(display,"Choices", 300, 400);
 
+        doubleIndex = -1;
+
         includeGold = true;
         includeHealth = true;
         includeCard = true;
@@ -123,6 +127,8 @@ public class Choices extends AbstractWindow{
             Display.getDefault().dispose();
             Gdx.app.exit();
         }
+
+        doubleIndex = -1;
 
         if(!setFormat && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.runHistoryScreen != null){
             if (Settings.language == Settings.GameLanguage.JPN) {
@@ -760,10 +766,12 @@ public class Choices extends AbstractWindow{
             if (item instanceof String) {
                 choices.add((String) item);
             } else if (item instanceof AbstractCard) {
-                if(TextTheSpire.replayTheSpire && ((AbstractCard) item).equals(ReplayShopInitCardsPatch.doubleCard))
+                if(TextTheSpire.replayTheSpire && ((AbstractCard) item).equals(ReplayShopInitCardsPatch.doubleCard)) {
                     choices.add(((AbstractCard) item).name.toLowerCase() + "-" + ((AbstractCard) item).price + " Two for One");
-                else
+                    doubleIndex = choices.size() - 1;
+                }else {
                     choices.add(((AbstractCard) item).name.toLowerCase() + "-" + ((AbstractCard) item).price);
+                }
             } else if (item instanceof StoreRelic) {
                 choices.add(((StoreRelic)item).relic.name + "-" + ((StoreRelic) item).price);
             } else if (item instanceof StorePotion) {
