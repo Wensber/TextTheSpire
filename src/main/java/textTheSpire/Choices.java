@@ -561,33 +561,9 @@ public class Choices extends AbstractWindow{
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN) {
 
-                    if(!TextTheSpire.replayTheSpire) {
-                        for (String c : priceShopScreenChoices()) {
-                            s.append(count).append(":").append(c).append("\r\n");
-                            count++;
-                        }
-                    }else{
-                        ArrayList<String> choices = new ArrayList<>();
-                        ArrayList<Object> shopItems = getAvailableShopItems();
-                        for (Object item : shopItems) {
-                            if (item instanceof String) {
-                                choices.add((String) item);
-                            } else if (item instanceof AbstractCard) {
-                                if(item.equals(ReplayShopInitCardsPatch.doubleCard)) {
-                                    choices.add(((AbstractCard) item).name.toLowerCase() + " Two for One");
-                                }else{
-                                    choices.add(((AbstractCard) item).name.toLowerCase());
-                                }
-                            } else if (item instanceof StoreRelic) {
-                                choices.add(((StoreRelic)item).relic.name);
-                            } else if (item instanceof StorePotion) {
-                                choices.add(((StorePotion)item).potion.name);
-                            }
-                        }
-                        for (String c : choices) {
-                            s.append(count).append(":").append(c).append("\r\n");
-                            count++;
-                        }
+                    for (String c : priceShopScreenChoices()) {
+                        s.append(count).append(":").append(c).append("\r\n");
+                        count++;
                     }
 
                 }else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
@@ -784,7 +760,10 @@ public class Choices extends AbstractWindow{
             if (item instanceof String) {
                 choices.add((String) item);
             } else if (item instanceof AbstractCard) {
-                choices.add(((AbstractCard) item).name.toLowerCase() + "-" + ((AbstractCard) item).price);
+                if(TextTheSpire.replayTheSpire && ((AbstractCard) item).equals(ReplayShopInitCardsPatch.doubleCard))
+                    choices.add(((AbstractCard) item).name.toLowerCase() + "-" + ((AbstractCard) item).price + " Two for One");
+                else
+                    choices.add(((AbstractCard) item).name.toLowerCase() + "-" + ((AbstractCard) item).price);
             } else if (item instanceof StoreRelic) {
                 choices.add(((StoreRelic)item).relic.name + "-" + ((StoreRelic) item).price);
             } else if (item instanceof StorePotion) {
