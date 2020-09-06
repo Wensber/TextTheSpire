@@ -1396,6 +1396,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     "\r\nhelp start" +
                     "\r\nAll commands are input in the prompt window." +
                     "\r\ntutorial" +
+                    "\r\nascension" +
                     "\r\nstart" +
                     "\r\nabandon" +
                     "\r\ncontinue" +
@@ -1439,6 +1440,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             switch(tokens[1].toLowerCase()){
                 case "tutorial":
                     return  getTutorial();
+                case "ascension":
+                    return  "\r\nascension" +
+                            "\r\nThis command lists all the ascension modifiers.";
                 case "start":
                 case "abandon":
                 case "continue":
