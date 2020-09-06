@@ -237,11 +237,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
-        if(input.equals("test")){
-            AbstractDungeon.player.relics.add(new WaxSeal());
-            return;
-        }
-
         if(choice.screen != Choices.HistoryScreen.NONE){
             parseHistoryCommand(tokens);
             return;
