@@ -656,9 +656,9 @@ public class Choices extends AbstractWindow{
 
                     s.append(p.name().toLowerCase()).append(" ");
 
-                    if (TextTheSpire.characterUnlocked(p.name().toLowerCase()))
-                        s.append(TextTheSpire.ascensionLevel(p.name().toLowerCase())).append("\r\n");
-                    else
+                    if (TextTheSpire.characterUnlocked(p.name().toLowerCase())) {
+                        s.append(TextTheSpire.ascensionLevel(p)).append("\r\n");
+                    }else
                         s.append("locked\r\n");
 
                 }

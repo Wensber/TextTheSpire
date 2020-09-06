@@ -32,6 +32,7 @@ import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
 import com.megacrit.cardcrawl.powers.AbstractPower;
+import com.megacrit.cardcrawl.random.Random;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
@@ -65,6 +66,8 @@ import com.megacrit.cardcrawl.ui.panels.DeleteSaveConfirmPopup;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
+import communicationmod.GameStateListener;
+import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
 import communicationmod.patches.ShopScreenPatch;
 import org.eclipse.swt.widgets.Display;
@@ -87,6 +90,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     public static boolean replayTheSpire;
     public static boolean stslib;
+    public static int maxAsc;
+    public static boolean ascensionReborn;
 
     private Hand hand;
     private Map map;
@@ -126,6 +131,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         replayTheSpire = Loader.isModLoaded("ReplayTheSpireMod");
         stslib = Loader.isModLoaded("stslib");
+        ascensionReborn = Loader.isModLoaded("ascensionmod");
+        if(ascensionReborn)
+            maxAsc = 25;
+        else
+            maxAsc = 20;
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -242,16 +252,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
-        if(input.equals("tutorial")){
-            inspect.setText(getTutorial());
-            return;
-        }
-
-        if(input.equals("mod")){
-            inspect.setText(modNotes());
-            return;
-        }
-
         switch(input){
             case "deck":
                 inspect.setText(deck.getText());
@@ -285,6 +285,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 return;
             case "log":
                 inspect.setText(logs.getText());
+                return;
+            case "tutorial":
+                inspect.setText(getTutorial());
+                return;
+            case "mod":
+                inspect.setText(modNotes());
+                return;
+            case "ascension":
+                inspect.setText(ascensionNotes());
                 return;
         }
 
@@ -812,7 +821,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         if (tokens[0].equals("start") && CardCrawlGame.mainMenuScreen != null && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-1).result == MenuButton.ClickResult.PLAY) {
             try {
                 if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && isUnlocked(tokens))
-                    CommandExecutor.executeCommand(input);
+                    if(!ascensionReborn)
+                        CommandExecutor.executeCommand(input);
+                    else
+                        ascensionRebornStart(tokens);
                 return;
             } catch (Exception e) {
                 return;
@@ -1080,12 +1092,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         }
     }
 
-    /*
-    private static void executeStartCommand(String[] tokens){
+    private static void ascensionRebornStart(String[] tokens) throws InvalidCommandException {
         if (tokens.length < 2) {
-            return;
+            throw new InvalidCommandException(tokens, InvalidCommandException.InvalidCommandFormat.MISSING_ARGUMENT);
         }
         int ascensionLevel = 0;
+        boolean seedSet = false;
+        long seed = 0;
         AbstractPlayer.PlayerClass selectedClass = null;
         for(AbstractPlayer.PlayerClass playerClass : AbstractPlayer.PlayerClass.values()) {
             if(playerClass.name().equalsIgnoreCase(tokens[1])) {
@@ -1097,23 +1110,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             selectedClass = AbstractPlayer.PlayerClass.THE_SILENT;
         }
         if(selectedClass == null) {
-            return;
+            throw new InvalidCommandException(tokens, InvalidCommandException.InvalidCommandFormat.INVALID_ARGUMENT, tokens[1]);
         }
         if(tokens.length >= 3) {
             try {
                 ascensionLevel = Integer.parseInt(tokens[2]);
             } catch (NumberFormatException e) {
-                return;
+                throw new InvalidCommandException(tokens, InvalidCommandException.InvalidCommandFormat.INVALID_ARGUMENT, tokens[2]);
             }
-            if(ascensionLevel < 0 || ascensionLevel > 20) {
-                return;
+            if(ascensionLevel < -20 || ascensionLevel > 25) {
+                throw new InvalidCommandException(tokens, InvalidCommandException.InvalidCommandFormat.OUT_OF_BOUNDS, tokens[2]);
             }
         }
-
-        Settings.seed = SeedHelper.generateUnoffensiveSeed(new Random(System.nanoTime()));;
-        Settings.seedSet = false;
-        Settings.isTrial = false;
-        Settings.isDailyRun = false;
+        if(tokens.length >= 4) {
+            String seedString = tokens[3].toUpperCase();
+            if(!seedString.matches("^[A-Z0-9]+$")) {
+                throw new InvalidCommandException(tokens, InvalidCommandException.InvalidCommandFormat.INVALID_ARGUMENT, seedString);
+            }
+            seedSet = true;
+            seed = SeedHelper.getLong(seedString);
+            boolean isTrialSeed = TrialHelper.isTrialSeed(seedString);
+            if (isTrialSeed) {
+                Settings.specialSeed = seed;
+                Settings.isTrial = true;
+                seedSet = false;
+            }
+        }
+        if(!seedSet) {
+            seed = SeedHelper.generateUnoffensiveSeed(new Random(System.nanoTime()));
+        }
+        Settings.seed = seed;
+        Settings.seedSet = seedSet;
         AbstractDungeon.generateSeeds();
         AbstractDungeon.ascensionLevel = ascensionLevel;
         AbstractDungeon.isAscensionMode = ascensionLevel > 0;
@@ -1124,7 +1151,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         manager.setChosenCharacter(selectedClass);
         CardCrawlGame.chosenCharacter = selectedClass;
         GameStateListener.resetStateVariables();
-    }*/
+    }
 
     public void executeChoice(String[] tokens){
 
@@ -1269,6 +1296,63 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     }
 
+    public String ascensionNotes(){
+        StringBuilder s = new StringBuilder("\r\n");
+        s.append("Ascension Modifiers\r\nAscension levels include all modifiers from it to 0.\r\n");
+        if(ascensionReborn){
+            s.append(   "25: Choose a blight before every boss relic.\r\n" +
+                        "24: Ascender's bane is no longer ethereal.\r\n" +
+                        "23: Healing is less effective.\r\n" +
+                        "22: Some of your gold is eaten (You'll see, trust me).\r\n" +
+                        "21: Merchant's card removal now costs more.\r\n" );
+        }
+        s.append(   "20: Double boss. (Fight 2 bosses at the end of Act 3.)\r\n" +
+                    "19: Boss enemies have more challenging movesets and abilities.\r\n" +
+                    "18: Elite enemies have more challenging movesets and abilities.\r\n" +
+                    "17: Normal enemies have more challenging movesets and abilities.\r\n" +
+                    "16: Shops are more costly. (10% more)\r\n" +
+                    "15: Unfavorable events.\r\n" +
+                    "14: Lower max HP. (-5 for Ironclad, -4 for Silent, Defect, and Watcher)\r\n" +
+                    "13: Bosses drop less gold. (25% less)\r\n" +
+                    "12: Upgraded cards appear less often. (50% less)\r\n" +
+                    "11: Start each run with 1 less potion slot.\r\n" +
+                    "10: Start each run cursed. (Ascender's Bane)\r\n" +
+                    "9: Bosses are tougher.\r\n" +
+                    "8: Elites are tougher.\r\n" +
+                    "7: Normal enemies are tougher.\r\n" +
+                    "6: Start each run damaged (-10% health)\r\n" +
+                    "5: Heal less after Boss battles (75% of missing health)\r\n" +
+                    "4: Bosses are deadlier.\r\n" +
+                    "3: Elites are deadlier.\r\n" +
+                    "2: Normal enemies are deadlier.\r\n" +
+                    "1: Elites spawn more often.\r\n" +
+                    "0: No Modifiers.\r\n");
+        if(ascensionReborn){
+            s.append(   "-1: Normal enemies are less deadly.\r\n" +
+                        "-2: Elites are less deadly.\r\n" +
+                        "-3: Bosses are less deadly.\r\n" +
+                        "-4: Normal enemies are less tough.\r\n" +
+                        "-5: Elites are less tough.\r\n" +
+                        "-6: Bosses are less tough.\r\n" +
+                        "-7: Upgraded cards appear more often.\r\n" +
+                        "-8: Richer bosses.\r\n" +
+                        "-9: Higher Max HP.\r\n" +
+                        "-10: Shops cost less.\r\n" +
+                        "-11: Gain Max HP when you defeat a boss.\r\n" +
+                        "-12: You gain more gold.\r\n" +
+                        "-13: Healing is more effective.\r\n" +
+                        "-14: Normal enemies now have chance to drop a relic.\r\n" +
+                        "-15: Elites now drop 1 more card.\r\n" +
+                        "-16: Bosses now drop a rare relic.\r\n" +
+                        "-17: All combat rewards now contain additional potion.\r\n" +
+                        "-18: Start each combat with one extra max energy.\r\n" +
+                        "-19: Draw one more card each turn.\r\n" +
+                        "-20: All starting cards are upgraded; all non-boss chests contain an extra relic.\r\n");
+        }
+
+        return s.toString();
+    }
+
     public String modNotes(){
         StringBuilder s = new StringBuilder("\r\n");
         if(stslib){
@@ -1294,6 +1378,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("New Mechanics\r\n");
             s.append("The boss Fading Forest uses events during combat. Between turns check the Event and Choices windows to proceed.\r\n");
             s.append("The shop can include 2 for 1 sales which will be noted after the name in the shop.\r\n");
+        }
+        if(ascensionReborn){
+            s.append("Ascension Reborn\r\n");
+            s.append("This adds new ascension levels from -20 to 25.\r\n");
+            s.append("Check what ascension levels do with the command ascension.\r\n");
         }
         return s.toString();
     }
@@ -2336,45 +2425,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     }
 
-    public static int ascensionLevel(String p){
+    public static int ascensionLevel(AbstractPlayer.PlayerClass p){
 
-        int asc;
-
-        switch(p){
-            case "ironclad" :
-                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.IRONCLAD).getPrefs().getInteger("ASCENSION_LEVEL", 1);
-                if(asc == 21)
-                    return 20;
-                return asc;
-            case "the_silent" :
-            case "silent" :
-                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.THE_SILENT).getPrefs().getInteger("ASCENSION_LEVEL", 1);
-                if(asc == 21)
-                    return 20;
-                return asc;
-            case "defect" :
-                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.DEFECT).getPrefs().getInteger("ASCENSION_LEVEL", 1);
-                if(asc == 21)
-                    return 20;
-                return asc;
-            case "watcher" :
-                asc = CardCrawlGame.characterManager.getCharacter(AbstractPlayer.PlayerClass.WATCHER).getPrefs().getInteger("ASCENSION_LEVEL", 1);
-                if(asc == 21)
-                    return 20;
-                return asc;
-            default:
-                return 20;
-        }
-
+        int asc = CardCrawlGame.characterManager.getCharacter(p).getPrefs().getInteger("ASCENSION_LEVEL", 1);
+        if(asc > maxAsc)
+            return maxAsc;
+        return asc;
     }
 
     public boolean isUnlocked(String[] tokens){
 
-        String p = tokens[1].toLowerCase();
+        String character = tokens[1].toLowerCase();
+        AbstractPlayer.PlayerClass pClass = null;
 
-        if(characterUnlocked(p)){
+        for (AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()) {
+            if(character.equals(p.name().toLowerCase())) {
+                pClass = p;
+                break;
+            }
+        }
+        if(pClass == null)
+            return false;
+
+        if(characterUnlocked(character)){
             try{
-                if(tokens.length == 2 || Integer.parseInt(tokens[2]) <= ascensionLevel(p))
+                if(tokens.length == 2 || Integer.parseInt(tokens[2]) <= ascensionLevel(pClass))
                     return true;
             }catch (Exception ignored){
             }

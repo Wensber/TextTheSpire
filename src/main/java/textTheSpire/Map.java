@@ -126,6 +126,8 @@ public class Map extends AbstractWindow{
         A String representing the type of node n is
      */
      public static String nodeType(MapRoomNode n){
+         if(n.getRoom() == null)
+             return "null";
         if(n.getRoom() instanceof MonsterRoomElite){
             if(n.hasEmeraldKey)
                 return "Emerald Key ";
