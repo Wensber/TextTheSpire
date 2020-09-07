@@ -90,8 +90,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     public static boolean replayTheSpire;
     public static boolean stslib;
-    public static int maxAsc;
     public static boolean ascensionReborn;
+    public static int maxAsc;
+    public static boolean beaked;
 
     private Hand hand;
     private Map map;
@@ -136,6 +137,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             maxAsc = 25;
         else
             maxAsc = 20;
+        beaked = Loader.isModLoaded("beakedthecultist-sts");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -2378,20 +2380,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         s = s.replace("NL", " ");
 
-        if(c.magicNumber <= 0)
+        if(AbstractDungeon.getCurrRoom().phase != AbstractRoom.RoomPhase.COMBAT) {
             s = s.replace("!M!", "" + c.baseMagicNumber);
-        else
-            s = s.replace("!M!", "" + c.magicNumber);
-
-        if(c.damage < 0)
             s = s.replace("!D!", "" + c.baseDamage);
-        else
-            s = s.replace("!D!", "" + c.damage);
-
-        if(c.block < 0)
             s = s.replace("!B!", "" + c.baseBlock);
-        else
+        } else {
+            s = s.replace("!D!", "" + c.damage);
             s = s.replace("!B!", "" + c.block);
+            if(c.magicNumber <= 0){
+                s = s.replace("!M!", "" + c.baseMagicNumber);
+            }else{
+                s = s.replace("!M!", "" + c.magicNumber);
+            }
+        }
 
         if(stslib){
             if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
@@ -2401,7 +2402,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 s = s.replace("!stslib:ex!", "" + (Integer) ExhaustiveField.ExhaustiveFields.baseExhaustive.get(c));
                 s = s.replace("!stslib:refund!", "" + (Integer) RefundFields.baseRefund.get(c));
             }
-            System.out.println("stslib");
+        }
+        if(beaked){
+            s = s.replace("!beaked:wI!", "" + c.misc);
+            s = s.replace("!beaked:I!", "" + c.misc);
+            if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
+                s = s.replace("!beaked:B+M!", "" + c.block + c.magicNumber);
+                s = s.replace("!beaked:wD!", "" + c.damage);
+                s = s.replace("!beaked:wB!", "" + c.block);
+            }else{
+                s = s.replace("!beaked:B+M!", "" + c.baseBlock + c.baseMagicNumber);
+                s = s.replace("!beaked:wD!", "" + c.baseDamage);
+                s = s.replace("!beaked:wB!", "" + c.baseBlock);
+            }
         }
 
         return s;
