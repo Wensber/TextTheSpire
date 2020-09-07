@@ -2439,6 +2439,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     public static int ascensionLevel(AbstractPlayer.PlayerClass p){
 
+        if(CardCrawlGame.characterManager.getCharacter(p) == null || CardCrawlGame.characterManager.getCharacter(p).getPrefs() == null){
+            return maxAsc;
+        }
+
         int asc = CardCrawlGame.characterManager.getCharacter(p).getPrefs().getInteger("ASCENSION_LEVEL", 1);
         if(asc > maxAsc)
             return maxAsc;
