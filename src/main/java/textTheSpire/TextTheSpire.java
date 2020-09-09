@@ -2460,6 +2460,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 break;
             }
         }
+        if(character.equals("silent"))
+            pClass = AbstractPlayer.PlayerClass.THE_SILENT;
         if(pClass == null)
             return false;
 
