@@ -1140,7 +1140,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         Settings.seedSet = seedSet;
         AbstractDungeon.generateSeeds();
         AbstractDungeon.ascensionLevel = ascensionLevel;
-        AbstractDungeon.isAscensionMode = ascensionLevel > 0;
+        AbstractDungeon.isAscensionMode = ascensionLevel != 0;
         CardCrawlGame.startOver = true;
         CardCrawlGame.mainMenuScreen.isFadingOut = true;
         CardCrawlGame.mainMenuScreen.fadeOutMusic();
