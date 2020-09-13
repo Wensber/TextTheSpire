@@ -1,5 +1,8 @@
 package textTheSpire;
 
+import ascensionMod.AscensionMod;
+import ascensionMod.UI.AscModScreen;
+import ascensionMod.UI.CharSelectScreenUI;
 import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.cards.AbstractCard;
@@ -687,6 +690,7 @@ public class Choices extends AbstractWindow{
                 }
                 s.append("back\r\n");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
+                s.append("Input character name to select.\r\nasc to toggle ascension.\r\nasc [number] to set ascension level.\r\nIf that fails you can use + and - to manually change ascension level.\r\n");
                 s.append("back\r\n");
                 for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
                     s.append(co.c.getClass().getSimpleName().toLowerCase());
@@ -706,9 +710,22 @@ public class Choices extends AbstractWindow{
                         s.append(CardCrawlGame.mainMenuScreen.charSelectScreen.ascensionLevel).append("\r\n");
                     else
                         s.append("off\r\n");
+                    if(TextTheSpire.ascensionReborn){
+                        s.append("c_asc ").append(AscensionMod.customAscensionRun).append("\r\n");
+                        if(AscensionMod.customAscensionRun){
+                            s.append("open\r\n");
+                        }
+                    }
                     s.append("embark\r\n");
                 }
-
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
+                s.append("Custom Ascension Screen\r\nback\r\nInput number to toggle ascension.\r\nUse ascension command to check what the modifiers do.\r\n");
+                for(int i=CharSelectScreenUI.ascScreen.posAscButtons.size()-1; i>=0; i--){
+                    s.append((i+1)).append(" : ").append(CharSelectScreenUI.ascScreen.posAscButtons.get(i).toggledOn).append("\r\n");
+                }
+                for(int i=0; i<CharSelectScreenUI.ascScreen.negAscButtons.size(); i++){
+                    s.append(((i*-1)-1)).append(" : ").append(CharSelectScreenUI.ascScreen.negAscButtons.get(i).toggledOn).append("\r\n");
+                }
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
                 s.append("embark\r\nback\r\n");
                 if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){

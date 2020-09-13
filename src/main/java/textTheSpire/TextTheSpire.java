@@ -1,5 +1,9 @@
 package textTheSpire;
 
+import ascensionMod.AscensionMod;
+import ascensionMod.UI.AscModScreen;
+import ascensionMod.UI.CharSelectScreenUI;
+import ascensionMod.UI.buttons.AscButton;
 import basemod.ReflectionHacks;
 import basemod.interfaces.*;
 import com.badlogic.gdx.Gdx;
@@ -613,6 +617,44 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascLeftHb");
                 hb.clicked = true;
                 return;
+            }
+            if(ascensionReborn){
+                if(input.equals("c_asc") && ready){
+                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "customAscensionModeHb");
+                    hb.clicked = true;
+                    return;
+                }
+                if(input.equals("open") && ready && AscensionMod.customAscensionRun){
+                    AscButton ascb = (AscButton) basemod.ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "openAscMenuButton");
+                    ascb.pressed = true;
+                    return;
+                }
+            }
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
+            if(input.equals("back")){
+                MenuCancelButton mcb = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CharSelectScreenUI.ascScreen, AscModScreen.class, "button");
+                mcb.hb.clicked = true;
+                return;
+            }
+            try{
+                int in = Integer.parseInt(input);
+                if(in > 0){
+                    in = in - 1;
+                    if(in < CharSelectScreenUI.ascScreen.posAscButtons.size()){
+                        CharSelectScreenUI.ascScreen.posAscButtons.get(in).toggledOn = !CharSelectScreenUI.ascScreen.posAscButtons.get(in).toggledOn;
+                        return;
+                    }
+                }
+                if(in < 0){
+                    in = Math.abs(in) - 1;
+                    if(in < CharSelectScreenUI.ascScreen.negAscButtons.size()){
+                        CharSelectScreenUI.ascScreen.negAscButtons.get(in).toggledOn = !CharSelectScreenUI.ascScreen.negAscButtons.get(in).toggledOn;
+                        return;
+                    }
+                }
+            }catch (Exception ignored){
             }
         }
 
