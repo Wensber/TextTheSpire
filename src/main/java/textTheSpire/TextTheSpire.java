@@ -37,6 +37,8 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
 import com.megacrit.cardcrawl.rooms.*;
+import com.megacrit.cardcrawl.screens.charSelect.CharacterOption;
+import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.custom.CustomMod;
 import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.FilterButton;
@@ -63,6 +65,7 @@ import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
 import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
 import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
 import com.megacrit.cardcrawl.ui.panels.DeleteSaveConfirmPopup;
+import com.megacrit.cardcrawl.ui.panels.SeedPanel;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
@@ -77,6 +80,7 @@ import javax.smartcardio.Card;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 
 @SpireInitializer
@@ -457,7 +461,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
                 }catch(Exception ignored){
                 }
-            }else if(tokens.length == 2 && tokens[1] == "ambience"){
+            }else if(tokens.length == 2 && tokens[1].equals("ambience")){
                 Settings.soundPref.putBoolean("Ambience On", !Settings.AMBIANCE_ON);
                 Settings.soundPref.flush();
                 Settings.AMBIANCE_ON = !Settings.AMBIANCE_ON;
@@ -493,11 +497,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         }
 
-        if(CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN && input.equals("abandon")){
-            CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).hb.clicked = true;
-            return;
-        }
-
         if(input.equals("quit")){
             if(CommandExecutor.isInDungeon()) {
                 CardCrawlGame.music.fadeAll();
@@ -518,6 +517,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN && input.equals("abandon")){
+            CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).hb.clicked = true;
+            return;
+        }
+
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.ABANDON_CONFIRM){
             if(input.equals("yes")){
                 CardCrawlGame.mainMenuScreen.abandonPopup.yesHb.clicked = true;
@@ -526,6 +530,95 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 CardCrawlGame.mainMenuScreen.abandonPopup.noHb.clicked = true;
                 return;
             }
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && !CommandExecutor.isInDungeon() && CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-1).result == MenuButton.ClickResult.PLAY && input.equals("play")){
+            CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-1).hb.clicked = true;
+            return;
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PANEL_MENU){
+            if(input.equals("standard")){
+                CardCrawlGame.mainMenuScreen.panelScreen.panels.get(0).hb.clicked = true;
+                return;
+            } else if (input.equals("daily") && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
+                CardCrawlGame.mainMenuScreen.panelScreen.panels.get(1).hb.clicked = true;
+                return;
+            } else if (input.equals("custom") && StatsScreen.all.highestDaily > 0){
+                CardCrawlGame.mainMenuScreen.panelScreen.panels.get(2).hb.clicked = true;
+                return;
+            } else if (input.equals("back")){
+                CardCrawlGame.mainMenuScreen.panelScreen.button.hb.clicked = true;
+                return;
+            }
+        }
+
+        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
+            for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
+                if(input.equals(co.c.getClass().getSimpleName().toLowerCase())){
+                    co.hb.clicked = true;
+                    return;
+                }
+            }
+            if(input.equals("back")){
+                CardCrawlGame.mainMenuScreen.charSelectScreen.cancelButton.hb.clicked = true;
+                return;
+            }
+            if(input.equals("seed")){
+                SeedPanel sp = (SeedPanel) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedPanel");
+                if(sp.shown){
+                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedHb");
+                    hb.clicked = true;
+                    inspect.setText("\r\nGo to main game window, paste the seed, then hit enter.\r\n");
+                    return;
+                }
+            }
+            boolean ready = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "anySelected");
+            boolean asc = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "isAscensionModeUnlocked");
+            if(tokens[0].equals("asc") && ready && asc){
+                if(tokens.length == 1) {
+                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascensionModeHb");
+                    hb.clicked = true;
+                }else{
+                    try{
+                        int in = Integer.parseInt(tokens[1]);
+                        CharacterOption select = null;
+                        for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
+                            if(co.selected)
+                                select = co;
+                        }
+                        if(select == null)
+                            return;
+                        if(in < CardCrawlGame.mainMenuScreen.charSelectScreen.ascensionLevel){
+                            select.decrementAscensionLevel(in);
+                        }
+                        if(in > CardCrawlGame.mainMenuScreen.charSelectScreen.ascensionLevel){
+                            select.incrementAscensionLevel(in);
+                        }
+                    }catch (Exception ignored){
+                    }
+                }
+                return;
+            }
+            if(input.equals("embark") && ready){
+                CardCrawlGame.mainMenuScreen.charSelectScreen.confirmButton.hb.clicked = true;
+                return;
+            }
+            if(input.equals("+") && ready){
+                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascRightHb");
+                hb.clicked = true;
+                return;
+            }
+            if(input.equals("-") && ready){
+                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascLeftHb");
+                hb.clicked = true;
+                return;
+            }
+        }
+
+        if(input.equals("custom")){
+            inspect.setText(custom.getText());
+            return;
         }
 
         AbstractDungeon d = CardCrawlGame.dungeon;
@@ -560,11 +653,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
-        if(input.equals("daily") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && !CardCrawlGame.characterManager.anySaveFileExists() && CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
-            CardCrawlGame.mainMenuScreen.dailyScreen.open();
-            return;
-        }
-
         if(input.equals("leader") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU && DistributorFactory.isLeaderboardEnabled()){
             CardCrawlGame.mainMenuScreen.leaderboardsScreen.open();
             return;
@@ -574,16 +662,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             CardCrawlGame.mainMenuScreen.patchNotesScreen.open();
             return;
         }
-
-        if(input.equals("custom")){
-            if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen != MainMenuScreen.CurScreen.CUSTOM && !CardCrawlGame.characterManager.anySaveFileExists() && StatsScreen.all.highestDaily > 0) {
-                CardCrawlGame.mainMenuScreen.customModeScreen.open();
-            }else{
-                inspect.setText(custom.getText());
-            }
-            return;
-        }
-
 
         if(input.equals("slot") && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU){
             CardCrawlGame.mainMenuScreen.saveSlotScreen.open(CardCrawlGame.playerName);
@@ -659,7 +737,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
 
-            if(input.equals("embark")){
+            if(input.equals("back")){
+                MenuCancelButton c = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "cancelButton");
+                c.hb.clicked = true;
+                return;
+            }else if(input.equals("embark")){
                 ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
                 return;
@@ -696,7 +778,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM && !CommandExecutor.isInDungeon()){
 
-            if(input.equals("embark")){
+            if(input.equals("back")){
+                MenuCancelButton c = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "cancelButton");
+                c.hb.clicked = true;
+                return;
+            }else if(input.equals("embark")){
                 GridSelectConfirmButton c = (GridSelectConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "confirmButton");
                 c.hb.clicked = true;
                 return;
@@ -727,6 +813,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     return;
                 case "seed":
                     Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "seedHb");
+                    inspect.setText("\r\nGo to main game window, paste the seed, then hit enter.\r\n");
                     hb.clicked = true;
                     return;
                 case "mod":

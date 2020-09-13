@@ -14,16 +14,15 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.events.shrines.GremlinWheelGame;
-import com.megacrit.cardcrawl.helpers.Prefs;
-import com.megacrit.cardcrawl.helpers.SaveHelper;
-import com.megacrit.cardcrawl.helpers.SeedHelper;
-import com.megacrit.cardcrawl.helpers.TipTracker;
+import com.megacrit.cardcrawl.helpers.*;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.metrics.Metrics;
 import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.screens.charSelect.CharacterOption;
+import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
@@ -36,6 +35,7 @@ import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
 import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
+import com.megacrit.cardcrawl.ui.panels.SeedPanel;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
@@ -640,12 +640,12 @@ public class Choices extends AbstractWindow{
 
             }
 
-        }else{
+        }else {
 
             //Not in dungeon. Check if save exists. checkedSave so we don't check each time.
-            if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
+            if (CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.MAIN_MENU) {
 
-                if(!disableTips) {
+                if (!disableTips) {
                     TipTracker.disableAllFtues();
                     disableTips = true;
                 }
@@ -658,33 +658,59 @@ public class Choices extends AbstractWindow{
 
                     if (TextTheSpire.characterUnlocked(p.name().toLowerCase())) {
                         s.append(TextTheSpire.ascensionLevel(p)).append("\r\n");
-                    }else
+                    } else
                         s.append("locked\r\n");
 
                 }
 
                 s.append("Commands\r\n");
 
-                if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size()-2).result == MenuButton.ClickResult.ABANDON_RUN) {
+                if (CardCrawlGame.mainMenuScreen.buttons.get(CardCrawlGame.mainMenuScreen.buttons.size() - 2).result == MenuButton.ClickResult.ABANDON_RUN) {
                     s.append("abandon\r\n");
                     s.append("continue\r\n");
                 } else {
-                    s.append("start [class] [ascension] [seed]\r\n");
-                    if(CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()){
-                        s.append("daily\r\n");
-                    }
-                    if(StatsScreen.all.highestDaily > 0){
-                        s.append("custom\r\n");
-                    }
-                    if(DistributorFactory.isLeaderboardEnabled()){
+                    s.append("play\r\n");
+                    if (DistributorFactory.isLeaderboardEnabled()) {
                         s.append("leader\r\n");
                     }
                 }
 
                 s.append("history\r\nslot\r\npatch\r\nquit");
 
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PANEL_MENU){
+                s.append("standard\r\n");
+                if (CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()) {
+                    s.append("daily\r\n");
+                }
+                if (StatsScreen.all.highestDaily > 0) {
+                    s.append("custom\r\n");
+                }
+                s.append("back\r\n");
+            }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
+                s.append("back\r\n");
+                for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
+                    s.append(co.c.getClass().getSimpleName().toLowerCase());
+                    if(co.selected)
+                        s.append(" Selected");
+                    s.append("\r\n");
+                }
+                SeedPanel sp = (SeedPanel) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedPanel");
+                if(sp.shown){
+                    s.append("seed\r\n");
+                }
+                boolean ready = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "anySelected");
+                boolean asc = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "isAscensionModeUnlocked");
+                if(asc && ready){
+                    s.append("asc ");
+                    if(CardCrawlGame.mainMenuScreen.charSelectScreen.isAscensionMode)
+                        s.append(CardCrawlGame.mainMenuScreen.charSelectScreen.ascensionLevel).append("\r\n");
+                    else
+                        s.append("off\r\n");
+                    s.append("embark\r\n");
+                }
+
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
-                s.append("embark\r\n");
+                s.append("embark\r\nback\r\n");
                 if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
                     long day = (long)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
                     s.append("Daily Leaderboard ").append(TimeHelper.getDate(day)).append("\r\n");
