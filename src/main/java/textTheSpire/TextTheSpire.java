@@ -632,7 +632,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             }
         }
 
-        if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
+        if(ascensionReborn && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
             if(input.equals("back")){
                 MenuCancelButton mcb = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CharSelectScreenUI.ascScreen, AscModScreen.class, "button");
                 mcb.hb.clicked = true;
