@@ -48,6 +48,7 @@ import conspire.events.MimicChestEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
+import shopmod.relics.MerchantsRug;
 
 import javax.smartcardio.Card;
 import java.text.ParseException;
@@ -579,6 +580,9 @@ public class Choices extends AbstractWindow{
                     for (String c : priceShopScreenChoices()) {
                         s.append(count).append(":").append(c).append("\r\n");
                         count++;
+                    }
+                    if(TextTheSpire.shopMod && MerchantsRug.forSale && AbstractDungeon.player.gold >= MerchantsRug.price){
+                        s.append("rug:MerchantsRug.price");
                     }
 
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){

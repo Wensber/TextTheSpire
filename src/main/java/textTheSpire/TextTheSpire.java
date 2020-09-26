@@ -78,6 +78,7 @@ import communicationmod.patches.ShopScreenPatch;
 import conspire.events.MimicChestEvent;
 import org.eclipse.swt.widgets.Display;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
+import shopmod.relics.MerchantsRug;
 
 import javax.smartcardio.Card;
 import javax.swing.*;
@@ -101,6 +102,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static int maxAsc;
     public static boolean beaked;
     public static boolean conspire;
+    public static boolean shopMod;
 
     private Hand hand;
     private Map map;
@@ -147,6 +149,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             maxAsc = 20;
         beaked = Loader.isModLoaded("beakedthecultist-sts");
         conspire = Loader.isModLoaded("conspire");
+        shopMod = Loader.isModLoaded("ShopMod");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -985,11 +988,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     if(in >= 0 && in < AbstractDungeon.player.potions.size()) {
                         AbstractPotion p = AbstractDungeon.player.potions.get(in);
 
-                        inspect.setText(inspectPotion(p));
+                        inspect.setText(inspectPotion(p, in));
 
                     }
                     return;
-                }else {
+                } else if(shopMod && MerchantsRug.isSelling() && tokens.length == 3 && tokens[1].equals("sell")){
+                    int in =Integer.parseInt(tokens[2]);
+                    if(in >= 0 && in < AbstractDungeon.player.potions.size()){
+                        AbstractPotion p = AbstractDungeon.player.potions.get(in);
+                        MerchantsRug.sell(in, p);
+                    }
+                } else {
                     StringBuilder command = new StringBuilder("potion ");
                     switch(tokens[1]){
                         case "use":
@@ -1048,6 +1057,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         if(r instanceof ClickableRelic){
                             ((ClickableRelic) r).onRightClick();
                         }
+                    }
+                }else if(TextTheSpire.shopMod && MerchantsRug.isSelling() && tokens.length == 3 && tokens[2].equals("sell")){
+                    int in = Integer.parseInt(tokens[1]);
+                    if(in >= 0 && in < AbstractDungeon.player.relics.size()){
+                        AbstractRelic r = AbstractDungeon.player.relics.get(in);
+                        MerchantsRug.sell(r);
                     }
                 }
                 return;
@@ -1187,10 +1202,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 chest.isOpen = true;
                 chest.open(false);
             }
+        } else if(conspire && AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getCurrRoom().event instanceof MimicChestEvent) {
+            if (input.equals("1")) {
+
+                (AbstractDungeon.getCurrRoom()).phase = AbstractRoom.RoomPhase.INCOMPLETE;
+                ReflectionHacks.setPrivate(AbstractDungeon.getCurrRoom().event, MimicChestEvent.class, "inFight", true);
+                if (Settings.isDailyRun) {
+                    AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(30));
+                } else {
+                    AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(25, 35));
+                }
+                AbstractDungeon.getCurrRoom().addRelicToRewards(AbstractDungeon.returnRandomRelicTier());
+                (AbstractDungeon.getCurrRoom()).monsters = MonsterHelper.getEncounter("conspire:MimicChest");
+                AbstractDungeon.getCurrRoom().event.enterCombat();
+                AbstractDungeon.lastCombatMetricKey = "conspire:MimicChest";
+            } else if (input.equals("proceed")) {
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(AbstractDungeon.overlayMenu.proceedButton, ProceedButton.class, "hb");
+                hb.clicked = true;
+            }
+        } else if(shopMod && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN && MerchantsRug.forSale && input.equals("rug")){
+            MerchantsRug.rugHb.clicked = true;
         } else {
             //Everything else is a choice screen command. Only a number is needed.
             int in;
             try {
+
                 in = Integer.parseInt(input) - 1;
 
                 if(AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getCurrRoom().event instanceof GremlinMatchGame){
@@ -1204,29 +1240,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
                     if(choiceList.size() > in){
                         inspect.setText("Goblin Match Card\r\nPosition " + GremlinMatchGamePatch.cardPositions.get(choiceList.get(in).uuid) + "\r\n" + inspectCard(choiceList.get(in)));
-                    }
-                }
-
-                if(conspire && AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getCurrRoom().event instanceof MimicChestEvent) {
-                    if (input.equals("1")) {
-
-                        (AbstractDungeon.getCurrRoom()).phase = AbstractRoom.RoomPhase.INCOMPLETE;
-                        ReflectionHacks.setPrivate(AbstractDungeon.getCurrRoom().event, MimicChestEvent.class, "inFight", true);
-                        if (Settings.isDailyRun) {
-                            AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(30));
-                        } else {
-                            AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(25, 35));
-                        }
-                        AbstractDungeon.getCurrRoom().addRelicToRewards(AbstractDungeon.returnRandomRelicTier());
-                        (AbstractDungeon.getCurrRoom()).monsters = MonsterHelper.getEncounter("conspire:MimicChest");
-                        AbstractDungeon.getCurrRoom().event.enterCombat();
-                        AbstractDungeon.lastCombatMetricKey = "conspire:MimicChest";
-
-                        return;
-                    } else if (input.equals("proceed")) {
-                        Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(AbstractDungeon.overlayMenu.proceedButton, ProceedButton.class, "hb");
-                        hb.clicked = true;
-                        return;
                     }
                 }
 
@@ -1533,6 +1546,15 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Ascension Reborn\r\n");
             s.append("This adds new ascension levels from -20 to 25.\r\n");
             s.append("Check what ascension levels do with the command ascension.\r\n");
+        }
+        if(shopMod){
+            s.append("Shop Mod\r\n");
+            s.append("This lets you buy the shop's rug and then sell your relics and potions.\r\n");
+            s.append("If the rug is for sale and you can afford it, the rug will appear at the bottom of the shop screen.\r\n");
+            s.append("You can sell relics and potions on the shop screen.\r\n");
+            s.append("Check their prices with inspect while on the shpp screen.\r\n");
+            s.append("Sell relics with the format \"relic [number] sell\"\r\n");
+            s.append("Sell potions with the format \"pot sell [number]\"");
         }
         return s.toString();
     }
@@ -2454,12 +2476,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     }
 
-    public String inspectPotion(AbstractPotion p){
+    public String inspectPotion(AbstractPotion p) {
+        return inspectPotion(p, -1);
+    }
+
+    public String inspectPotion(AbstractPotion p, int slot){
 
         String s = "\r\n";
-
         s += "Potion\r\n";
         s += p.name + "\r\n";
+        if(shopMod && MerchantsRug.isSelling() && slot != -1)
+            s += "Sale Price : " + MerchantsRug.potionSalePrice(slot, p) + "\r\n";
         s += p.rarity.name() + "\r\n";
         s += Choices.stripColor(p.description) + "\r\n";
 
@@ -2473,6 +2500,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         s += "Relic\r\n";
         s += r.name + "\r\n";
+        if(shopMod && MerchantsRug.isSelling())
+            s += "Sale Price : " + MerchantsRug.relicSalePrice(r) + "\r\n";
         s += r.tier.name() + "\r\n";
         s += "Charges " + r.counter + "\r\n";
         s += Choices.stripColor(r.description) + "\r\n";
