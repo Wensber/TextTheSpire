@@ -74,5 +74,14 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.conspire.cardcrawl:Conspire:1.7.0">
+        <CLASSES>
+          <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/1612329757/Conspire.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

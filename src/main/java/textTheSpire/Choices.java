@@ -44,6 +44,7 @@ import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
 import communicationmod.CommunicationMod;
 import communicationmod.patches.GremlinMatchGamePatch;
+import conspire.events.MimicChestEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
@@ -546,6 +547,11 @@ public class Choices extends AbstractWindow{
                 //Event choices
                 if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.EVENT) {
 
+                    if(TextTheSpire.conspire && AbstractDungeon.getCurrRoom().event instanceof MimicChestEvent) {
+                        s.append("\r\nproceed\r\n1:open\r\n");
+                        return s.toString();
+                    }
+
                     s.append(AbstractDungeon.getCurrRoom().event.getClass().getSimpleName()).append("\r\n");
 
                     ArrayList<LargeDialogOptionButton> activeButtons = ChoiceScreenUtils.getActiveEventButtons();
@@ -575,7 +581,7 @@ public class Choices extends AbstractWindow{
                         count++;
                     }
 
-                }else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
+                } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
 
                     //Also shows current position
                     if (AbstractDungeon.firstRoomChosen)

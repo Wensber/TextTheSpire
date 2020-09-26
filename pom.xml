@@ -22,6 +22,7 @@
         <CommunicationMod.version>1.0.0</CommunicationMod.version>
         <ReplayTheSpireMod.version>1.5.12</ReplayTheSpireMod.version>
         <AscensionReborn.version>2.8.8</AscensionReborn.version>
+        <Conspire.version>1.7.0</Conspire.version>
         <Steam.path>C:/Program Files (x86)/Steam/steamapps</Steam.path>
     </properties>
 
@@ -87,6 +88,13 @@
             <version>${AscensionReborn.version}</version>
             <scope>system</scope>
             <systemPath>${Steam.path}/workshop/content/646570/1635237252/AscensionRebornMod.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.conspire.cardcrawl</groupId>
+            <artifactId>Conspire</artifactId>
+            <version>${Conspire.version}</version>
+            <scope>system</scope>
+            <systemPath>${Steam.path}/workshop/content/646570/1612329757/Conspire.jar</systemPath>
         </dependency>
 
     </dependencies>

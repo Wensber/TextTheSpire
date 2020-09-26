@@ -29,6 +29,7 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.mod.replay.relics.WaxSeal;
@@ -64,10 +65,7 @@ import com.megacrit.cardcrawl.screens.stats.StatsScreen;
 import com.megacrit.cardcrawl.shop.ShopScreen;
 import com.megacrit.cardcrawl.shop.StorePotion;
 import com.megacrit.cardcrawl.shop.StoreRelic;
-import com.megacrit.cardcrawl.ui.buttons.CancelButton;
-import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
-import com.megacrit.cardcrawl.ui.buttons.GridSelectConfirmButton;
-import com.megacrit.cardcrawl.ui.buttons.LargeDialogOptionButton;
+import com.megacrit.cardcrawl.ui.buttons.*;
 import com.megacrit.cardcrawl.ui.panels.DeleteSaveConfirmPopup;
 import com.megacrit.cardcrawl.ui.panels.SeedPanel;
 import com.megacrit.cardcrawl.unlock.UnlockTracker;
@@ -77,6 +75,7 @@ import communicationmod.GameStateListener;
 import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
 import communicationmod.patches.ShopScreenPatch;
+import conspire.events.MimicChestEvent;
 import org.eclipse.swt.widgets.Display;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
 
@@ -101,6 +100,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static boolean ascensionReborn;
     public static int maxAsc;
     public static boolean beaked;
+    public static boolean conspire;
 
     private Hand hand;
     private Map map;
@@ -146,6 +146,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         else
             maxAsc = 20;
         beaked = Loader.isModLoaded("beakedthecultist-sts");
+        conspire = Loader.isModLoaded("conspire");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -252,7 +253,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }else if(input.equals("history") && CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && CardCrawlGame.mainMenuScreen != null){
             CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
-            runList = (ArrayList<RunData>)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.runHistoryScreen, RunHistoryScreen.class, "unfilteredRuns");
+            runList = (ArrayList<RunData>) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.runHistoryScreen, RunHistoryScreen.class, "unfilteredRuns");
             choice.screen = Choices.HistoryScreen.MAIN;
             return;
         }
@@ -569,19 +570,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 return;
             }
             if(input.equals("seed")){
-                SeedPanel sp = (SeedPanel) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedPanel");
+                SeedPanel sp = (SeedPanel) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedPanel");
                 if(sp.shown){
-                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedHb");
                     hb.clicked = true;
                     inspect.setText("\r\nGo to main game window, paste the seed, then hit enter.\r\n");
                     return;
                 }
             }
-            boolean ready = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "anySelected");
-            boolean asc = (boolean) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "isAscensionModeUnlocked");
+            boolean ready = (boolean) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "anySelected");
+            boolean asc = (boolean) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "isAscensionModeUnlocked");
             if(tokens[0].equals("asc") && ready && asc){
                 if(tokens.length == 1) {
-                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascensionModeHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascensionModeHb");
                     hb.clicked = true;
                 }else{
                     try{
@@ -609,23 +610,23 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 return;
             }
             if(input.equals("+") && ready){
-                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascRightHb");
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascRightHb");
                 hb.clicked = true;
                 return;
             }
             if(input.equals("-") && ready){
-                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascLeftHb");
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "ascLeftHb");
                 hb.clicked = true;
                 return;
             }
             if(ascensionReborn){
                 if(input.equals("c_asc") && ready){
-                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "customAscensionModeHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "customAscensionModeHb");
                     hb.clicked = true;
                     return;
                 }
                 if(input.equals("open") && ready && AscensionMod.customAscensionRun){
-                    AscButton ascb = (AscButton) basemod.ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "openAscMenuButton");
+                    AscButton ascb = (AscButton) ReflectionHacks.getPrivateStatic(CharSelectScreenUI.class, "openAscMenuButton");
                     ascb.pressed = true;
                     return;
                 }
@@ -634,7 +635,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
         if(ascensionReborn && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
             if(input.equals("back")){
-                MenuCancelButton mcb = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CharSelectScreenUI.ascScreen, AscModScreen.class, "button");
+                MenuCancelButton mcb = (MenuCancelButton) ReflectionHacks.getPrivate(CharSelectScreenUI.ascScreen, AscModScreen.class, "button");
                 mcb.hb.clicked = true;
                 return;
             }
@@ -762,14 +763,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
             if(CardCrawlGame.mainMenuScreen.saveSlotScreen.curPop == SaveSlotScreen.CurrentPopup.DELETE){
                 if(input.equals("yes")){
-                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "yesHb");
+                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "yesHb");
                     hb.clicked = true;
                     return;
                 }
                 if(input.equals("no")){
-                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "noHb");
+                    DeleteSaveConfirmPopup delete = (DeleteSaveConfirmPopup) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.saveSlotScreen, SaveSlotScreen.class, "deletePopup");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(delete, DeleteSaveConfirmPopup.class, "noHb");
                     hb.clicked = true;
                     return;
                 }
@@ -780,37 +781,37 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY && !CommandExecutor.isInDungeon()){
 
             if(input.equals("back")){
-                MenuCancelButton c = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "cancelButton");
+                MenuCancelButton c = (MenuCancelButton) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "cancelButton");
                 c.hb.clicked = true;
                 return;
             }else if(input.equals("embark")){
-                ConfirmButton c = (ConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
+                ConfirmButton c = (ConfirmButton) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "confirmButton");
                 c.hb.clicked = true;
                 return;
             }else if(input.equals("mine")){
-                Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "viewMyScoreHb");
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "viewMyScoreHb");
                 hb.clicked = true;
                 return;
             }else if(input.equals("prev")){
-                Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevDayHb");
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevDayHb");
                 hb.clicked = true;
                 return;
             }else if(input.equals("next")){
-                long day = (long)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
+                long day = (long) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
                 if(day != 0L && day < TimeHelper.daySince1970()){
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextDayHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextDayHb");
                     hb.clicked = true;
                     return;
                 }
             }else if(input.equals("+")){
                 if(CardCrawlGame.mainMenuScreen.dailyScreen.entries.size() == 20){
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "nextHb");
                     hb.clicked = true;
                     return;
                 }
             }else if(input.equals("-")){
                 if(CardCrawlGame.mainMenuScreen.dailyScreen.currentStartIndex != 1){
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "prevHb");
                     hb.clicked = true;
                     return;
                 }
@@ -821,11 +822,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM && !CommandExecutor.isInDungeon()){
 
             if(input.equals("back")){
-                MenuCancelButton c = (MenuCancelButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "cancelButton");
+                MenuCancelButton c = (MenuCancelButton) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "cancelButton");
                 c.hb.clicked = true;
                 return;
             }else if(input.equals("embark")){
-                GridSelectConfirmButton c = (GridSelectConfirmButton) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "confirmButton");
+                GridSelectConfirmButton c = (GridSelectConfirmButton) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "confirmButton");
                 c.hb.clicked = true;
                 return;
             }
@@ -841,7 +842,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     return;
                 case "asc":
                     if(tokens.length == 1){
-                        Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "ascensionModeHb");
+                        Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "ascensionModeHb");
                         hb.clicked = true;
                     }else if(CardCrawlGame.mainMenuScreen.customModeScreen.isAscensionMode){
                         try{
@@ -854,14 +855,14 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
                     return;
                 case "seed":
-                    Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "seedHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "seedHb");
                     inspect.setText("\r\nGo to main game window, paste the seed, then hit enter.\r\n");
                     hb.clicked = true;
                     return;
                 case "mod":
 
                     if(tokens.length > 2 && tokens[1].equals("i")){
-                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
+                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
                         try{
                             int in = Integer.parseInt(tokens[2]);
                             String s = modList.get(in).name + "\r\n" + modList.get(in).description;
@@ -869,7 +870,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         }catch(Exception ignored){
                         }
                     } else if(tokens.length > 1) {
-                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
+                        ArrayList<CustomMod> modList = (ArrayList<CustomMod>) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.customModeScreen, CustomModeScreen.class, "modList");
                         try{
                             int in = Integer.parseInt(tokens[1]);
                             modList.get(in).hb.clicked = true;
@@ -891,18 +892,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 if(((FilterButton)CardCrawlGame.mainMenuScreen.leaderboardsScreen.regionButtons.get(0)).active){
                     return;
                 }
-                Hitbox hb = (Hitbox) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "viewMyScoreHb");
+                Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "viewMyScoreHb");
                 hb.clicked = true;
                 return;
             }else if(input.equals("+")){
                 if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.entries.size() == 20){
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "nextHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "nextHb");
                     hb.clicked = true;
                     return;
                 }
             }else if(input.equals("-")){
                 if(CardCrawlGame.mainMenuScreen.leaderboardsScreen.currentStartIndex != 1){
-                    Hitbox hb = (Hitbox)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "prevHb");
+                    Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.leaderboardsScreen, LeaderboardScreen.class, "prevHb");
                     hb.clicked = true;
                     return;
                 }
@@ -1135,7 +1136,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 default:
                     try {
                         if(TextTheSpire.replayTheSpire && AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1) instanceof FadingForestBoss){
-                            boolean show = (boolean)basemod.ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
+                            boolean show = (boolean) ReflectionHacks.getPrivateStatic(GenericEventDialog.class, "show");
                             if(show){
                                 ArrayList<LargeDialogOptionButton> buttons = ((FadingForestBoss) AbstractDungeon.getCurrRoom().monsters.monsters.get(AbstractDungeon.getCurrRoom().monsters.monsters.size()-1)).imageEventText.optionList;
                                 ArrayList<LargeDialogOptionButton> activeButtons = new ArrayList<>();
@@ -1203,6 +1204,29 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
                     if(choiceList.size() > in){
                         inspect.setText("Goblin Match Card\r\nPosition " + GremlinMatchGamePatch.cardPositions.get(choiceList.get(in).uuid) + "\r\n" + inspectCard(choiceList.get(in)));
+                    }
+                }
+
+                if(conspire && AbstractDungeon.getCurrRoom() != null && AbstractDungeon.getCurrRoom().event instanceof MimicChestEvent) {
+                    if (input.equals("1")) {
+
+                        (AbstractDungeon.getCurrRoom()).phase = AbstractRoom.RoomPhase.INCOMPLETE;
+                        ReflectionHacks.setPrivate(AbstractDungeon.getCurrRoom().event, MimicChestEvent.class, "inFight", true);
+                        if (Settings.isDailyRun) {
+                            AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(30));
+                        } else {
+                            AbstractDungeon.getCurrRoom().addGoldToRewards(AbstractDungeon.eventRng.random(25, 35));
+                        }
+                        AbstractDungeon.getCurrRoom().addRelicToRewards(AbstractDungeon.returnRandomRelicTier());
+                        (AbstractDungeon.getCurrRoom()).monsters = MonsterHelper.getEncounter("conspire:MimicChest");
+                        AbstractDungeon.getCurrRoom().event.enterCombat();
+                        AbstractDungeon.lastCombatMetricKey = "conspire:MimicChest";
+
+                        return;
+                    } else if (input.equals("proceed")) {
+                        Hitbox hb = (Hitbox) ReflectionHacks.getPrivate(AbstractDungeon.overlayMenu.proceedButton, ProceedButton.class, "hb");
+                        hb.clicked = true;
+                        return;
                     }
                 }
 
