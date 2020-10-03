@@ -486,6 +486,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
+        if(input.equals("tts")){
+            inspect.setText(ttsPatchNotes());
+            return;
+        }
+
         //Continue command. Only usable when not in dungeon and save file exists
         if (CardCrawlGame.mode == CardCrawlGame.GameMode.CHAR_SELECT && !CommandExecutor.isInDungeon() && CardCrawlGame.characterManager.anySaveFileExists() && input.equals("continue")) {
 
@@ -1457,6 +1462,79 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             }
         }
 
+    }
+
+    public String ttsPatchNotes(){
+        StringBuilder s = new StringBuilder("\r\n");
+
+        s.append("Current Version : v1.16\r\n");
+        s.append("v1.16\r\nAdded support for Shop Mod.\r\n" +
+                "Added support for the Mimic chest event in Conspire.\r\n");
+        s.append("v1.15\r\nModified the main menu support so that starting a run navigates the menu.\r\n" +
+                "This change is to make it easier to support content mods with new gamemodes or character select options.\r\n" +
+                "The old command to start runs still works but isn't guaranteed to work for mods.\r\n" +
+                "Ascension Reborn support is fixed with the menu navigation.\r\n" +
+                "Hotfix: Fixed an issue where it didn't check if Ascension Reborn was loaded before using its classes.\r\n");
+        s.append("v1.14\r\nAdded support for Ascension Reborn.\r\n" +
+                "Ascension unlocks should track properly for mod characters.\r\n" +
+                "Crashes when running mods should be less common.\r\n" +
+                "Hotfix: Tentative fix for crash when checking ascension unlock for certain mod characters. Will set to max ascension instead of crashing.\r\n" +
+                "Hotfix: Fixed issue where you have to use the_silent instead of silent to start a run.\r\n");
+        s.append("v1.13\r\nStSLib's Clickable relics are now supported.\r\n" +
+                "Replay the Spire's 2 for 1 sale tag is supported.\r\n" +
+                "Orb window how totals end of turn Lightning and Frost passives.\r\n" +
+                "Reverted Event nodes to Unknown. Run History now mentions if a node was Unknown at first.\r\n" +
+                "Hotfix: Fixed Two for One support not showing prices.\r\n" +
+                "Hotfix. Fixed Two for One support preventing you from buying anything but cards.\r\n");
+        s.append("v1.12\r\nMasterdeck is now numbered and can be inspected.\r\n" +
+                "Exhaust command added to view exhaust pile. Exhausted cards are tracked by Log.\r\n" +
+                "While making the map more flexible with custom rooms, unknown rooms were renamed to Event.\r\n" +
+                "Began implementing Replay the Spire. Fadding Forest boss, map nodes, and new variables in card inspect should all work. Have not been able to test everything so cannot confirm that everything works.\r\n" +
+                "Hotfix: Fixed an issue where you couldn't play targeted cards.\r\n" +
+                "Hotfix: Fixed an issue where you couldn't discard potions when out of combat.\r\n");
+        s.append("v1.11\r\nAdded leaderboard support for both Daily Climb and general leaderboards.\r\n" +
+                "Added a new window called Log that is a basic combat log.\r\n" +
+                "Added a patch command to access game patch notes from the main menu.\r\n" +
+                "Added a tutorial command that outputs a tutorial I put together.\r\n" +
+                "Added a background ambience sounds toggle to the volume command.\r\n");
+        s.append("v1.10\r\nAdded language support with the lang command.\r\n" +
+                "Fixed a bug with map and path commands where the game would crash when you input a destination lower than the source.\r\n" +
+                "You no longer need to input a target for potions with one enemy.\r\n" +
+                "Map stops tracking after you reach the floor you are tracking to.\r\n" +
+                "Blights now appear in the Relic window.\r\n");
+        s.append("v1.9\r\nAdded Run History support.\r\n" +
+                "Death and Victory screens now have a score breakdown.");
+        s.append("v1.8\r\nAdded compendium support with the comp command.\r\n" +
+                "Added save slot support with the slot command.\r\n" +
+                "The quit command now saves and quits to main menu when in a run.\r\n" +
+                "You can now inspect orbs.\r\n");
+        s.append("v1.7\r\nAdded stats command.\r\n" +
+                "Replaced restart command with abandon command.\r\n" +
+                "Inspects now display rarity.\r\n" +
+                "Relic inspects display charges.\r\n" +
+                "Added some commas into path command output.\r\n");
+        s.append("v1.6\r\nMap command can now set a different source.\r\n" +
+                "Added a path command can displays all unique paths from point a to point b and tallies the node types for each path.\r\n" +
+                "Added examples to some of the help commands.\r\n");
+        s.append("v1.5\r\nAdded custom game support.\r\n");
+        s.append("v1.4\r\nAdded volume support.\r\n" +
+                "Fixed some daily climb bugs.\r\n" +
+                "Fixed a typo in the help command.\r\n");
+        s.append("v1.3\r\nAdded achievement display.\r\n" +
+                "Allows shortened versions of some commands.\r\n" +
+                "Fixed a boss chest room bug.\r\n");
+        s.append("v1.2\r\nDaily climb is now available, though the modifiers Draft and Sealed deck are currently not supported.\r\n" +
+                "Also, the return button does not work and is disabled as I bypassed a bit of menuing.\r\n" +
+                "Event dialogue has been fixed.\r\n" +
+                "Unlocks are displayed.\r\n");
+        s.append("v1.1\r\nFixed some issues found after making the mod public and added some quality of life changes.\r\n" +
+                "Goblin Match game now displays cards picked to output.\r\n" +
+                "You can save and load the output window for future viewing.\r\n" +
+                "Upgrade preview is now displayed.\r\n" +
+                "You can show and hide all windows besides prompt and output at once.\r\n" +
+                "You can skip typing play during combat when there are no choices.\r\n");
+
+        return  s.toString();
     }
 
     public String ascensionNotes(){

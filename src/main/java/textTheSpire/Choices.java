@@ -663,6 +663,8 @@ public class Choices extends AbstractWindow{
                     disableTips = true;
                 }
 
+                s.append("Text The Spire v1.16\r\ntts : patch notes\r\n");
+
                 s.append("Slot ").append(CardCrawlGame.saveSlot).append(" ").append(CardCrawlGame.playerName).append("\r\n");
 
                 for (AbstractPlayer.PlayerClass p : AbstractPlayer.PlayerClass.values()) {
