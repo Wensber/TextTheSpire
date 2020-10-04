@@ -49,11 +49,8 @@ import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.FilterButton;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardScreen;
-import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.*;
 
-import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
-import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
-import com.megacrit.cardcrawl.screens.mainMenu.SaveSlotScreen;
 import com.megacrit.cardcrawl.screens.options.OptionsPanel;
 import com.megacrit.cardcrawl.screens.options.Slider;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
@@ -76,7 +73,10 @@ import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
 import communicationmod.patches.ShopScreenPatch;
 import conspire.events.MimicChestEvent;
+import downfall.patches.EvilModeCharacterSelect;
+import downfall.patches.MainMenuEvilMode;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 
@@ -103,6 +103,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static boolean beaked;
     public static boolean conspire;
     public static boolean shopMod;
+    public static boolean downfall;
 
     private Hand hand;
     private Map map;
@@ -150,6 +151,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         beaked = Loader.isModLoaded("beakedthecultist-sts");
         conspire = Loader.isModLoaded("conspire");
         shopMod = Loader.isModLoaded("ShopMod");
+        downfall = Loader.isModLoaded("downfall");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -248,6 +250,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         String[] tokens = input.split("\\s+");
 
         if(tokens.length == 0){
+            return;
+        }
+
+        if(input.equals("test")){
+            inspect.setText("\r\n" + CardCrawlGame.mainMenuScreen.screen.name() + "\r\n");
             return;
         }
 
@@ -560,6 +567,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             } else if (input.equals("custom") && StatsScreen.all.highestDaily > 0){
                 CardCrawlGame.mainMenuScreen.panelScreen.panels.get(2).hb.clicked = true;
                 return;
+            } else if (downfall && input.equals("downfall")){
+                MenuPanelScreen.PanelScreen ps = (MenuPanelScreen.PanelScreen) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.panelScreen, MenuPanelScreen.class, "screen");
+                if(ps == MainMenuEvilMode.Enums.EVIL){
+                    CardCrawlGame.mainMenuScreen.panelScreen.panels.get(1).hb.clicked = true;
+                }
             } else if (input.equals("back")){
                 CardCrawlGame.mainMenuScreen.panelScreen.button.hb.clicked = true;
                 return;
@@ -1191,13 +1203,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             }
         } else if (tokens[0].equals("map") || tokens[0].equals("m")){
 
-            if(tokens.length >= 3){
+            if(downfall && EvilModeCharacterSelect.evilMode){
+                inspect.setText(Inspect.downfallInspect(tokens));
+            } else if(tokens.length >= 3){
                 inspect.setText(Inspect.inspectMap(tokens));
             }
 
         }else if (tokens[0].equals("path")){
 
-            if(tokens.length >= 3){
+            if(downfall && EvilModeCharacterSelect.evilMode){
+                inspect.setText(Inspect.downfallPaths(tokens));
+            } else if(tokens.length >= 3){
                 inspect.setText(Inspect.inspectPaths(tokens));
             }
 

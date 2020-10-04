@@ -92,5 +92,14 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.downfall.cardcrawl:Downfall:2.0.34">
+        <CLASSES>
+          <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/1610056683/downfall.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

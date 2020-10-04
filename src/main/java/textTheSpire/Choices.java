@@ -27,10 +27,7 @@ import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterOption;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
-import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
-import com.megacrit.cardcrawl.screens.mainMenu.MenuButton;
-import com.megacrit.cardcrawl.screens.mainMenu.SaveSlot;
-import com.megacrit.cardcrawl.screens.mainMenu.SaveSlotScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.*;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
 import com.megacrit.cardcrawl.screens.select.GridCardSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.*;
@@ -45,6 +42,7 @@ import communicationmod.CommandExecutor;
 import communicationmod.CommunicationMod;
 import communicationmod.patches.GremlinMatchGamePatch;
 import conspire.events.MimicChestEvent;
+import downfall.patches.MainMenuEvilMode;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
@@ -693,14 +691,19 @@ public class Choices extends AbstractWindow{
                 s.append("history\r\nslot\r\npatch\r\nquit");
 
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.PANEL_MENU){
-                s.append("standard\r\n");
-                if (CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()) {
-                    s.append("daily\r\n");
+                MenuPanelScreen.PanelScreen ps = (MenuPanelScreen.PanelScreen) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.panelScreen, MenuPanelScreen.class, "screen");
+                if(TextTheSpire.downfall && ps == MainMenuEvilMode.Enums.EVIL){
+                    s.append("standard\r\ndownfall\r\n");
+                } else {
+                    s.append("standard\r\n");
+                    if (CardCrawlGame.mainMenuScreen.statsScreen.statScreenUnlocked()) {
+                        s.append("daily\r\n");
+                    }
+                    if (StatsScreen.all.highestDaily > 0) {
+                        s.append("custom\r\n");
+                    }
+                    s.append("back\r\n");
                 }
-                if (StatsScreen.all.highestDaily > 0) {
-                    s.append("custom\r\n");
-                }
-                s.append("back\r\n");
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
                 s.append("Input character name to select.\r\nasc to toggle ascension.\r\nasc [number] to set ascension level.\r\nIf that fails you can use + and - to manually change ascension level.\r\n");
                 s.append("back\r\n");
