@@ -79,6 +79,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
+import slimebound.cards.AbstractSlimeboundCard;
+import slimebound.orbs.SpawnedSlime;
 
 import javax.smartcardio.Card;
 import javax.swing.*;
@@ -1178,7 +1180,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                                 return;
                             }
                         }
-                        if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE){
+                        if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE || (downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof ShopRoom)){
                             String playInput = "play " + input;
                             String[] playTokens = playInput.split("\\s+");
                             if(playTokens.length == 2){
@@ -2621,6 +2623,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         String s = "\r\n";
 
         s = s + o.name + "\r\n";
+
+        if(downfall && o instanceof SpawnedSlime){
+
+            if(((SpawnedSlime) o).customDescription != null)
+                s = s + ((SpawnedSlime) o).customDescription + "\r\n";
+            if(((SpawnedSlime) o).description != null)
+                s = s + ((SpawnedSlime) o).description + "\r\n";
+            s = Choices.stripColor(s);
+            return s;
+        }
+
         s = s + "Passive " + o.passiveAmount + "\r\n";
         s = s + "Evoke " + o.evokeAmount + "\r\n";
 
@@ -2691,6 +2704,20 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 s = s.replace("!beaked:wD!", "" + c.baseDamage);
                 s = s.replace("!beaked:wB!", "" + c.baseBlock);
             }
+        }
+        if(downfall){
+            if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                if(c instanceof AbstractSlimeboundCard) {
+                    s = s.replace("!SlimeboundSlimed!", "" + ((AbstractSlimeboundCard) c).slimed);
+                    s = s.replace("!SlimeboundSelfharm!", "" + ((AbstractSlimeboundCard) c).selfDamage);
+                }
+            }else{
+                if(c instanceof AbstractSlimeboundCard) {
+                    s = s.replace("!SlimeboundSlimed!", "" + ((AbstractSlimeboundCard) c).baseSlimed);
+                    s = s.replace("!SlimeboundSelfharm!", "" + ((AbstractSlimeboundCard) c).baseSelfDamage);
+                }
+            }
+            s = s.replaceAll("slimeboundmod:", "");
         }
 
         return s;

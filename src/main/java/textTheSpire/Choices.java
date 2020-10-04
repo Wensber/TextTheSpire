@@ -24,6 +24,7 @@ import com.megacrit.cardcrawl.metrics.Metrics;
 import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.rooms.ShopRoom;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterOption;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
@@ -468,6 +469,10 @@ public class Choices extends AbstractWindow{
         } else if(CommandExecutor.isInDungeon()){
 
             ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();
+
+            if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode && currChoice == ChoiceScreenUtils.ChoiceType.SHOP_ROOM){
+                return "";
+            }
 
             if(currChoice == ChoiceScreenUtils.ChoiceType.HAND_SELECT){
                 s.append("Hand Selection\r\n");
