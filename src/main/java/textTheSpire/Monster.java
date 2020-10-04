@@ -1,13 +1,21 @@
 package textTheSpire;
 
+import charbosses.bosses.AbstractCharBoss;
+import charbosses.stances.AbstractEnemyStance;
+import charbosses.stances.EnNeutralStance;
+import charbosses.ui.EnemyEnergyPanel;
 import com.badlogic.gdx.Gdx;
+import com.megacrit.cardcrawl.cards.AbstractCard;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
+import com.megacrit.cardcrawl.orbs.AbstractOrb;
+import com.megacrit.cardcrawl.orbs.Dark;
 import com.megacrit.cardcrawl.powers.AbstractPower;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.RunicDome;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
+import com.megacrit.cardcrawl.stances.NeutralStance;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
 
@@ -15,7 +23,6 @@ import java.util.ArrayList;
 
 public class Monster extends AbstractWindow{
 
-    public boolean haveRunic = false;
     public int totalDmg = 0;
 
     public Monster(Display display){
@@ -54,7 +61,7 @@ public class Monster extends AbstractWindow{
                     s.append("Block: ").append(m.currentBlock).append("\r\n");
                     s.append("HP: ").append(m.currentHealth).append("/").append(m.maxHealth).append("\r\n");
 
-                    if (!haveRunic && !runicDome())
+                    if (!runicDome())
                         s.append(monsterIntent(m));
 
                     int powCount = 0;
@@ -67,6 +74,35 @@ public class Monster extends AbstractWindow{
                         }
                     }
                     s.append("\r\n");
+
+                    if(TextTheSpire.downfall && m instanceof AbstractCharBoss){
+                        s.append("Hand:\r\n");
+                        for(AbstractCard c : ((AbstractCharBoss) m).hand.group){
+                            s.append(c.name).append("\r\n");
+                        }
+                        s.append("Energy: ").append(EnemyEnergyPanel.totalCount).append("\r\n");
+                        if(((AbstractCharBoss) m).orbs.size() > 0){
+                            s.append("Orbs:\r\n");
+                            for(AbstractOrb o : ((AbstractCharBoss) m).orbs){
+                                if (o instanceof Dark) {
+                                    s.append(count).append("Dark ").append(o.evokeAmount).append("\r\n");
+                                } else {
+                                    s.append(o.name).append("\r\n");
+                                }
+                            }
+                        }
+                        if (((AbstractCharBoss) m).stance instanceof AbstractEnemyStance) {
+                            s.append("Stance: ").append(((AbstractEnemyStance)((AbstractCharBoss) m).stance).ID).append("\r\n");
+                        }
+                        s.append("Relics:\r\n");
+                        for(AbstractRelic r : ((AbstractCharBoss) m).relics){
+                            if(r.counter >= 0){
+                                s.append(r.name).append(" ").append(r.counter).append("\r\n");
+                            }else{
+                                s.append(r.name).append("\r\n");
+                            }
+                        }
+                    }
                 }
                 count++;
 
@@ -83,11 +119,8 @@ public class Monster extends AbstractWindow{
     }
 
     public boolean runicDome(){
-        if(haveRunic)
-            return true;
         for(AbstractRelic r : AbstractDungeon.player.relics){
             if(r instanceof RunicDome){
-                haveRunic = true;
                 return true;
             }
         }

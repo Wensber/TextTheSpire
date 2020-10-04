@@ -1516,7 +1516,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public String ttsPatchNotes(){
         StringBuilder s = new StringBuilder("\r\n");
 
-        s.append("Current Version : v1.16\r\n");
+        s.append("Current Version : v1.17\r\n");
+        s.append("v1.17\r\nAdded support for Downfall.\r\n" +
+                "Due to time limitations was not able to test everything.\r\n" +
+                "Use the command mod for more info.\r\n" +
+                "Added in game patch notes for Text The Spire which can be accesses with command tts.\r\n");
         s.append("v1.16\r\nAdded support for Shop Mod.\r\n" +
                 "Added support for the Mimic chest event in Conspire.\r\n");
         s.append("v1.15\r\nModified the main menu support so that starting a run navigates the menu.\r\n" +
@@ -1682,6 +1686,54 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Check their prices with inspect while on the shpp screen.\r\n");
             s.append("Sell relics with the format \"relic [number] sell\"\r\n");
             s.append("Sell potions with the format \"pot sell [number]\"");
+        }
+        if(downfall){
+            s.append("Downfall\r\n");
+            s.append("This mod adds a new gamemode with 4 new characters.\r\n");
+            s.append("You will be playing as a villian and descending down the spire rather than up.\r\n");
+            s.append("Slimbound:\r\n");
+            s.append("Can split off slimes with effects.\r\n");
+            s.append("These slimes use orb slots and can be inspected like a normal orb.\r\n");
+            s.append("New keywords:\r\n");
+            s.append("Goop : The next attack deals 1 more damage per Goop and triggering Consume effects.\r\n");
+            s.append("Consume : Bonus effects that trigger when an attack consumes Goop.\r\n");
+            s.append("Split : Lose 4 HP and spawn a slime.\r\nWhile the slime exists you lose 4 Max HP.\r\nIf you have no empty orb slots the leading slime is Absorbed.\r\n");
+            s.append("Absorb : Recombine with your leading slime regaining the Max HP and gaining 1 STR.\r\n");
+            s.append("Command : Your leading slime attacks.\r\n");
+            s.append("Potency : Increases the effects of all your slimes.\r\n");
+            s.append("Guardian:\r\n");
+            s.append("Can put cards in stasis which uses orb slots and can be inspected like one.\r\n");
+            s.append("Has a gem system which lets you add gem cards to sockets to combine their effects while at a bonfire.\r\n");
+            s.append("This is a free action and lets you use another action.\r\n");
+            s.append("New Keywords:\r\n");
+            s.append("Defensive Mode : While in this stance you gain 3 thorns and gain 2 block when you play a card.\r\n");
+            s.append("Socket : While at a bonfire you can place a gem into this socket to gain the gem's effects.\r\nThe gem is removed from the deck.\r\n");
+            s.append("Gem : While at a bonfire you can place this gem into a socket to add this gem's effects to the card with the socket.\r\nThis gem is removed from the deck.\r\n");
+            s.append("Stasis : Place a card into stasis with turn counters equal to card cost plus 1.\r\nTurn counters are reduced by 1 at start of turn.\r\nWhen turn counters reach 0 the card is added to your hand costing 0 until played.\r\n");
+            s.append("Accelerate : Reduce the turn counters of the oldest stasis card by 1.\r\n");
+            s.append("Tick : This effect is triggered when a turn counter is removed.\r\n");
+            s.append("Volatile : Exhaust the card when it leaves stasis.\r\n");
+            s.append("Hexaghost:\r\n");
+            s.append("The Hexaghost has 6 Ghostflames.\r\n");
+            s.append("One of them is active at all times.\r\n");
+            s.append("They can be either ignited or extinguished starting as extinguished.\r\n");
+            s.append("The active Ghostflame can become ignited by fulfilling a condition.\r\n");
+            s.append("Igniting a Ghostflame triggers effects.\r\n");
+            s.append("Effects can cause the active Ghostflame to rotate.\r\n");
+            s.append("Inspect a Ghostflame with command \"gf [number]\"\r\n");
+            s.append("New Keywords:\r\n");
+            s.append("Advance : Activte the next Ghostflame.\r\nIf it is ignited extinguish it.\r\n");
+            s.append("Retract : Activate the previous Ghostflam.\r\nIf it is ignited extinguish it.\r\n");
+            s.append("Soulburn : After 3 turns deal damage equal to Soulburn value.\r\n");
+            s.append("Force-Ignite : Trigger the Ignition effect of the active Ghostflame even if its already ignited.\r\n");
+            s.append("Afterlife : If this card is exhausted, its effects activate.\r\n");
+            s.append("Intensity : Increases the effects of Ghostflames.\r\n");
+            s.append("Seal : Can't be Upgraded.\r\nIf you have all 6 seals active, remove the seals from your deck and obtain the Broken Seal.\r\n");
+            s.append("Snecko:\r\n");
+            s.append("New Keywords:\r\n");
+            s.append("Unknown : Unknown cards transform into a random card from any class during combat.\r\nThe pool of cards selected from can have limitations added.\r\n");
+            s.append("Muddle : Randomize a card's cost between 0 and 3.\r\n");
+            s.append("Snekproof : Unaffected by Muddle or Confusion.\r\n");
         }
         return s.toString();
     }
