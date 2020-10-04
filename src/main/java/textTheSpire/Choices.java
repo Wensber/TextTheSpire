@@ -42,6 +42,7 @@ import communicationmod.CommandExecutor;
 import communicationmod.CommunicationMod;
 import communicationmod.patches.GremlinMatchGamePatch;
 import conspire.events.MimicChestEvent;
+import downfall.patches.EvilModeCharacterSelect;
 import downfall.patches.MainMenuEvilMode;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
@@ -586,12 +587,23 @@ public class Choices extends AbstractWindow{
                 } else if (ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
 
                     //Also shows current position
-                    if (AbstractDungeon.firstRoomChosen)
+                    if (AbstractDungeon.firstRoomChosen) {
                         s.append("Floor:").append(AbstractDungeon.currMapNode.y + 1).append(", X:").append(AbstractDungeon.currMapNode.x).append("\r\n");
-                    else
-                        s.append("Floor:0\r\n");
+                    }else {
+                        if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode)
+                            s.append("Floor 16\r\n");
+                        else
+                            s.append("Floor:0\r\n");
+                    }
 
-                    if (ChoiceScreenUtils.bossNodeAvailable()) {
+                    ArrayList<MapRoomNode> choices;
+
+                    if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode)
+                        choices = Map.getMapScreenNodeChoices();
+                    else
+                        choices = ChoiceScreenUtils.getMapScreenNodeChoices();
+
+                    if ((ChoiceScreenUtils.bossNodeAvailable() && !TextTheSpire.downfall) || (TextTheSpire.downfall && AbstractDungeon.getCurrMapNode().y == 0)) {
 
                         s.append(count).append(":");
                         s.append("boss").append("\r\n");
@@ -599,7 +611,7 @@ public class Choices extends AbstractWindow{
                     } else if(!Inspect.has_inspected) {
 
                         //Displays node type and xPos for each choice
-                        for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
+                        for (MapRoomNode n : choices) {
                             s.append(count).append(":");
                             if(AbstractDungeon.player.hasRelic("WingedGreaves") && (AbstractDungeon.player.getRelic("WingedGreaves")).counter > 0 && !AbstractDungeon.getCurrMapNode().isConnectedTo(n)) {
                                 s.append(Map.nodeType(n)).append("Winged ").append(n.x).append("\r\n");
@@ -613,7 +625,7 @@ public class Choices extends AbstractWindow{
 
                         s.append("Inspected ").append(Map.nodeType(Inspect.destination)).append(Inspect.destination.y + 1).append(" ").append(Inspect.destination.x).append("\r\n");
 
-                        for (MapRoomNode n : ChoiceScreenUtils.getMapScreenNodeChoices()) {
+                        for (MapRoomNode n : choices) {
                             s.append(count).append(":");
                             s.append(Map.nodeType(n));
                             if (Inspect.inspected_map.contains(n)) {

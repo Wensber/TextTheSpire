@@ -253,11 +253,6 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             return;
         }
 
-        if(input.equals("test")){
-            inspect.setText("\r\n" + CardCrawlGame.mainMenuScreen.screen.name() + "\r\n");
-            return;
-        }
-
         if(choice.screen != Choices.HistoryScreen.NONE){
             parseHistoryCommand(tokens);
             return;
@@ -1267,6 +1262,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 if(TextTheSpire.replayTheSpire && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_SCREEN && ReplayShopInitCardsPatch.doubleCard != null && in == Choices.doubleIndex){
                     ReplayShopInitCardsPatch.doubleCard.hb.clicked = true;
                     ReplayShopInitCardsPatch.doubleCard.hb.hovered = true;
+                    return;
+                }
+
+                if(downfall && EvilModeCharacterSelect.evilMode && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
+                    Map.downfallMapChoice(in);
                     return;
                 }
 

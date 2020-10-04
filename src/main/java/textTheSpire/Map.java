@@ -2,12 +2,15 @@ package textTheSpire;
 
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.dungeons.TheEnding;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.mod.replay.rooms.PsuedoBonfireRoom;
 import com.megacrit.cardcrawl.mod.replay.rooms.TeleportRoom;
 import com.megacrit.cardcrawl.rooms.*;
 import communicationmod.ChoiceScreenUtils;
 import communicationmod.CommandExecutor;
+import communicationmod.patches.DungeonMapPatch;
+import communicationmod.patches.MapRoomNodeHoverPatch;
 import downfall.patches.EvilModeCharacterSelect;
 import org.eclipse.swt.widgets.Display;
 import replayTheSpire.patches.BonfirePatches;
@@ -211,6 +214,48 @@ public class Map extends AbstractWindow{
         }else{
             return "";
         }
+    }
+
+    public static void downfallMapChoice(int choice){
+        MapRoomNode currMapNode = AbstractDungeon.getCurrMapNode();
+        if(currMapNode.y == 0) {
+            if(choice == 0) {
+                DungeonMapPatch.doBossHover = true;
+                return;
+            } else {
+                throw new IndexOutOfBoundsException("Only a boss node can be chosen here.");
+            }
+        }
+        ArrayList<MapRoomNode> nodeChoices = getMapScreenNodeChoices();
+        MapRoomNodeHoverPatch.hoverNode = nodeChoices.get(choice);
+        MapRoomNodeHoverPatch.doHover = true;
+        AbstractDungeon.dungeonMapScreen.clicked = true;
+    }
+
+    public static ArrayList<MapRoomNode> getMapScreenNodeChoices() {
+        ArrayList<MapRoomNode> choices = new ArrayList<>();
+        MapRoomNode currMapNode = AbstractDungeon.getCurrMapNode();
+        ArrayList<ArrayList<MapRoomNode>> map = AbstractDungeon.map;
+        if(!AbstractDungeon.firstRoomChosen) {
+            for(MapRoomNode node : map.get(14)) {
+                if (node.hasEdges()) {
+                    choices.add(node);
+                }
+            }
+        } else {
+            for (ArrayList<MapRoomNode> rows : map) {
+                for (MapRoomNode node : rows) {
+                    if (node.hasEdges()) {
+                        boolean normalConnection = currMapNode.isConnectedTo(node);
+                        boolean wingedConnection = currMapNode.wingedIsConnectedTo(node);
+                        if (normalConnection || wingedConnection) {
+                            choices.add(node);
+                        }
+                    }
+                }
+            }
+        }
+        return choices;
     }
 
     /*
