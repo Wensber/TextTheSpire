@@ -84,6 +84,8 @@ import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 import slimebound.cards.AbstractSlimeboundCard;
 import slimebound.orbs.SpawnedSlime;
+import sneckomod.cards.AbstractSneckoCard;
+import sneckomod.cards.unknowns.UnknownClass;
 import theHexaghost.GhostflameHelper;
 import theHexaghost.cards.AbstractHexaCard;
 import theHexaghost.ghostflames.AbstractGhostflame;
@@ -2756,9 +2758,17 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     s = s.replace("!burny!","" + ((AbstractHexaCard) c).baseBurn);
                 }
             }
+            if(c instanceof AbstractSneckoCard){
+                if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                    s = s.replace("!qqq!","" + ((AbstractSneckoCard) c).silly);
+                }else {
+                    s = s.replace("!qqq!", "" + ((AbstractSneckoCard) c).baseSilly);
+                }
+            }
             s = s.replaceAll("slimeboundmod:", "");
             s = s.replaceAll("guardianmod:", "");
             s = s.replaceAll("hexamod:", "");
+            s = s.replaceAll("sneckomod:", "");
         }
 
         return s;
