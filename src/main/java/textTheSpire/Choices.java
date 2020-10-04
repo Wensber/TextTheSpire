@@ -45,6 +45,7 @@ import communicationmod.patches.GremlinMatchGamePatch;
 import conspire.events.MimicChestEvent;
 import downfall.patches.EvilModeCharacterSelect;
 import downfall.patches.MainMenuEvilMode;
+import downfall.rooms.HeartShopRoom;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
@@ -470,7 +471,7 @@ public class Choices extends AbstractWindow{
 
             ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();
 
-            if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode && currChoice == ChoiceScreenUtils.ChoiceType.SHOP_ROOM){
+            if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof HeartShopRoom && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
                 return "";
             }
 

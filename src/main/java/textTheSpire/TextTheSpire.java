@@ -75,6 +75,9 @@ import communicationmod.patches.ShopScreenPatch;
 import conspire.events.MimicChestEvent;
 import downfall.patches.EvilModeCharacterSelect;
 import downfall.patches.MainMenuEvilMode;
+import downfall.rooms.HeartShopRoom;
+import downfall.util.HeartMerchant;
+import guardian.cards.AbstractGuardianCard;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
@@ -1269,6 +1272,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
                 if(downfall && EvilModeCharacterSelect.evilMode && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
                     Map.downfallMapChoice(in);
+                    return;
+                }
+
+                if(downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof HeartShopRoom && ((HeartShopRoom) AbstractDungeon.getCurrRoom()).heartMerchantShown && !AbstractDungeon.isScreenUp && in == 0){
+                    AbstractDungeon.overlayMenu.proceedButton.setLabel(HeartMerchant.NAMES[0]);
+                    basemod.ReflectionHacks.setPrivate(((HeartShopRoom) AbstractDungeon.getCurrRoom()).heartMerchant, HeartMerchant.class, "saidWelcome", true);
+                    (AbstractDungeon.getCurrRoom()).rewards.clear();
+                    (AbstractDungeon.getCurrRoom()).rewardAllowed = false;
+                    AbstractDungeon.shopScreen.open();
+                    ((HeartShopRoom) AbstractDungeon.getCurrRoom()).heartMerchant.hb.hovered = false;
                     return;
                 }
 
@@ -2706,18 +2719,22 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             }
         }
         if(downfall){
-            if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
-                if(c instanceof AbstractSlimeboundCard) {
+
+            if(c instanceof AbstractSlimeboundCard) {
+                if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
                     s = s.replace("!SlimeboundSlimed!", "" + ((AbstractSlimeboundCard) c).slimed);
                     s = s.replace("!SlimeboundSelfharm!", "" + ((AbstractSlimeboundCard) c).selfDamage);
-                }
-            }else{
-                if(c instanceof AbstractSlimeboundCard) {
+                }else{
                     s = s.replace("!SlimeboundSlimed!", "" + ((AbstractSlimeboundCard) c).baseSlimed);
                     s = s.replace("!SlimeboundSelfharm!", "" + ((AbstractSlimeboundCard) c).baseSelfDamage);
                 }
             }
+            if(c instanceof AbstractGuardianCard) {
+                s = s.replace("!GuardianMulti!", "" + ((AbstractGuardianCard) c).multihit);
+                s = s.replace("!GuardianSecondM!", "" + ((AbstractGuardianCard) c).secondaryM);
+            }
             s = s.replaceAll("slimeboundmod:", "");
+            s = s.replaceAll("guardianmod:", "");
         }
 
         return s;
