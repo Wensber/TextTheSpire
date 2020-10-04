@@ -12,6 +12,9 @@ import com.megacrit.cardcrawl.stances.NeutralStance;
 import com.megacrit.cardcrawl.ui.panels.EnergyPanel;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
+import theHexaghost.GhostflameHelper;
+import theHexaghost.TheHexaghost;
+import theHexaghost.ghostflames.AbstractGhostflame;
 
 import java.util.ArrayList;
 
@@ -59,6 +62,25 @@ public class Player extends AbstractWindow{
                 s.append("Powers:\r\n");
                 for (AbstractPower ap : po) {
                     s.append(count).append(": ").append(ap.name).append(" ").append(ap.amount).append("\r\n");
+                    count++;
+                }
+            }
+
+            if(TextTheSpire.downfall && AbstractDungeon.player instanceof TheHexaghost){
+                s.append("Ghostflames:\r\n");
+                count = 0;
+                for(AbstractGhostflame gf : GhostflameHelper.hexaGhostFlames){
+                    s.append(count).append(":").append(gf.getName().replace("Ghostflame", ""));
+                    if(GhostflameHelper.activeGhostFlame == gf){
+                        s.append("active ");
+                    }else{
+                        s.append("inactive ");
+                    }
+                    if(gf.charged){
+                        s.append("ignite\r\n");
+                    }else{
+                        s.append("extinguish\r\n");
+                    }
                     count++;
                 }
             }

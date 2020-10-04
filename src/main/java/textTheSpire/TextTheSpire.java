@@ -84,6 +84,9 @@ import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 import slimebound.cards.AbstractSlimeboundCard;
 import slimebound.orbs.SpawnedSlime;
+import theHexaghost.GhostflameHelper;
+import theHexaghost.cards.AbstractHexaCard;
+import theHexaghost.ghostflames.AbstractGhostflame;
 
 import javax.smartcardio.Card;
 import javax.swing.*;
@@ -1148,6 +1151,19 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         ArrayList<AbstractOrb> ol = AbstractDungeon.player.orbs;
                         if(in >= 0 && in < ol.size()) {
                             inspect.setText(inspectOrb(AbstractDungeon.player.orbs.get(in)));
+                        }
+                    } catch (Exception e) {
+                        return;
+                    }
+                    return;
+                case "gf":
+                    try {
+                        int in;
+                        in = Integer.parseInt(tokens[1]);
+                        ArrayList<AbstractGhostflame> gfl = GhostflameHelper.hexaGhostFlames;
+                        if(in >= 0 && in < gfl.size()){
+                            AbstractGhostflame gf = gfl.get(in);
+                            inspect.setText("\r\n" + gf.getName() + "\r\n" + Choices.stripColor(gf.getDescription()));
                         }
                     } catch (Exception e) {
                         return;
@@ -2733,8 +2749,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 s = s.replace("!GuardianMulti!", "" + ((AbstractGuardianCard) c).multihit);
                 s = s.replace("!GuardianSecondM!", "" + ((AbstractGuardianCard) c).secondaryM);
             }
+            if(c instanceof AbstractHexaCard){
+                if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                    s = s.replace("!burny!","" + ((AbstractHexaCard) c).burn);
+                }else{
+                    s = s.replace("!burny!","" + ((AbstractHexaCard) c).baseBurn);
+                }
+            }
             s = s.replaceAll("slimeboundmod:", "");
             s = s.replaceAll("guardianmod:", "");
+            s = s.replaceAll("hexamod:", "");
         }
 
         return s;
