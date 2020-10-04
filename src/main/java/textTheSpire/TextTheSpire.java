@@ -1691,6 +1691,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Downfall\r\n");
             s.append("This mod adds a new gamemode with 4 new characters.\r\n");
             s.append("You will be playing as a villian and descending down the spire rather than up.\r\n");
+            s.append("The bosses are the original playable characters.\r\n");
+            s.append("They use cards, energy, and relics.\r\n");
+            s.append("At the moment you are unable to inspect them.\r\n");
             s.append("Slimbound:\r\n");
             s.append("Can split off slimes with effects.\r\n");
             s.append("These slimes use orb slots and can be inspected like a normal orb.\r\n");
