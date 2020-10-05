@@ -471,7 +471,7 @@ public class Choices extends AbstractWindow{
 
             ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();
 
-            if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof HeartShopRoom && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
+            if(TextTheSpire.downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof HeartShopRoom && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_ROOM && AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT){
                 return "";
             }
 
