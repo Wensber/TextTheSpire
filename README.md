@@ -11,6 +11,14 @@ This is a mod for the game Slay the Spire and provides screen reader accessibili
 It does so by providing lots of windows displaying the game information and a prompt window for inputting commands.
 Descriptions of the windows and commands are provided with the help command.
 
+This mod supports Windows 64 bit. Other versions of the mod are experimental and can be found:
+
+win32 : https://steamcommunity.com/sharedfiles/filedetails/?id=2254163848
+
+mac : https://steamcommunity.com/sharedfiles/filedetails/?id=2254164037
+
+linux : https://steamcommunity.com/sharedfiles/filedetails/?id=2254164205
+
 Requirements:
 
 Steam - https://steamcommunity.com/

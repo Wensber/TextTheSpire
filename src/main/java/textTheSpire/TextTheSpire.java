@@ -1537,7 +1537,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public String ttsPatchNotes(){
         StringBuilder s = new StringBuilder("\r\n");
 
-        s.append("Current Version : v1.17\r\n");
+        s.append("Current Version : v1.18\r\n");
+        s.append("v1.18\r\nFixed some bugs in Downfall's support.\r\n" +
+                "Boss's hand, orbs, and relics can be inspected.\r\n" +
+                "The Explore Events choice in Winding Halls event seems to be broken in Downfall and should be avoided.\r\n" +
+                "Experimenting with support for different OS.\r\n" +
+                "Created different steam pages for Linux, Mac, and Win 32 bit.\r\n" +
+                "Due to not owning devices with those OS, have not tested if they work.\r\n");
         s.append("v1.17\r\nAdded support for Downfall.\r\n" +
                 "Due to time limitations was not able to test everything.\r\n" +
                 "Use the command mod for more info.\r\n" +

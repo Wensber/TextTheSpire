@@ -5,7 +5,7 @@
 
     <groupId>textthespire</groupId>
     <artifactId>TextTheSpire</artifactId>
-    <version>1.17</version>
+    <version>1.18</version>
     <packaging>jar</packaging>
     <name>TextTheSpire</name>
     <description>Screen Reader Assistance. Requires CommunicationMod.</description>
@@ -127,7 +127,8 @@
                                 <phase>package</phase>
                                 <configuration>
                                     <target>
-                                        <copy file="target/TextTheSpire-win64.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
+                                        <copy file="target/TextTheSpire-win64.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/TextTheSpire-win64.jar"/>
+                                        <copy file="target/TextTheSpire-win64.jar" tofile="${Steam.path}/common/SlayTheSpire/tts-win64/content/TextTheSpire-win64.jar"/>
                                     </target>
                                 </configuration>
                                 <goals>
@@ -151,6 +152,26 @@
             <id>win32</id>
             <build>
                 <finalName>TextTheSpire-win32</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy file="target/TextTheSpire-win32.jar" tofile="${Steam.path}/common/SlayTheSpire/tts-win32/content/TextTheSpire-win32.jar"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
@@ -165,6 +186,26 @@
             <id>linux</id>
             <build>
                 <finalName>TextTheSpire-linux</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy file="target/TextTheSpire-linux.jar" tofile="${Steam.path}/common/SlayTheSpire/tts-linux/content/TextTheSpire-linux.jar"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
@@ -179,6 +220,26 @@
             <id>mac</id>
             <build>
                 <finalName>TextTheSpire-mac</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy file="target/TextTheSpire-mac.jar" tofile="${Steam.path}/common/SlayTheSpire/tts-mac/content/TextTheSpire-mac.jar"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
             </build>
             <dependencies>
                 <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
