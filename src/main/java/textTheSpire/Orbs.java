@@ -12,6 +12,7 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.relics.GoldPlatedCables;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import communicationmod.CommandExecutor;
+import guardian.characters.GuardianCharacter;
 import org.eclipse.swt.widgets.Display;
 
 import java.util.ArrayList;
@@ -86,7 +87,11 @@ public class Orbs extends AbstractWindow{
                 if (o instanceof Dark) {
                     s.append(count).append(". Dark ").append(o.evokeAmount).append("\r\n");
                 } else{
-                    s.append(count).append(". ").append(o.name).append("\r\n");
+                    if(TextTheSpire.downfall && AbstractDungeon.player instanceof GuardianCharacter){
+                        s.append(count).append(". ").append(o.name).append(" ").append(o.passiveAmount).append("\r\n");
+                    } else {
+                        s.append(count).append(". ").append(o.name).append("\r\n");
+                    }
                 }
                 count++;
             }
