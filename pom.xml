@@ -71,12 +71,6 @@
             <scope>system</scope>
             <systemPath>${Steam.path}/common/SlayTheSpire/mods/CommunicationMod.jar</systemPath>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
-        <dependency>
-            <groupId>org.eclipse.swt</groupId>
-            <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
-            <version>4.4</version>
-        </dependency>
         <dependency>
             <groupId>com.replay.cardcrawl</groupId>
             <artifactId>ReplayTheSpireMod</artifactId>
@@ -115,6 +109,88 @@
 
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>win64</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <finalName>TextTheSpire-win64</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <configuration>
+                                    <target>
+                                        <copy file="target/TextTheSpire-win64.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
+                <dependency>
+                    <groupId>org.eclipse.swt</groupId>
+                    <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+                    <version>4.4</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>win32</id>
+            <build>
+                <finalName>TextTheSpire-win32</finalName>
+            </build>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
+                <dependency>
+                    <groupId>org.eclipse.swt</groupId>
+                    <artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
+                    <version>4.4</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>linux</id>
+            <build>
+                <finalName>TextTheSpire-linux</finalName>
+            </build>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
+                <dependency>
+                    <groupId>org.eclipse.swt</groupId>
+                    <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+                    <version>4.4</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>mac</id>
+            <build>
+                <finalName>TextTheSpire-mac</finalName>
+            </build>
+            <dependencies>
+                <!-- https://mvnrepository.com/artifact/org.eclipse.swt/org.eclipse.swt -->
+                <dependency>
+                    <groupId>org.eclipse.swt</groupId>
+                    <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
+                    <version>4.4</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>TextTheSpire</finalName>
         <plugins>
@@ -139,11 +215,6 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <configuration>
-                            <target>
-                                <copy file="target/TextTheSpire-${project.version}-shaded.jar" tofile="${Steam.path}/common/SlayTheSpire/mods/${project.artifactId}.jar"/>
-                            </target>
-                        </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
