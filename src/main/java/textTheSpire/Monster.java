@@ -61,7 +61,7 @@ public class Monster extends AbstractWindow{
                     s.append("Block: ").append(m.currentBlock).append("\r\n");
                     s.append("HP: ").append(m.currentHealth).append("/").append(m.maxHealth).append("\r\n");
 
-                    if (!runicDome())
+                    if (!runicDome() && !(TextTheSpire.downfall && m instanceof AbstractCharBoss))
                         s.append(monsterIntent(m));
 
                     int powCount = 0;
@@ -73,21 +73,23 @@ public class Monster extends AbstractWindow{
                             powCount++;
                         }
                     }
-                    s.append("\r\n");
 
                     if(TextTheSpire.downfall && m instanceof AbstractCharBoss){
                         s.append("Hand:\r\n");
+                        int hand_count = 0;
                         for(AbstractCard c : ((AbstractCharBoss) m).hand.group){
-                            s.append(c.name).append("\r\n");
+                            s.append(hand_count).append(": ").append(c.name).append("\r\n");
+                            hand_count++;
                         }
                         s.append("Energy: ").append(EnemyEnergyPanel.totalCount).append("\r\n");
                         if(((AbstractCharBoss) m).orbs.size() > 0){
+                            int orb_count = 0;
                             s.append("Orbs:\r\n");
                             for(AbstractOrb o : ((AbstractCharBoss) m).orbs){
                                 if (o instanceof Dark) {
-                                    s.append(count).append("Dark ").append(o.evokeAmount).append("\r\n");
+                                    s.append(orb_count).append(": ").append(count).append("Dark ").append(o.evokeAmount).append("\r\n");
                                 } else {
-                                    s.append(o.name).append("\r\n");
+                                    s.append(orb_count).append(": ").append(o.name).append("\r\n");
                                 }
                             }
                         }
@@ -95,20 +97,24 @@ public class Monster extends AbstractWindow{
                             s.append("Stance: ").append(((AbstractEnemyStance)((AbstractCharBoss) m).stance).ID).append("\r\n");
                         }
                         s.append("Relics:\r\n");
+                        int relic_count = 0;
                         for(AbstractRelic r : ((AbstractCharBoss) m).relics){
                             if(r.counter >= 0){
-                                s.append(r.name).append(" ").append(r.counter).append("\r\n");
+                                s.append(relic_count).append(": ").append(r.name).append(" ").append(r.counter).append("\r\n");
                             }else{
-                                s.append(r.name).append("\r\n");
+                                s.append(relic_count).append(": ").append(r.name).append("\r\n");
                             }
+                            relic_count++;
                         }
+                        s.append("b [h/o/r] [index]\r\n");
                     }
                 }
                 count++;
 
             }
 
-            s.insert(0, "\r\nCount: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
+            if(!(TextTheSpire.downfall && AbstractDungeon.getCurrRoom().monsters.monsters.get(0) instanceof AbstractCharBoss))
+                s.insert(0, "\r\nCount: " + totalAlive + "\r\n" + "Incoming: " + totalDmg + "\r\n");
 
             return s.toString();
 

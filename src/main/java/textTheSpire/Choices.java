@@ -46,6 +46,9 @@ import conspire.events.MimicChestEvent;
 import downfall.patches.EvilModeCharacterSelect;
 import downfall.patches.MainMenuEvilMode;
 import downfall.rooms.HeartShopRoom;
+import downfall.util.RemoveCardReward;
+import downfall.util.TransformCardReward;
+import downfall.util.UpgradeCardReward;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
@@ -640,6 +643,21 @@ public class Choices extends AbstractWindow{
 
                 } else if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.COMBAT_REWARD) {
                     for(RewardItem reward : AbstractDungeon.combatRewardScreen.rewards) {
+                        if(TextTheSpire.downfall){
+                            if(reward instanceof RemoveCardReward){
+                                s.append(count).append(":").append("remove\r\n");
+                                count++;
+                                continue;
+                            } else if(reward instanceof UpgradeCardReward){
+                                s.append(count).append(":").append("upgrade\r\n");
+                                count++;
+                                continue;
+                            } else if(reward instanceof TransformCardReward){
+                                s.append(count).append(":").append("transform\r\n");
+                                count++;
+                                continue;
+                            }
+                        }
                         if(reward.type == RewardItem.RewardType.POTION)
                             s.append(count).append(":").append(reward.potion.name).append("\r\n");
                         else if(reward.type == RewardItem.RewardType.RELIC)

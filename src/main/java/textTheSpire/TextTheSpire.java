@@ -6,6 +6,7 @@ import ascensionMod.UI.CharSelectScreenUI;
 import ascensionMod.UI.buttons.AscButton;
 import basemod.ReflectionHacks;
 import basemod.interfaces.*;
+import charbosses.bosses.AbstractCharBoss;
 import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.RefundFields;
@@ -73,6 +74,8 @@ import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
 import communicationmod.patches.ShopScreenPatch;
 import conspire.events.MimicChestEvent;
+import downfall.events.GremlinWheelGame_Evil;
+import downfall.events.GremlinWheelGame_Rest;
 import downfall.patches.EvilModeCharacterSelect;
 import downfall.patches.MainMenuEvilMode;
 import downfall.rooms.HeartShopRoom;
@@ -1159,6 +1162,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     }
                     return;
                 case "gf":
+                    if(!TextTheSpire.downfall)
+                        return;
                     try {
                         int in;
                         in = Integer.parseInt(tokens[1]);
@@ -1169,6 +1174,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                         }
                     } catch (Exception e) {
                         return;
+                    }
+                    return;
+                case "boss":
+                case "b":
+                    if(TextTheSpire.downfall && AbstractDungeon.getCurrRoom().monsters.monsters.get(0) instanceof AbstractCharBoss && tokens.length >= 3){
+                        inspect.setText(inspectDownfallBoss(tokens, (AbstractCharBoss)AbstractDungeon.getCurrRoom().monsters.monsters.get(0)));
                     }
                     return;
                 case "exhaust":
@@ -1301,6 +1312,16 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     AbstractDungeon.shopScreen.open();
                     ((HeartShopRoom) AbstractDungeon.getCurrRoom()).heartMerchant.hb.hovered = false;
                     return;
+                }
+
+                if(downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom().event instanceof GremlinWheelGame_Evil){
+                    ReflectionHacks.setPrivate(AbstractDungeon.getCurrRoom().event, GremlinWheelGame_Evil.class, "buttonPressed", true);
+                    CardCrawlGame.sound.play("WHEEL");
+                }
+
+                if(downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom().event instanceof GremlinWheelGame_Rest){
+                    ReflectionHacks.setPrivate(AbstractDungeon.getCurrRoom().event, GremlinWheelGame_Rest.class, "buttonPressed", true);
+                    CardCrawlGame.sound.play("WHEEL");
                 }
 
                 ChoiceScreenUtils.executeChoice(in);
@@ -1693,7 +1714,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("You will be playing as a villian and descending down the spire rather than up.\r\n");
             s.append("The bosses are the original playable characters.\r\n");
             s.append("They use cards, energy, and relics.\r\n");
-            s.append("At the moment you are unable to inspect them.\r\n");
+            s.append("Their hand is sorted in the order they are played.\r\n");
+            s.append("You can inspect the boss's zones with the command:\r\n");
+            s.append("b [h/o/r] [index]\r\n");
+            s.append("h is hand, o is orb, and r is relic.\r\n");
             s.append("Slimbound:\r\n");
             s.append("Can split off slimes with effects.\r\n");
             s.append("These slimes use orb slots and can be inspected like a normal orb.\r\n");
@@ -2645,6 +2669,31 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         }
 
         return s;
+    }
+
+    public String inspectDownfallBoss(String[] tokens, AbstractCharBoss m){
+        StringBuilder s = new StringBuilder("");
+
+        try{
+            int in = Integer.parseInt(tokens[2]);
+            switch (tokens[1]){
+                case "hand":
+                case "h":
+                    s.append(inspectCard(m.hand.group.get(in)));
+                    break;
+                case "orb":
+                case "o":
+                    s.append(inspectOrb(m.orbs.get(in)));
+                    break;
+                case "relic":
+                case "r":
+                    s.append(inspectRelic(m.relics.get(in)));
+                    break;
+            }
+        }catch (Exception ignored){
+        }
+
+        return s.toString();
     }
 
     public String inspectPower(AbstractPower p){
