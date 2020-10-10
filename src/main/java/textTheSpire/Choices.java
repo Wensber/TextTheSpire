@@ -458,15 +458,6 @@ public class Choices extends AbstractWindow{
 
             return s.toString();
 
-
-
-
-
-
-
-
-
-
         } else if(CommandExecutor.isInDungeon()){
 
             ChoiceScreenUtils.ChoiceType currChoice = ChoiceScreenUtils.getCurrentChoiceType();

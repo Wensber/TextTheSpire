@@ -1201,7 +1201,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                                 return;
                             }
                         }
-                        if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE || (downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof ShopRoom)){
+                        if(ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.NONE || (downfall && EvilModeCharacterSelect.evilMode && AbstractDungeon.getCurrRoom() instanceof ShopRoom && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.SHOP_ROOM)){
                             String playInput = "play " + input;
                             String[] playTokens = playInput.split("\\s+");
                             if(playTokens.length == 2){
