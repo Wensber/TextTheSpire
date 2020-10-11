@@ -103,6 +103,8 @@ import java.util.concurrent.Callable;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
+    public final static String VERSION = "1.18";
+
     //Used to only update display every number of update cycles
     int iter;
     int choiceTimeout;
@@ -1537,7 +1539,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public String ttsPatchNotes(){
         StringBuilder s = new StringBuilder("\r\n");
 
-        s.append("Current Version : v1.18\r\n");
+        s.append("Current Version : v" + VERSION + "\r\n");
         s.append("v1.18\r\nFixed some bugs in Downfall's support.\r\n" +
                 "Boss's hand, orbs, and relics can be inspected.\r\n" +
                 "The Explore Events choice in Winding Halls event seems to be broken in Downfall and should be avoided.\r\n" +
