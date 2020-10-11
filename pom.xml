@@ -106,7 +106,6 @@
             <scope>system</scope>
             <systemPath>${Steam.path}/workshop/content/646570/1610056683/downfall.jar</systemPath>
         </dependency>
-
     </dependencies>
 
     <profiles>

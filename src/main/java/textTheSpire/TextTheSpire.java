@@ -1181,7 +1181,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 case "boss":
                 case "b":
                     if(TextTheSpire.downfall && AbstractDungeon.getCurrRoom().monsters.monsters.get(0) instanceof AbstractCharBoss && tokens.length >= 3){
-                        inspect.setText(inspectDownfallBoss(tokens, (AbstractCharBoss)AbstractDungeon.getCurrRoom().monsters.monsters.get(0)));
+                        inspect.setText(inspectDownfallBoss(tokens, AbstractDungeon.getCurrRoom().monsters.monsters.get(0)));
                     }
                     return;
                 case "exhaust":
@@ -2679,8 +2679,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         return s;
     }
 
-    public String inspectDownfallBoss(String[] tokens, AbstractCharBoss m){
+    public String inspectDownfallBoss(String[] tokens, AbstractMonster mon){
         StringBuilder s = new StringBuilder("");
+
+        if(!(downfall && mon instanceof AbstractCharBoss))
+            return "";
+
+        AbstractCharBoss m = (AbstractCharBoss)mon;
 
         try{
             int in = Integer.parseInt(tokens[2]);
