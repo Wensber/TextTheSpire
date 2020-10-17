@@ -7,6 +7,7 @@ import ascensionMod.UI.buttons.AscButton;
 import basemod.ReflectionHacks;
 import basemod.interfaces.*;
 import charbosses.bosses.AbstractCharBoss;
+import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.RefundFields;
 import com.evacipated.cardcrawl.mod.stslib.relics.ClickableRelic;
@@ -85,6 +86,8 @@ import theHexaghost.cards.AbstractHexaCard;
 import theHexaghost.ghostflames.AbstractGhostflame;
 
 import javax.swing.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -136,7 +139,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     private static String queuedCommand = "";
     private static boolean hasQueuedCommand = false;
 
-    private static JSONObject pickedLang;
+    private static JSONObject localization;
     private static JSONObject help;
     private static String tutorial;
 
@@ -230,22 +233,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         });
 
         try{
-            JSONObject jo = (JSONObject) new JSONParser().parse(new FileReader("localization.json"));
-            String current_lang = Settings.language.toString();
-            System.out.println(current_lang);
-            if(jo.containsKey(current_lang)){
-                pickedLang = (JSONObject) jo.get(current_lang);
-                System.out.println("Match " + (pickedLang != null));
-            }else{
-                pickedLang = (JSONObject) jo.get("ENG");
-                System.out.println("Mismatch " + (pickedLang != null));
-            }
-            help = (JSONObject) pickedLang.get("help");
-            tutorial = (String) pickedLang.get("tutorial");
-            System.out.println("help " + (help != null));
-            System.out.println("tutorial " + (tutorial != null));
+            InputStream in = getClass().getResourceAsStream("/localization.json");
+            localization = (JSONObject) new JSONParser().parse(new InputStreamReader(in, "UTF-8"));
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            System.out.println("Error " + e.getMessage());
         }
 
     }
@@ -1798,8 +1789,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         }else{
             if(tokens[1].equals("tutorial")){
                 return getTutorial();
-            }else{
+            }else if(help.containsKey(tokens[1])){
                 return (String)help.get(tokens[1]);
+            }else{
+                return "";
             }
         }
     }
@@ -2608,6 +2601,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     //Update displays every 30 update cycles
     @Override
     public void receivePostUpdate() {
+
+        if(help == null && Settings.language != null){
+            String current_lang = Settings.language.toString();
+            JSONObject pickedLang;
+            if(localization.containsKey(current_lang)){
+                pickedLang = (JSONObject) localization.get(current_lang);
+            }else{
+                pickedLang = (JSONObject) localization.get("ENG");
+            }
+            help = (JSONObject) pickedLang.get("help");
+            tutorial = (String) pickedLang.get("tutorial");
+        }
 
         logs.update();
 
