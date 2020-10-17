@@ -3,7 +3,6 @@
     "help": {
       "base": "Here are a list of commands you can perform.\nFor more details enter help followed by a command.\nExample:\nhelp start\nAll commands are input in the prompt window.\ntutorial\nascension\nquit\nseed\nstats\ncomp\nhistory\nvolume\nlang\nachieve\nmod\nleader\npotion\nchoice\npower\nend\nshow\nhide\nChoices\nDeck\nDiscard\nEvent\nHand\nexhaust\nOutput\nLog\nSave\nLoad\nMap\npath\nMonster\nOrbs\nPlayer\nRelic",
       "ascension": "ascension\nThis command lists all the ascension modifiers.",
-      "tutorial": "tutorial\nThis command displays a tutorial.",
       "quit": "quit\nWhile in a run, this command saves and quits to main menu.\nWhile on the main menu, this command quits the game.\nAnother easy way to close the game would be to close the ModTheSpire window.",
       "seed": "seed\nThis command displays the run's seed to the output window.\nA seed is used for random number generation.\nIt can be input when starting a run to have a set seed.",
       "stats": "stats\nThis command displays your save file's statistics to output.\nWill not work on a fresh save file.",

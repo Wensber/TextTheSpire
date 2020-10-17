@@ -91,8 +91,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import java.io.FileReader;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
 
@@ -100,7 +98,7 @@ import org.json.simple.parser.*;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
-    public final static String VERSION = "1.18";
+    public final static String VERSION = "1.19";
 
     //Used to only update display every number of update cycles
     int iter;
@@ -1549,6 +1547,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         StringBuilder s = new StringBuilder("\r\n");
 
         s.append("Current Version : v" + VERSION + "\r\n");
+        s.append("v1.19\r\nFixed an issue where Choices did not list embark in character select if ascension mode isn't unlocked.\r\n" +
+                "Cleaned up the help menu and moved it to a json file to accommodate potential translations.\r\n");
         s.append("v1.18\r\nFixed some bugs in Downfall's support.\r\n" +
                 "Boss's hand, orbs, and relics can be inspected.\r\n" +
                 "The Explore Events choice in Winding Halls event seems to be broken in Downfall and should be avoided.\r\n" +
@@ -2607,7 +2607,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             JSONObject pickedLang;
             if(localization.containsKey(current_lang)){
                 pickedLang = (JSONObject) localization.get(current_lang);
-            }else{
+            } else {
                 pickedLang = (JSONObject) localization.get("ENG");
             }
             help = (JSONObject) pickedLang.get("help");
