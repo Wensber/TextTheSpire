@@ -106,6 +106,25 @@
             <scope>system</scope>
             <systemPath>${Steam.path}/workshop/content/646570/1610056683/downfall.jar</systemPath>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+                <!-- maven note: must manually exclude all ancestors
+                        see http://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html -->
+                <exclusion>
+                    <groupId>org.hamcrest</groupId>
+                    <artifactId>hamcrest-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
     <profiles>

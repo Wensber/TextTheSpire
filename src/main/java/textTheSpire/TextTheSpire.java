@@ -7,7 +7,6 @@ import ascensionMod.UI.buttons.AscButton;
 import basemod.ReflectionHacks;
 import basemod.interfaces.*;
 import charbosses.bosses.AbstractCharBoss;
-import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.RefundFields;
 import com.evacipated.cardcrawl.mod.stslib.relics.ClickableRelic;
@@ -30,10 +29,8 @@ import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.events.GenericEventDialog;
 import com.megacrit.cardcrawl.events.shrines.GremlinMatchGame;
 import com.megacrit.cardcrawl.helpers.*;
-import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.integrations.DistributorFactory;
 import com.megacrit.cardcrawl.mod.replay.monsters.replay.FadingForestBoss;
-import com.megacrit.cardcrawl.mod.replay.relics.WaxSeal;
 import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.orbs.AbstractOrb;
 import com.megacrit.cardcrawl.potions.AbstractPotion;
@@ -48,12 +45,9 @@ import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.custom.CustomMod;
 import com.megacrit.cardcrawl.screens.custom.CustomModeScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.FilterButton;
-import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.*;
 
-import com.megacrit.cardcrawl.screens.options.OptionsPanel;
-import com.megacrit.cardcrawl.screens.options.Slider;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
 import com.megacrit.cardcrawl.screens.select.BossRelicSelectScreen;
 import com.megacrit.cardcrawl.screens.stats.AchievementItem;
@@ -72,7 +66,6 @@ import communicationmod.CommandExecutor;
 import communicationmod.GameStateListener;
 import communicationmod.InvalidCommandException;
 import communicationmod.patches.GremlinMatchGamePatch;
-import communicationmod.patches.ShopScreenPatch;
 import conspire.events.MimicChestEvent;
 import downfall.events.GremlinWheelGame_Evil;
 import downfall.events.GremlinWheelGame_Rest;
@@ -82,22 +75,23 @@ import downfall.rooms.HeartShopRoom;
 import downfall.util.HeartMerchant;
 import guardian.cards.AbstractGuardianCard;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Menu;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 import slimebound.cards.AbstractSlimeboundCard;
 import slimebound.orbs.SpawnedSlime;
 import sneckomod.cards.AbstractSneckoCard;
-import sneckomod.cards.unknowns.UnknownClass;
 import theHexaghost.GhostflameHelper;
 import theHexaghost.cards.AbstractHexaCard;
 import theHexaghost.ghostflames.AbstractGhostflame;
 
-import javax.smartcardio.Card;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
+
+import java.io.FileReader;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
 
 
 @SpireInitializer
@@ -121,7 +115,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static boolean downfall;
 
     private Hand hand;
-    private Map map;
+    private textTheSpire.Map map;
     private Discard discard;
     private Deck deck;
     private Player player;
@@ -142,6 +136,10 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     private static String queuedCommand = "";
     private static boolean hasQueuedCommand = false;
 
+    private static JSONObject pickedLang;
+    private static JSONObject help;
+    private static String tutorial;
+
     public static ArrayList<RunData> runList;
     public static ArrayList<RunData> runFiltered;
     public static boolean include_win;
@@ -154,6 +152,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static boolean include_asc;
     public static boolean include_daily;
 
+    @SuppressWarnings("Duplicates")
     public TextTheSpire() {
 
         replayTheSpire = Loader.isModLoaded("ReplayTheSpireMod");
@@ -172,7 +171,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             Display display = new Display();
 
             hand = new Hand(display);
-            map = new Map(display);
+            map = new textTheSpire.Map(display);
             choice = new Choices(display);
             monster = new Monster(display);
             deck = new Deck(display);
@@ -229,6 +228,25 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             promptFrame.setText("");
             promptFrame.repaint();
         });
+
+        try{
+            JSONObject jo = (JSONObject) new JSONParser().parse(new FileReader("localization.json"));
+            String current_lang = Settings.language.toString();
+            System.out.println(current_lang);
+            if(jo.containsKey(current_lang)){
+                pickedLang = (JSONObject) jo.get(current_lang);
+                System.out.println("Match " + (pickedLang != null));
+            }else{
+                pickedLang = (JSONObject) jo.get("ENG");
+                System.out.println("Mismatch " + (pickedLang != null));
+            }
+            help = (JSONObject) pickedLang.get("help");
+            tutorial = (String) pickedLang.get("tutorial");
+            System.out.println("help " + (help != null));
+            System.out.println("tutorial " + (tutorial != null));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
@@ -1302,7 +1320,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                 }
 
                 if(downfall && EvilModeCharacterSelect.evilMode && ChoiceScreenUtils.getCurrentChoiceType() == ChoiceScreenUtils.ChoiceType.MAP){
-                    Map.downfallMapChoice(in);
+                    textTheSpire.Map.downfallMapChoice(in);
                     return;
                 }
 
@@ -1776,453 +1794,18 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public String displayHelp(String[] tokens){
 
         if(tokens.length == 1){
-            return  "\r\nHere are a list of commands you can perform." +
-                    "\r\nFor more details enter help followed by a command." +
-                    "\r\nExample:" +
-                    "\r\nhelp start" +
-                    "\r\nAll commands are input in the prompt window." +
-                    "\r\ntutorial" +
-                    "\r\nascension" +
-                    "\r\nstart" +
-                    "\r\nabandon" +
-                    "\r\ncontinue" +
-                    "\r\nslot" +
-                    "\r\nquit" +
-                    "\r\nseed" +
-                    "\r\nstats" +
-                    "\r\ncomp" +
-                    "\r\nhistory" +
-                    "\r\nvolume" +
-                    "\r\nlang" +
-                    "\r\nachieve" +
-                    "\r\nmod" +
-                    "\r\nplay" +
-                    "\r\ncustom" +
-                    "\r\ndaily" +
-                    "\r\nleader" +
-                    "\r\npotion" +
-                    "\r\nchoice" +
-                    "\r\npower" +
-                    "\r\nend" +
-                    "\r\nshow" +
-                    "\r\nhide" +
-                    "\r\nChoices" +
-                    "\r\nDeck" +
-                    "\r\nDiscard" +
-                    "\r\nEvent" +
-                    "\r\nHand" +
-                    "\r\nexhaust" +
-                    "\r\nOutput" +
-                    "\r\nLog" +
-                    "\r\nSave" +
-                    "\r\nLoad" +
-                    "\r\nMap" +
-                    "\r\npath" +
-                    "\r\nMonster" +
-                    "\r\nOrbs" +
-                    "\r\nPlayer" +
-                    "\r\nRelic";
+            return (String)help.get("base");
         }else{
-            switch(tokens[1].toLowerCase()){
-                case "tutorial":
-                    return  getTutorial();
-                case "ascension":
-                    return  "\r\nascension" +
-                            "\r\nThis command lists all the ascension modifiers.";
-                case "start":
-                case "abandon":
-                case "continue":
-                    return  "\r\nstart, abandon, and continue" +
-                            "\r\nThese commands let you enter a run. You see these options while on the start menu." +
-                            "\r\nIf there is no save file, you can start a run." +
-                            "\r\nThe format is" +
-                            "\r\nstart, class name, ascension level, seed" +
-                            "\r\nThe second 2 are optional." +
-                            "\r\nExamples:" +
-                            "\r\nstart ironclad" +
-                            "\r\nstart defect 10" +
-                            "\r\nDefault ascension is 0." +
-                            "\r\nIf you want to enter a seed you will need to enter an ascension level." +
-                            "\r\nIf there is a save file, you will have the continue and abandon options." +
-                            "\r\nabandon will delete your current run after a confirmation popup." +
-                            "\r\nThe choices window will display all of the classes and their unlocked ascension level." +
-                            "\r\nIf the character is locked it will display locked.";
-                case "slot":
-                    return  "\r\nslot" +
-                            "\r\nFrom the main menu this opens up the save slot screen." +
-                            "\r\nDetails on how to navigate this screen will appear in the Choices window.";
-                case "quit":
-                    return  "\r\nquit" +
-                            "\r\nWhile in a run, this command saves and quits to main menu." +
-                            "\r\nWhile on the main menu, this command quits the game." +
-                            "\r\nAnother easy way to close the game would be to close the ModTheSpire window.";
-                case "seed":
-                    return  "\r\nseed" +
-                            "\r\nThis command displays the run's seed to the output window." +
-                            "\r\nA seed is used for random number generation." +
-                            "\r\nIt can be input when starting a run to have a set seed,";
-                case "stats":
-                    return  "\r\nstats" +
-                            "\r\nThis command displays your save file's statistics to output." +
-                            "\r\nWill not work on a fresh save file.";
-                case "comp":
-                    return  "\r\ncomp" +
-                            "\r\nThis is the Compendium command." +
-                            "\r\nThere are various categories and subcategories." +
-                            "\r\nThe Categories are" +
-                            "\r\ni for Ironclad" +
-                            "\r\ns for Silent" +
-                            "\r\nd for Defect" +
-                            "\r\nw for Watcher" +
-                            "\r\np for Potions" +
-                            "\r\nr for Relics" +
-                            "\r\nRelics has subcategories." +
-                            "\r\nThese are i, s, d, w, and sh." +
-                            "\r\nsh is shared and is all of the shared relics." +
-                            "\r\nFollowing any command by a number will inspect the item at that index." +
-                            "\r\nExamples" +
-                            "\r\ncomp i" +
-                            "\r\ncomp s 5" +
-                            "\r\ncomp p" +
-                            "\r\ncomp r w" +
-                            "\r\ncomp r sh 10";
-                case "history":
-                    return  "\r\nhistory" +
-                            "\r\nThis is the Run History command." +
-                            "\r\nFrom the main menu you can active the Run History screen." +
-                            "\r\nAlmost all commands will be disabled while on this screen." +
-                            "\r\nYou can input close at any time to close Run History." +
-                            "\r\nRead the Choices window to navigate Run History." +
-                            "\r\nThere is currently an issues with Run History." +
-                            "\r\nSome objects are named differently in the code than what they actually are." +
-                            "\r\nAs Run History only uses text and not abstract objects, it would be difficult to grab the actual name." +
-                            "\r\nFor now Run History is using these code names.";
-                case "volume":
-                    return  "\r\nvolume" +
-                            "\r\nThis displays the current volume settings to output." +
-                            "\r\nIt can also change the settings." +
-                            "\r\nThe different volume types are master, music, and sound effects." +
-                            "\r\nThere is an additional toggle for background ambience sounds." +
-                            "\r\nThe format is" +
-                            "\r\nvolume master/music/sound number" +
-                            "\r\nThe number needs to be a decimal between 0 and 1." +
-                            "\r\nExamples:" +
-                            "\r\nvolume master 0.5" +
-                            "\r\nvolume ambience";
-                case "lang":
-                    return  "\r\nlang" +
-                            "\r\nThis displays the current language and available languages." +
-                            "\r\nChange the language with lang followed by the index of the language you want." +
-                            "\r\nExample:" +
-                            "\r\nlang 0" +
-                            "\r\nOnly game text like card descriptions and monster names will change." +
-                            "\r\nThis does not affect the mod's text as it hasn't been translated yet." +
-                            "\r\nRestart the game for the display to update.";
-                case "achieve":
-                    return  "\r\nachieve" +
-                            "\r\nThis displays to output the list of locked and unlocked achievements." +
-                            "\r\nachieve number displays the description of a given achievement." +
-                            "\r\nachieve can be shortened to a.";
-                case "mod":
-                    return  "\r\nmod" +
-                            "\r\nThis displays to output some notes on certain loaded content mods." +
-                            "\r\nIf a mod isn't listed here then it either works out of the box or hasn't been implemented yet.";
-                case "play":
-                    return  "\r\nplay" +
-                            "\r\nThis command lets you play cards from your hand." +
-                            "\r\nThe format is" +
-                            "\r\n[card number] [enemy number]" +
-                            "\r\nEnemy number is optional for cards without targets or if there is only 1 target." +
-                            "\r\nNote that the card number is the index in your hand." +
-                            "\r\nIt changes as cards are played." +
-                            "\r\nEnemy number does not change.";
-                case "custom":
-                    return  "\r\ncustom" +
-                            "\r\nFrom the main menu this opens up the custom mode panel." +
-                            "\r\nIt opens the Custom window which displays the options for a custom game." +
-                            "\r\nYou may display to output a simplified version of the current settings with the command simple." +
-                            "\r\nThe commands to set settings are char, asc, seed, and mod." +
-                            "\r\nchar is the character command. The format is" +
-                            "\r\nchar number" +
-                            "\r\nasc is the ascension command." +
-                            "\r\nasc on its own will toggle whether asc is on or off. The format for setting the level is" +
-                            "\r\nasc number" +
-                            "\r\nseed opens the seed panel." +
-                            "\r\nYou will need to to go to the main game window, type or paste the seed, and hit enter." +
-                            "\r\nAn empty seed generates a random seed when you embark." +
-                            "\r\nmod lets you select and inspect modifiers." +
-                            "\r\nThe format to select a mod is" +
-                            "\r\nmod number" +
-                            "\r\nThe format to inspect a mod is" +
-                            "\r\nmod i number" +
-                            "\r\nExample series of commands to start a custom game:" +
-                            "\r\ncustom" +
-                            "\r\nchar 2" +
-                            "\r\nasc" +
-                            "\r\nasc 15" +
-                            "\r\nmod 10" +
-                            "\r\nmod 15" +
-                            "\r\nmod 13" +
-                            "\r\nembark";
-                case "daily":
-                    return  "\r\ndaily" +
-                            "\r\nFrom the main menu this opens up the daily climb screen." +
-                            "\r\nOn that screen you can view the current daily mods and embark on a daily climb." +
-                            "\r\nThere is also a Daily Climb Leaderboard." +
-                            "\r\nUse the embark command to begin a Daily Climb." +
-                            "\r\nUse the mine command to display personal scores." +
-                            "\r\nUse the prev and next commands to change the date to display." +
-                            "\r\nUse the + and - commands to shift the leaderboard by 20 ranks.";
-                case "leader":
-                    return  "\r\nleader" +
-                            "\r\nFrom the main menu this opens up the leaderboard screen." +
-                            "\r\nThe leaderboard is displayed in the Event window." +
-                            "\r\nThe Choices window displays the leaderboard options." +
-                            "\r\nOption 1 is char which is which Character." +
-                            "\r\nOption 2 is region." +
-                            "\r\nOption 3 is type." +
-                            "\r\nFor all options used the format:" +
-                            "\r\n[option] [number]" +
-                            "\r\nExamples:" +
-                            "\r\nchar 1" +
-                            "\r\nregion 0" +
-                            "\r\ntype 2" +
-                            "\r\nUse the commands + and - to shift which ranks to display on the leaderboard." +
-                            "\r\nUse the command mine while region is set to Global to display your scores.";
-                case "potion":
-                    return  "\r\npotion" +
-                            "\r\nThis command lets you interact with your potions." +
-                            "\r\nThere are 3 different options." +
-                            "\r\nuse. discard, and inspect." +
-                            "\r\nThe format for use is" +
-                            "\r\npotion use [potion number] [enemy number]" +
-                            "\r\nEnemy number is optional for potions without targets." +
-                            "\r\nThe format for discard is" +
-                            "\r\npotion discard [potion number]" +
-                            "\r\nThe format for inspect is" +
-                            "\r\npotion inspect [potion number]" +
-                            "\r\nInspect displays what the potion does to the output window." +
-                            "\r\npotion can be shortened to pot, use to u, discard to d, and inspect to i." +
-                            "\r\nExamples:" +
-                            "\r\npot u 1 1" +
-                            "\r\npot d 2" +
-                            "\r\npot i 1";
-                case "choice":
-                    return  "\r\nchoice" +
-                            "\r\nNot to be confused with choices, which is one of the windows." +
-                            "\r\nchoice displays the info for one of the choices in the choices window in the output window." +
-                            "\r\nThe format is" +
-                            "\r\nchoice [choice number]" +
-                            "\r\nchoice can be shortened to c." +
-                            "\r\nExample:" +
-                            "\r\nc 1";
-                case "power":
-                    return  "\r\npower" +
-                            "\r\nThis command inspects one of your or a monster's powers." +
-                            "\r\nThe format to inspect one of your powers is" +
-                            "\r\npower player [power number]" +
-                            "\r\nThe format to inspect a monster's power is" +
-                            "\r\npower monster [monster number] [power number]" +
-                            "\r\npower can be shortened to pow, monster to m, and player to p." +
-                            "\r\nExample:" +
-                            "\r\npow p 1" +
-                            "\r\npow m 1 2";
-                case "end":
-                    return  "\r\nend" +
-                            "\r\nThis command ends your turn.";
-                case "show":
-                case "hide":
-                    return  "\r\nshow and hide" +
-                            "\r\nThese commands allow you to hide and unhide windows." +
-                            "\r\nThe format is" +
-                            "\r\n[show/hide] window name" +
-                            "\r\nYou may also use all for window name to show or hide all windows besides output and prompt." +
-                            "\r\nExamples:" +
-                            "\r\nhide all" +
-                            "\r\nshow map";
-                case "choices":
-                    return  "\r\nchoices" +
-                            "\r\nThis command displays the text in the choices window in the output window." +
-                            "\r\nThe choices window has all of the available choices you can make." +
-                            "\r\nChoices are either numbered or are a single word." +
-                            "\r\nEntering either the number or the word selects that choice.";
-                case "deck":
-                    return  "\r\ndeck" +
-                            "\r\nThis command displays the text in the deck window in the output window." +
-                            "\r\nThe deck window displays your deck size and all cards in the deck." +
-                            "\r\nOut of combat it displays your master deck." +
-                            "\r\nIn combat it displays your current deck.";
-                case "discard":
-                    return  "\r\ndiscard" +
-                            "\r\nThis command displays the text in the discard window in the output window." +
-                            "\r\nThe discard window displays your discard size and all cards in your discard.";
-                case "event":
-                    return  "\r\nevent" +
-                            "\r\nThis command displays the event name and text in the event window in the output window." +
-                            "\r\nThe event window displays the event dialogue." +
-                            "\r\nThe dialogue does have some extra symbols and is often a single line of text." +
-                            "\r\nI apologize for the inconvenience." +
-                            "\r\nIt also displays the run score on death or victory.";
-                case "hand":
-                    return  "\r\nhand" +
-                            "\r\nThis command has two options." +
-                            "\r\nThe first option displays the text in the hand window in the output window." +
-                            "\r\nThe hand window contains the cards in your hand and your potions." +
-                            "\r\nThe second option displays the info of a card in your hand in the output window." +
-                            "\r\nThe format is" +
-                            "\r\nhand [card number]" +
-                            "\r\nhand can be shortened to h." +
-                            "\r\nExample:" +
-                            "\r\nh 1";
-                case "exhaust":
-                    return  "\r\nexhaust" +
-                            "\r\nThis command displays your exhaust pile in Output." +
-                            "\r\nNote that exhaust does not have a window as there are very few reasons to need to check the exhaust pile.";
-                case "output":
-                    return  "\r\noutput" +
-                            "\r\nThis window displays output from various sources." +
-                            "\r\nThis is the only window that cannot display its text to the output window." +
-                            "\r\nIt also cannot be hidden.";
-                case "log":
-                    return  "\r\nlog" +
-                            "\r\nThis window displays the log." +
-                            "\r\nYou can also display the log to output with the log command." +
-                            "\r\nThis log is meant to be a combat log and is still quite basic." +
-                            "\r\nIt will track:" +
-                            "\r\nChanges in health and powers for the player and monsters." +
-                            "\r\nUsed cards and potions." +
-                            "\r\nThe user's inputs.";
-                case "save":
-                case "load":
-                    return  "\r\nsave/load" +
-                            "\r\nThese commands let you save and load the output window for later viewing." +
-                            "\r\nFormat is" +
-                            "\r\nsave/load [anything no spaces]" +
-                            "\r\nExample that saves the output of a map command:" +
-                            "\r\nmap 6 4" +
-                            "\r\nsave 6-4" +
-                            "\r\nload 6-4";
-                case "map":
-                    return  "\r\nmap" +
-                            "\r\nThe map window displays the map that the user can reach." +
-                            "\r\nThe map command has several uses." +
-                            "\r\nThe first is to simply display the text in the map window to the output window." +
-                            "\r\nThe next is to inspect the map." +
-                            "\r\nThis lets you set a destination and display a map that the user can reach and can reach the destination." +
-                            "\r\nThis destination will also be tracked in the choice window when moving on the map." +
-                            "\r\nOptionally you can set a different starting position." +
-                            "\r\nIf you do so the destination will not be tracked in the choice window." +
-                            "\r\nmap can be shortened to m" +
-                            "\r\nFormat is:" +
-                            "\r\nmap [start floor] [start x] [floor] [x]" +
-                            "\r\nExamples:" +
-                            "\r\nmap 6 4" +
-                            "\r\nmap 3 1 6 4" +
-                            "\r\nBoth examples had destination 6 4." +
-                            "\r\nFor a different way to inspect the map check the path command.";
-                case "path":
-                    return  "\r\npath" +
-                            "\r\nThe path command is closely related to the map command." +
-                            "\r\nIt displays all of the unique paths from point a to point b and tallies the types of nodes on each path." +
-                            "\r\nIf point a is not set if defaults to where the user is." +
-                            "\r\nFormat is:" +
-                            "\r\npath [a floor] [a x] [b floor] [b x]" +
-                            "\r\nExamples:" +
-                            "\r\npath 6 4" +
-                            "\r\npath 3 1 6 4" +
-                            "\r\nBoth examples had destination 6 4.";
-                case "monster":
-                    return  "\r\nmonster" +
-                            "\r\nThis command displays the text in the monster window in the output window." +
-                            "\r\nThe monster window display the info of all alive monsters." +
-                            "\r\nYou can view what number monsters are assigned in this window.";
-                case "orbs":
-                    return  "\r\nevent" +
-                            "\r\nThis command displays the text in the orbs window in the output window." +
-                            "\r\nThis window displays the orbs the player has." +
-                            "\r\nThis is usually exclusive to the class Defect." +
-                            "\r\nYou can inspect an orb with the format:" +
-                            "\r\norbs index" +
-                            "\r\nExample:" +
-                            "\r\norbs 1";
-                case "player":
-                    return  "\r\nplayer" +
-                            "\r\nThis command displays the text in the player window in the output window." +
-                            "\r\nThis window displays your character's info." +
-                            "\r\nOut of combat it also displays your potions.";
-                case "relic":
-                    return  "\r\nrelic" +
-                            "\r\nThis command has two options." +
-                            "\r\nThe first option displays the text in the relic window in the output window." +
-                            "\r\nThe relic window contains all the relics you own." +
-                            "\r\nThey are ordered in reverse acquired order." +
-                            "\r\nThe second option displays a relic's info in the inspect window." +
-                            "\r\nThe format is" +
-                            "\r\nrelic [relic number]" +
-                            "\r\nExample:" +
-                            "\r\nrelic 5";
+            if(tokens[1].equals("tutorial")){
+                return getTutorial();
+            }else{
+                return (String)help.get(tokens[1]);
             }
         }
-
-        return "";
-
     }
 
     public String getTutorial(){
-        return  "\r\ntutorial" +
-                "\r\nThe goal of each run is complete 3 acts." +
-                "\r\nEach act consists of 15 floors and a boss." +
-                "\r\nThe map will mention which boss is at the end of the current act." +
-                "\r\nYou may only proceed forward and you cannot change your path once you take it." +
-                "\r\nEach floor consists of various rooms and each node is connected to rooms on the next floor." +
-                "\r\nUse the map and path commands to inspect and understand the map." +
-                "\r\nEach room has a type that is viewable from the map." +
-                "\r\nMonster rooms contain combat against normal monsters." +
-                "\r\nElite rooms contain combat against elite monsters." +
-                "\r\nCampfire rooms contain a campfire which provides a list of services you can pick from." +
-                "\r\nTreasure rooms contain a treasure chest." +
-                "\r\nShop rooms contain a shop." +
-                "\r\nUnknown rooms can contain any of the above and can contain an event." +
-                "\r\nThroughout the game you will need to make choices." +
-                "\r\nMany of these choices will appear in the Choices window." +
-                "\r\nThese choices can appear as a numbered list or as whole words." +
-                "\r\nTo pick a numbered choice input the number." +
-                "\r\nWhole word choices require inputting the word." +
-                "\r\nCombat uses card game mechanics." +
-                "\r\nUse cards from your hand to defeat enemies." +
-                "\r\nCards cost energy to play." +
-                "\r\nAt the start of a new turn you draw a fresh hand and your energy is replenished." +
-                "\r\nPLay defensive block spells to prevent incoming damage." +
-                "\r\nBlock reduces incoming damage but wears off at the start of the next turn." +
-                "\r\nDuring your turn you can observe the enemy's intent." +
-                "\r\nView cards in your hand using the hand window or the hand command." +
-                "\r\nPlaying cards requires inputting the card number and the target number." +
-                "\r\nEnemies are all assigned a number that does not change." +
-                "\r\nCard numbers are its position in your hand so it can change as you play cards." +
-                "\r\nExamples:" +
-                "\r\n0 0" +
-                "\r\n1 4" +
-                "\r\nYou do not need to input a target if the card does not have a target or if there is only one enemy." +
-                "\r\nPotions follow similar rules to cards." +
-                "\r\nPotions have the options use, discard, and inspect." +
-                "\r\nThe format to use them is:" +
-                "\r\npot [u,d,i] [potion number] [target number]" +
-                "\r\nAgain, target number is not needed if the potion has no target or if there is only one enemy." +
-                "\r\nExamples:" +
-                "\r\npot u 0 1" +
-                "\r\npot d 1" +
-                "\r\npot i 2" +
-                "\r\npot u 3" +
-                "\r\nThroughout the run you will be provided with various rewards." +
-                "\r\nCard rewards add a card to your deck." +
-                "\r\nDo note that you always use all the cards you have and ways to remove cards are rare." +
-                "\r\nRelics are items with passive effects." +
-                "\r\nYou can check and inspect relics you have in the relic window." +
-                "\r\nYou can inspect choices too with the command:" +
-                "\r\nc [number]" +
-                "\r\nUse this to check out rewards before picking them." +
-                "\r\nThis should be enough to get you started." +
-                "\r\nBe sure to check out the rest of the commands in the help command.";
+        return tutorial;
     }
 
     public void parseHistoryCommand(String[] tokens){
