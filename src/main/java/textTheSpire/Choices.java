@@ -758,8 +758,9 @@ public class Choices extends AbstractWindow{
                             s.append("open\r\n");
                         }
                     }
-                    s.append("embark\r\n");
                 }
+                if(ready)
+                    s.append("embark\r\n");
             }else if(TextTheSpire.ascensionReborn && CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == AscModScreen.Enum.ASC_MOD){
                 s.append("Custom Ascension Screen\r\nback\r\nInput number to toggle ascension.\r\nUse ascension command to check what the modifiers do.\r\n");
                 for(int i=CharSelectScreenUI.ascScreen.posAscButtons.size()-1; i>=0; i--){
