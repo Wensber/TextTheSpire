@@ -12,9 +12,13 @@ import com.megacrit.cardcrawl.stances.NeutralStance;
 import com.megacrit.cardcrawl.ui.panels.EnergyPanel;
 import communicationmod.CommandExecutor;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Text;
 import theHexaghost.GhostflameHelper;
 import theHexaghost.TheHexaghost;
 import theHexaghost.ghostflames.AbstractGhostflame;
+import theThorton.ThortMod;
+import theThorton.characters.TheThorton;
+import theThorton.utilPatch.GhostsThortonEvent;
 
 import java.util.ArrayList;
 
@@ -56,6 +60,12 @@ public class Player extends AbstractWindow{
                 s.append("Stance: ").append(p.stance.name).append("\r\n");
             }
 
+            if(TextTheSpire.thorton && AbstractDungeon.player instanceof TheThorton){
+                s.append("Business Cards : ").append(ThortMod.businessCardAmt).append("/").append(ThortMod.businessCardMax).append("\r\n");
+                s.append("Investments : ").append(ThortMod.investmentAmt).append("/").append(ThortMod.investmentMax).append("\r\n");
+                s.append("Flee : ").append(ThortMod.fleeAmt).append("/").append(ThortMod.fleeMax).append("\r\n");
+            }
+
             int count = 0;
             ArrayList<AbstractPower> po = p.powers;
             if(po.size() > 0) {
@@ -91,6 +101,12 @@ public class Player extends AbstractWindow{
             s.append("Health: ").append(p.currentHealth).append("/").append(p.maxHealth).append("\r\n");
 
             s.append("Gold:").append(p.gold).append("\r\n");
+
+            if(TextTheSpire.thorton && AbstractDungeon.player instanceof TheThorton){
+                s.append("Business Cards : ").append(ThortMod.businessCardAmt).append("/").append(ThortMod.businessCardMax).append("\r\n");
+                s.append("Investments : ").append(ThortMod.investmentAmt).append("/").append(ThortMod.investmentMax).append("\r\n");
+                s.append("Flee : ").append(ThortMod.fleeAmt).append("/").append(ThortMod.fleeMax).append("\r\n");
+            }
 
             //Hand window is gone so show potions in player out of combat
             ArrayList<AbstractPotion> pl = p.potions;

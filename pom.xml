@@ -5,7 +5,7 @@
 
     <groupId>textthespire</groupId>
     <artifactId>TextTheSpire</artifactId>
-    <version>1.19</version>
+    <version>1.20</version>
     <packaging>jar</packaging>
     <name>TextTheSpire</name>
     <description>Screen Reader Assistance. Requires CommunicationMod.</description>
@@ -25,6 +25,8 @@
         <Conspire.version>1.7.0</Conspire.version>
         <ShopMod.version>1.1.2</ShopMod.version>
         <Downfall.version>2.0.34</Downfall.version>
+        <Thorton.version>100</Thorton.version>
+        <RelicStats.version>1.1.1</RelicStats.version>
         <Steam.path>C:/Program Files (x86)/Steam/steamapps</Steam.path>
     </properties>
 
@@ -105,6 +107,20 @@
             <version>${Downfall.version}</version>
             <scope>system</scope>
             <systemPath>${Steam.path}/workshop/content/646570/1610056683/downfall.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.thorton.cardcrawl</groupId>
+            <artifactId>Thorton</artifactId>
+            <version>${Thorton.version}</version>
+            <scope>system</scope>
+            <systemPath>${Steam.path}/workshop/content/646570/1783016812/thorton.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.relicstats.cardcrawl</groupId>
+            <artifactId>RelicStats</artifactId>
+            <version>${RelicStats.version}</version>
+            <scope>system</scope>
+            <systemPath>${Steam.path}/workshop/content/646570/2118491069/RelicStats.jar</systemPath>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <dependency>

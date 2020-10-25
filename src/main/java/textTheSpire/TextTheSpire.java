@@ -76,6 +76,8 @@ import downfall.rooms.HeartShopRoom;
 import downfall.util.HeartMerchant;
 import guardian.cards.AbstractGuardianCard;
 import org.eclipse.swt.widgets.Display;
+import relicstats.HasCustomStats;
+import relicstats.RelicStats;
 import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 import slimebound.cards.AbstractSlimeboundCard;
@@ -98,7 +100,7 @@ import org.json.simple.parser.*;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
-    public final static String VERSION = "1.19";
+    public final static String VERSION = "1.20";
 
     //Used to only update display every number of update cycles
     int iter;
@@ -114,6 +116,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
     public static boolean conspire;
     public static boolean shopMod;
     public static boolean downfall;
+    public static boolean thorton;
+    public static boolean relicStats;
 
     private Hand hand;
     private textTheSpire.Map map;
@@ -167,6 +171,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         conspire = Loader.isModLoaded("conspire");
         shopMod = Loader.isModLoaded("ShopMod");
         downfall = Loader.isModLoaded("downfall");
+        thorton = Loader.isModLoaded("thorton");
+        relicStats = Loader.isModLoaded("RelicStats");
 
         Thread ui = new Thread(() -> {
             Display display = new Display();
@@ -1547,6 +1553,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         StringBuilder s = new StringBuilder("\r\n");
 
         s.append("Current Version : v" + VERSION + "\r\n");
+        s.append("v1.20\r\nAdded support for The Thorton. Business Cards, Investments, and Run info are displayed in the Player Window.\r\n" +
+                "Added support for RelicStats.\r\n");
         s.append("v1.19\r\nFixed an issue where Choices did not list embark in character select if ascension mode isn't unlocked.\r\n" +
                 "Cleaned up the help menu and moved it to a json file to accommodate potential translations.\r\n");
         s.append("v1.18\r\nFixed some bugs in Downfall's support.\r\n" +
@@ -1778,6 +1786,12 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s.append("Unknown : Unknown cards transform into a random card from any class during combat.\r\nThe pool of cards selected from can have limitations added.\r\n");
             s.append("Muddle : Randomize a card's cost between 0 and 3.\r\n");
             s.append("Snekproof : Unaffected by Muddle or Confusion.\r\n");
+        }
+        if(thorton){
+            s.append("Thorton\r\n");
+            s.append("Character mod that adds The Thorton.\r\n");
+            s.append("New Keywords:\r\n");
+            s.append("Run : After playing a certain number of Run cards you win the combat with full rewards.\r\nThe number of times you need to play Run cards is listed in the Player window and increases each combat you win by running.\r\n");
         }
         return s.toString();
     }
@@ -2314,6 +2328,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
 
     }
 
+    @SuppressWarnings("unchecked")
     public static String inspectRelic(AbstractRelic r){
 
         String s = "\r\n";
@@ -2325,6 +2340,13 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         s += r.tier.name() + "\r\n";
         s += "Charges " + r.counter + "\r\n";
         s += Choices.stripColor(r.description) + "\r\n";
+
+        if(relicStats){
+            HashMap<String, HasCustomStats> stats = (HashMap<String, HasCustomStats>)basemod.ReflectionHacks.getPrivateStatic(RelicStats.class, "statsInfoHashMap");
+            if(stats.containsKey(r.relicId)){
+                s += stats.get(r.relicId).getStatsDescription();
+            }
+        }
 
         return s;
 
@@ -2462,6 +2484,9 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
             s = s.replaceAll("guardianmod:", "");
             s = s.replaceAll("hexamod:", "");
             s = s.replaceAll("sneckomod:", "");
+        }
+        if(thorton){
+            s = s.replace("thethorton:", "");
         }
 
         return s;
