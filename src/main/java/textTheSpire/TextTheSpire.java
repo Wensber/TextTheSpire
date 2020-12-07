@@ -102,7 +102,7 @@ import org.json.simple.parser.*;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
-    public final static String VERSION = "1.20";
+    public final static String VERSION = "1.21";
 
     //Used to only update display every number of update cycles
     int iter;
@@ -1555,6 +1555,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         StringBuilder s = new StringBuilder("\r\n");
 
         s.append("Current Version : v" + VERSION + "\r\n");
+        s.append("v1.21\r\nFixed victory and death screen crash introduced with new Slay the Spire version.\r\nUnable to reproduce abandon crash.\r\n");
         s.append("v1.20\r\nAdded support for The Thorton. Business Cards, Investments, and Run info are displayed in the Player Window.\r\n" +
                 "Added support for RelicStats.\r\n");
         s.append("v1.19\r\nFixed an issue where Choices did not list embark in character select if ascension mode isn't unlocked.\r\n" +

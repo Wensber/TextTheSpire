@@ -5,7 +5,7 @@
 
     <groupId>textthespire</groupId>
     <artifactId>TextTheSpire</artifactId>
-    <version>1.20</version>
+    <version>1.21</version>
     <packaging>jar</packaging>
     <name>TextTheSpire</name>
     <description>Screen Reader Assistance. Requires CommunicationMod.</description>
