@@ -13,6 +13,7 @@ import com.megacrit.cardcrawl.monsters.AbstractMonster;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rooms.AbstractRoom;
 import com.megacrit.cardcrawl.screens.DeathScreen;
+import com.megacrit.cardcrawl.screens.GameOverScreen;
 import com.megacrit.cardcrawl.screens.GameOverStat;
 import com.megacrit.cardcrawl.screens.VictoryScreen;
 import com.megacrit.cardcrawl.screens.leaderboards.LeaderboardEntry;
@@ -49,7 +50,7 @@ public class Event extends AbstractWindow{
 
         if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
             s.append("Death\r\nScore ").append(DeathScreen.calcScore(false)).append("\r\n");
-            for(GameOverStat g : AbstractDungeon.deathScreen.stats){
+            for(GameOverStat g : ((ArrayList<GameOverStat>)ReflectionHacks.getPrivate(AbstractDungeon.deathScreen, GameOverScreen.class, "stats"))){
                 if(g.label != null){
                     s.append(g.label).append(": ").append(g.value);
                     if(g.description != null){
@@ -59,8 +60,10 @@ public class Event extends AbstractWindow{
                 }
             }
 
-            if(AbstractDungeon.deathScreen.unlockBundle != null){
-                for(AbstractUnlock u : AbstractDungeon.deathScreen.unlockBundle){
+            ArrayList<AbstractUnlock> unlockBundle = ((ArrayList<AbstractUnlock>)ReflectionHacks.getPrivate(AbstractDungeon.deathScreen, GameOverScreen.class, "unlockBundle"));
+
+            if(unlockBundle != null){
+                for(AbstractUnlock u : unlockBundle){
                     switch (u.type){
                         case CARD:
                             s.append("Unlock Card ").append(TextTheSpire.inspectCard(u.card)).append("\r\n");
@@ -77,7 +80,7 @@ public class Event extends AbstractWindow{
         if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
             s.append("Victory\r\nScore").append(VictoryScreen.calcScore(true)).append("\r\n");
 
-            for(GameOverStat g : AbstractDungeon.victoryScreen.stats){
+            for(GameOverStat g : ((ArrayList<GameOverStat>)ReflectionHacks.getPrivate(AbstractDungeon.victoryScreen, GameOverScreen.class, "stats"))){
                 if(g.label != null){
                     s.append(g.label).append(": ").append(g.value);
                     if(g.description != null){
@@ -87,8 +90,10 @@ public class Event extends AbstractWindow{
                 }
             }
 
-            if(AbstractDungeon.victoryScreen.unlockBundle != null){
-                for(AbstractUnlock u : AbstractDungeon.victoryScreen.unlockBundle){
+            ArrayList<AbstractUnlock> unlockBundle = ((ArrayList<AbstractUnlock>)ReflectionHacks.getPrivate(AbstractDungeon.victoryScreen, GameOverScreen.class, "unlockBundle"));
+
+            if(unlockBundle != null){
+                for(AbstractUnlock u : unlockBundle){
                     switch (u.type){
                         case CARD:
                             s.append("Unlock Card ").append(TextTheSpire.inspectCard(u.card)).append("\r\n");

@@ -41,6 +41,8 @@ import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.rewards.RewardItem;
 import com.megacrit.cardcrawl.rewards.chests.AbstractChest;
 import com.megacrit.cardcrawl.rooms.*;
+import com.megacrit.cardcrawl.screens.DeathScreen;
+import com.megacrit.cardcrawl.screens.GameOverScreen;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterOption;
 import com.megacrit.cardcrawl.screens.charSelect.CharacterSelectScreen;
 import com.megacrit.cardcrawl.screens.custom.CustomMod;
@@ -1115,11 +1117,11 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         if (ChoiceScreenUtils.isConfirmButtonAvailable() && input.equals(ChoiceScreenUtils.getConfirmButtonText())) {
 
             if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.DEATH){
-                AbstractDungeon.deathScreen.returnButton.hb.clicked = true;
+                ((ReturnToMenuButton)ReflectionHacks.getPrivate(AbstractDungeon.deathScreen, GameOverScreen.class, "returnButton")).hb.clicked = true;
                 return;
             }
             if(AbstractDungeon.screen == AbstractDungeon.CurrentScreen.VICTORY){
-                AbstractDungeon.victoryScreen.returnButton.hb.clicked = true;
+                ((ReturnToMenuButton)ReflectionHacks.getPrivate(AbstractDungeon.victoryScreen, GameOverScreen.class, "returnButton")).hb.clicked = true;
                 return;
             }
 
