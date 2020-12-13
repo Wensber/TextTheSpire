@@ -770,7 +770,16 @@ public class Choices extends AbstractWindow{
                     s.append(((i*-1)-1)).append(" : ").append(CharSelectScreenUI.ascScreen.negAscButtons.get(i).toggledOn).append("\r\n");
                 }
             }else if(CardCrawlGame.mainMenuScreen != null && (CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY || CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CUSTOM)){
-                s.append("embark\r\nback\r\n");
+                s.append("embark\r\nback\r\n" +
+                        "Explanation:\r\n" +
+                        "Use the Custom window to toggle custom mode options.\r\n" +
+                        "char [number] to toggle character\r\n" +
+                        "asc to toggle ascension\r\n" +
+                        "asc [number] to select ascension level\r\n" +
+                        "seed to open the seed panel. Go to main gain window, paste the seed, and hit enter.\r\n" +
+                        "mod [number] to toggle a custom modifier\r\n" +
+                        "mod i [number] to inspect what a custom modifer is\r\n" +
+                        "simple to display a simplified version of current settings to Output\r\n");
                 if(CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.DAILY){
                     long day = (long)basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.dailyScreen, DailyScreen.class, "currentDay");
                     s.append("Daily Leaderboard ").append(TimeHelper.getDate(day)).append("\r\n");
