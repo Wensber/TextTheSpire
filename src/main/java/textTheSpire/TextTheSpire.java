@@ -4,8 +4,15 @@ import ascensionMod.AscensionMod;
 import ascensionMod.UI.AscModScreen;
 import ascensionMod.UI.CharSelectScreenUI;
 import ascensionMod.UI.buttons.AscButton;
+import automaton.cardmods.EncodeAndShuffleMod;
+import automaton.cardmods.EncodeMod;
+import automaton.cards.AbstractBronzeCard;
+import basemod.CustomCharacterSelectScreen;
 import basemod.ReflectionHacks;
+import basemod.abstracts.AbstractCardModifier;
+import basemod.helpers.CardModifierManager;
 import basemod.interfaces.*;
+import champ.cards.AbstractChampCard;
 import charbosses.bosses.AbstractCharBoss;
 import com.badlogic.gdx.Gdx;
 import com.evacipated.cardcrawl.mod.stslib.fields.cards.AbstractCard.ExhaustiveField;
@@ -102,7 +109,7 @@ import org.json.simple.parser.*;
 @SpireInitializer
 public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, PostPowerApplySubscriber, OnCardUseSubscriber, PrePotionUseSubscriber, PostDrawSubscriber, PostExhaustSubscriber {
 
-    public final static String VERSION = "1.21";
+    public final static String VERSION = "1.22";
 
     //Used to only update display every number of update cycles
     int iter;
@@ -604,7 +611,8 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         }
 
         if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
-            for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
+            ArrayList<CharacterOption> options = CardCrawlGame.mainMenuScreen.charSelectScreen.options;
+            for(CharacterOption co : options){
                 if(input.equals(co.c.getClass().getSimpleName().toLowerCase())){
                     co.hb.clicked = true;
                     return;
@@ -621,6 +629,23 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     hb.clicked = true;
                     inspect.setText("\r\nGo to main game window, paste the seed, then hit enter.\r\n");
                     return;
+                }
+            }
+            if(CardCrawlGame.mainMenuScreen.charSelectScreen instanceof CustomCharacterSelectScreen){
+                if(input.equals("left")){
+                    int selectIndex = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "selectIndex");
+                    int maxSelectIndex = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "maxSelectIndex");
+                    if(selectIndex > maxSelectIndex){
+                        ReflectionHacks.setPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "selectIndex", selectIndex - 1);
+                        selectIndex--;
+                        int optionsIndex = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "optionsIndex");
+                        int optionsPerIndex = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "optionsPerIndex");
+                        ReflectionHacks.setPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "optionsIndex", optionsPerIndex*selectIndex);
+                        optionsIndex = optionsPerIndex*selectIndex;
+                    }
+                }
+                if(input.equals("right")){
+
                 }
             }
             boolean ready = (boolean) ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "anySelected");
@@ -1555,6 +1580,7 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
         StringBuilder s = new StringBuilder("\r\n");
 
         s.append("Current Version : v" + VERSION + "\r\n");
+        s.append("v1.22\r\nUpdated the support for Downfall to fix the character select issues and the card text for the characters Champ and Automaton.");
         s.append("v1.21\r\nFixed victory and death screen crash introduced with new Slay the Spire version.\r\nUnable to reproduce abandon crash.\r\n");
         s.append("v1.20\r\nAdded support for The Thorton. Business Cards, Investments, and Run info are displayed in the Player Window.\r\n" +
                 "Added support for RelicStats.\r\n");
@@ -2483,10 +2509,34 @@ public class TextTheSpire implements PostUpdateSubscriber, PreUpdateSubscriber, 
                     s = s.replace("!qqq!", "" + ((AbstractSneckoCard) c).baseSilly);
                 }
             }
+            if(c instanceof AbstractChampCard){
+                if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                    s = s.replace("!cool!","" + ((AbstractChampCard) c).cool);
+                }else {
+                    s = s.replace("!cool!", "" + ((AbstractChampCard) c).baseCool);
+                }
+            }
+            if(c instanceof AbstractBronzeCard){
+                for(AbstractCardModifier m : CardModifierManager.modifiers(c)){
+                    if(m instanceof EncodeMod){
+                        s = s + "\r\nEncode";
+                    }
+                    if(m instanceof EncodeAndShuffleMod){
+                        s = s + "\r\nEncode, then add a copy of this into your discard pile.";
+                    }
+                }
+                if(AbstractDungeon.getCurrRoom().phase == AbstractRoom.RoomPhase.COMBAT) {
+                    s = s.replace("!bauto!","" + ((AbstractBronzeCard) c).auto);
+                }else {
+                    s = s.replace("!bauto!", "" + ((AbstractBronzeCard) c).baseAuto);
+                }
+            }
             s = s.replaceAll("slimeboundmod:", "");
             s = s.replaceAll("guardianmod:", "");
             s = s.replaceAll("hexamod:", "");
             s = s.replaceAll("sneckomod:", "");
+            s = s.replaceAll("champ:", "");
+            s = s.replaceAll("bronze:", "");
         }
         if(thorton){
             s = s.replace("thethorton:", "");

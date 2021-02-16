@@ -3,6 +3,7 @@ package textTheSpire;
 import ascensionMod.AscensionMod;
 import ascensionMod.UI.AscModScreen;
 import ascensionMod.UI.CharSelectScreenUI;
+import basemod.CustomCharacterSelectScreen;
 import basemod.ReflectionHacks;
 import com.badlogic.gdx.Gdx;
 import com.megacrit.cardcrawl.cards.AbstractCard;
@@ -55,6 +56,7 @@ import replayTheSpire.patches.ReplayShopInitCardsPatch;
 import shopmod.relics.MerchantsRug;
 
 import javax.smartcardio.Card;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -130,6 +132,7 @@ public class Choices extends AbstractWindow{
         includeBosses = true;
     }
 
+    @SuppressWarnings("unchecked")
     public String getText(){
 
         if(window.shell.isDisposed()){
@@ -732,12 +735,20 @@ public class Choices extends AbstractWindow{
                     s.append("back\r\n");
                 }
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
+
+                ArrayList<CharacterOption> allOptions = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "allOptions");
+                if(CardCrawlGame.mainMenuScreen.charSelectScreen.options.size() != allOptions.size()){
+                    CardCrawlGame.mainMenuScreen.charSelectScreen.options = allOptions;
+                }
+
                 s.append("Input character name to select.\r\nasc to toggle ascension.\r\nasc [number] to set ascension level.\r\nIf that fails you can use + and - to manually change ascension level.\r\n");
                 s.append("back\r\n");
-                for(CharacterOption co : CardCrawlGame.mainMenuScreen.charSelectScreen.options){
+                ArrayList<CharacterOption> options = CardCrawlGame.mainMenuScreen.charSelectScreen.options;
+                for(CharacterOption co : options){
                     s.append(co.c.getClass().getSimpleName().toLowerCase());
-                    if(co.selected)
+                    if(co.selected) {
                         s.append(" Selected");
+                    }
                     s.append("\r\n");
                 }
                 SeedPanel sp = (SeedPanel) basemod.ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CharacterSelectScreen.class, "seedPanel");

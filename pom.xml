@@ -5,7 +5,7 @@
 
     <groupId>textthespire</groupId>
     <artifactId>TextTheSpire</artifactId>
-    <version>1.21</version>
+    <version>1.22</version>
     <packaging>jar</packaging>
     <name>TextTheSpire</name>
     <description>Screen Reader Assistance. Requires CommunicationMod.</description>
@@ -71,7 +71,7 @@
             <artifactId>CommunicationMod</artifactId>
             <version>${CommunicationMod.version}</version>
             <scope>system</scope>
-            <systemPath>${Steam.path}/common/SlayTheSpire/mods/CommunicationMod.jar</systemPath>
+            <systemPath>${Steam.path}/workshop/content/646570/2131373661/CommunicationMod.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.replay.cardcrawl</groupId>

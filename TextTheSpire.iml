@@ -49,7 +49,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.arbiter.cardcrawl:CommunicationMod:1.0.0">
         <CLASSES>
-          <root url="jar://C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/mods/CommunicationMod.jar!/" />
+          <root url="jar://C:/Program Files (x86)/Steam/steamapps/workshop/content/646570/2131373661/CommunicationMod.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
