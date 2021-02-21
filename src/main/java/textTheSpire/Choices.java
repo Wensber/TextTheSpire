@@ -736,9 +736,11 @@ public class Choices extends AbstractWindow{
                 }
             }else if(CardCrawlGame.mainMenuScreen != null && CardCrawlGame.mainMenuScreen.screen == MainMenuScreen.CurScreen.CHAR_SELECT){
 
-                ArrayList<CharacterOption> allOptions = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "allOptions");
-                if(CardCrawlGame.mainMenuScreen.charSelectScreen.options.size() != allOptions.size()){
-                    CardCrawlGame.mainMenuScreen.charSelectScreen.options = allOptions;
+                if(CardCrawlGame.mainMenuScreen.charSelectScreen instanceof CustomCharacterSelectScreen) {
+                    ArrayList<CharacterOption> allOptions = ReflectionHacks.getPrivate(CardCrawlGame.mainMenuScreen.charSelectScreen, CustomCharacterSelectScreen.class, "allOptions");
+                    if (CardCrawlGame.mainMenuScreen.charSelectScreen.options.size() != allOptions.size()) {
+                        CardCrawlGame.mainMenuScreen.charSelectScreen.options = allOptions;
+                    }
                 }
 
                 s.append("Input character name to select.\r\nasc to toggle ascension.\r\nasc [number] to set ascension level.\r\nIf that fails you can use + and - to manually change ascension level.\r\n");
